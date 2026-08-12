@@ -128,8 +128,9 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 ### Épica 1 — Landing y navegación
 - [🟡] **US-1.1**: Como usuario, veo una página de inicio con dos botones grandes
   ("Necesito alojamiento" / "Tengo alojamiento disponible") sin necesidad de login.
-  - *Criterios de aceptación*: carga en <2s en 3G simulada; texto en español;
-    accesible desde móvil (responsive, botones táctiles ≥44px).
+  - *Criterios de aceptación*: texto en español; accesible desde móvil (responsive,
+    botones táctiles ≥44px); los botones deben comunicar claramente si abren el feed
+    o el formulario de publicación.
 - [✅] **US-1.2**: Como usuario, puedo navegar al feed de publicaciones desde cualquier
   página vía un enlace persistente en el header.
 - [✅] **US-1.3**: Como usuario, veo un enlace visible a la política de datos
@@ -212,6 +213,16 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 - [⬜] **US-8.2**: Como mantenedor, tengo un ambiente de *preview* (rama `staging`
   o PR preview) para probar cambios antes de producción, apuntando al
   ambiente de staging de la API (coordinado con el repo de infraestructura).
+
+### Épica 9 — Rendimiento y optimización de carga (fase 2)
+- [⬜] **PERF-1**: Como usuario, la página de inicio y el feed cargan de forma
+  rápida y con un tiempo de interacción inicial que se percibe como ágil en
+  conexiones limitadas.
+- [⬜] **PERF-2**: Como mantenedor, el bundle inicial y los recursos críticos del
+  hero/feed se optimizan para reducir peso innecesario sin comprometer claridad
+  visual ni usabilidad.
+- [⬜] **PERF-3**: Como equipo, se registran métricas de rendimiento básicas y se
+  definen hipótesis de mejora antes de introducir cambios complejos.
 
 ---
 

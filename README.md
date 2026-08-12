@@ -15,6 +15,56 @@ React / Next.js 14 Web Application for **Alojamiento Solidario Colombia** (`webs
 
 ---
 
+## 🌍 Environment Execution Guide
+
+### 1. LOCAL Environment (Offline / Development)
+
+#### Option A: Built-in Mock Server (Zero Setup)
+Runs Next.js frontend with emergency local fallback data & browser `localStorage` PIN resolution:
+```bash
+cd website-proyecto-colombia
+npm run dev
+```
+Open **`http://localhost:3000`** in your browser.
+
+#### Option B: Full Local Stack (Frontend + Local Lambda API)
+Terminal 1 (Local Lambda Server):
+```bash
+npm run dev:api
+```
+Terminal 2 (Frontend with Local API Endpoint):
+```bash
+NEXT_PUBLIC_API_URL="http://localhost:4000/api/listings" npm run dev
+```
+
+---
+
+### 2. DEV Environment (AWS Development Sandbox)
+
+To build or preview the website against your AWS **DEV** infrastructure stack (`dev.alojamientosolidario.co`):
+
+```bash
+NEXT_PUBLIC_API_URL="https://dev-api.alojamientosolidario.co/api/listings" npm run dev
+```
+
+To compile static HTML bundle targeting **DEV**:
+```bash
+NEXT_PUBLIC_API_URL="https://dev-api.alojamientosolidario.co/api/listings" npm run build
+```
+
+---
+
+### 3. PROD Environment (AWS Production)
+
+To compile the production static HTML bundle targeting **PROD** (`alojamientosolidario.co`):
+
+```bash
+NEXT_PUBLIC_API_URL="https://api.alojamientosolidario.co/api/listings" npm run build
+```
+Static bundle will be output to `out/` ready for upload to S3 web bucket `proyecto-colombia-prod-web-hosting`.
+
+---
+
 ## 🛠️ Tech Stack & Prerequisites
 
 - **Framework**: Next.js 14 React Framework (`output: 'export'`)
@@ -23,24 +73,3 @@ React / Next.js 14 Web Application for **Alojamiento Solidario Colombia** (`webs
 - **Icons**: Lucide React
 - **Uploads**: Direct browser-to-S3 photo uploads via pre-signed URLs (up to 3 photos per listing)
 - **Security**: Cloudflare Turnstile CAPTCHA + Hidden Honeypot trap (`b_hp_fax`)
-
----
-
-## 🚀 Local Development
-
-### 1. Install Dependencies
-```bash
-cd website-proyecto-colombia
-npm install
-```
-
-### 2. Run Local Development Server
-```bash
-npm run dev
-```
-
-### 3. Build Static HTML Export
-```bash
-npm run build
-```
-Output static files will be compiled into `out/` for deployment to AWS S3 + CloudFront.

@@ -6,7 +6,7 @@ React / Next.js 14 Web Application for **Alojamiento Solidario Colombia** (`webs
 
 ## ⚡ Agile Epics & User Stories Implemented
 
-- **Épica 1 (Landing y Navegación)**: US-1.1 (2 large touch-friendly $\ge 44\text{px}$ CTA buttons: "Necesito Alojamiento" / "Tengo Alojamiento", <2s load on 3G) & US-1.2 (persistent header navigation).
+- **Épica 1 (Landing y Navegación)**: US-1.1 (hero con dos CTA claramente distintos: uno abre el feed para ver alojamientos disponibles y otro abre el formulario de publicación) & US-1.2 (persistent header navigation).
 - **Épica 2 (Publicar Oferta "Tengo")**: US-2.1 (<60s publication form with E.164 +57 WhatsApp validation, Ley 1581 Habeas Data consent) & US-2.2 (WhatsApp share modal).
 - **Épica 3 (Publicar Solicitud "Necesito")**: US-3.1 (Symmetrical <60s request form).
 - **Épica 4 (Feed y Búsqueda)**: US-4.1 & US-4.2 (Feed sorted newest first, filters for highlighted cities Pereira/Cali/Quibdó/Manizales/Armenia, free-text barrio, and price range including "$0 / Gratis").

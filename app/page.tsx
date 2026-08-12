@@ -47,11 +47,13 @@ export default function Home() {
     setIsPublishOpen(true);
   };
 
-  const handleSelectHeroTipo = (tipo: ListingType) => {
-    // Also filter the feed to match selected choice or open publish modal
-    setFilters((prev) => ({ ...prev, tipo }));
-    handleOpenPublish(tipo);
-  };
+  const handleOpenFeed = useCallback(() => {
+    setFilters((prev) => ({ ...prev, tipo: 'ofrezco' }));
+
+    requestAnimationFrame(() => {
+      document.getElementById('feed')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
 
   const handleFilterChange = (updated: Partial<FilterState>) => {
     setFilters((prev) => ({ ...prev, ...updated }));
@@ -80,8 +82,8 @@ export default function Home() {
         {/* Header / Navbar (US-1.2) */}
         <Navbar onOpenPublish={handleOpenPublish} />
 
-        {/* Main Hero Section (US-1.1: 2 large buttons <2s load) */}
-        <HeroButtons onSelectTipo={handleSelectHeroTipo} />
+        {/* Main Hero Section (US-1.1: two clearly different actions) */}
+        <HeroButtons onOpenFeed={handleOpenFeed} onOpenPublish={handleOpenPublish} />
 
         {/* Listings Feed Section */}
         <main id="feed" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">

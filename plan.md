@@ -126,11 +126,11 @@ Formato para que los agentes generen issues/PRs automáticamente.
 Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubierto, [⬜] no iniciado.
 
 ### Épica 1 — Landing y navegación
-- [🟡] **US-1.1**: Como usuario, veo una página de inicio con dos botones grandes
+- [✅] **US-1.1**: Como usuario, veo una página de inicio con dos botones grandes
   ("Necesito alojamiento" / "Tengo alojamiento disponible") sin necesidad de login.
   - *Criterios de aceptación*: texto en español; accesible desde móvil (responsive,
-    botones táctiles ≥44px); los botones deben comunicar claramente si abren el feed
-    o el formulario de publicación.
+    botones táctiles ≥44px); los botones comunican claramente si abren el feed o el
+    formulario de publicación.
 - [✅] **US-1.2**: Como usuario, puedo navegar al feed de publicaciones desde cualquier
   página vía un enlace persistente en el header.
 - [✅] **US-1.3**: Como usuario, veo un enlace visible a la política de datos

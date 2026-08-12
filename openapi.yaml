@@ -1,0 +1,281 @@
+openapi: 3.0.3
+info:
+  title: Alojamiento Solidario Colombia API
+  version: 1.0.0
+  description: Minimal contract derived from the frontend fetch calls and TypeScript models in this repository.
+servers:
+  - url: https://api.alojamientosolidario.co/api
+paths:
+  /listings:
+    get:
+      tags:
+        - listings
+      summary: List active listings
+      operationId: listListings
+      parameters:
+        - in: query
+          name: ciudad
+          schema:
+            type: string
+        - in: query
+          name: tipo
+          schema:
+            type: string
+        - in: query
+          name: barrio
+          schema:
+            type: string
+        - in: query
+          name: maxPrecio
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Listings response envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Listing'
+    post:
+      tags:
+        - listings
+      summary: Create a listing
+      operationId: createListing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListingInput'
+      responses:
+        '200':
+          description: Created listing response.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - listing
+                properties:
+                  listing:
+                    $ref: '#/components/schemas/Listing'
+                  error:
+                    type: string
+  /listings/upload-url:
+    post:
+      tags:
+        - listings
+      summary: Request a pre-signed upload URL
+      operationId: requestUploadUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contentType
+              properties:
+                contentType:
+                  type: string
+      responses:
+        '200':
+          description: Upload URL payload.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - uploadUrl
+                  - fileUrl
+                properties:
+                  uploadUrl:
+                    type: string
+                  fileUrl:
+                    type: string
+                  error:
+                    type: string
+  /listings/report:
+    post:
+      tags:
+        - listings
+      summary: Report a listing
+      operationId: reportListing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: string
+      responses:
+        '200':
+          description: Report acknowledged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /listings/resolve:
+    post:
+      tags:
+        - listings
+      summary: Resolve a listing with a PIN
+      operationId: resolveListing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - pin
+              properties:
+                id:
+                  type: string
+                pin:
+                  type: string
+      responses:
+        '200':
+          description: Resolution acknowledged.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+components:
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        error:
+          type: string
+    Listing:
+      type: object
+      required:
+        - id
+        - tipo
+        - ciudad
+        - barrio
+        - personas
+        - fechaDesde
+        - precio
+        - descripcion
+        - whatsapp
+        - creadoEn
+        - estado
+        - reportes
+      properties:
+        id:
+          type: string
+        tipo:
+          type: string
+          enum:
+            - ofrece
+            - necesito
+        ciudad:
+          type: string
+        barrio:
+          type: string
+        personas:
+          type: integer
+          minimum: 1
+        fechaDesde:
+          type: string
+          format: date
+        fechaHasta:
+          type: string
+          format: date
+          nullable: true
+        precio:
+          type: integer
+          minimum: 0
+        descripcion:
+          type: string
+        whatsapp:
+          type: string
+          pattern: '^\\+573[0-9]{9}$'
+        imagenes:
+          type: array
+          items:
+            type: string
+        pin:
+          type: string
+        creadoEn:
+          type: integer
+          format: int64
+        estado:
+          type: string
+          enum:
+            - activo
+            - resuelto
+            - reportado
+            - eliminado
+        reportes:
+          type: integer
+          minimum: 0
+    CreateListingInput:
+      type: object
+      required:
+        - tipo
+        - ciudad
+        - barrio
+        - personas
+        - fechaDesde
+        - precio
+        - descripcion
+        - whatsapp
+        - imagenes
+        - habeasData
+      properties:
+        tipo:
+          type: string
+          enum:
+            - ofrece
+            - necesito
+        ciudad:
+          type: string
+        barrio:
+          type: string
+        personas:
+          type: integer
+          minimum: 1
+        fechaDesde:
+          type: string
+          format: date
+        fechaHasta:
+          type: string
+          format: date
+          nullable: true
+        precio:
+          type: integer
+          minimum: 0
+        descripcion:
+          type: string
+        whatsapp:
+          type: string
+          pattern: '^\\+573[0-9]{9}$'
+        imagenes:
+          type: array
+          items:
+            type: string
+        habeasData:
+          type: boolean
+        b_hp_fax:
+          type: string
+        turnstileToken:
+          type: string

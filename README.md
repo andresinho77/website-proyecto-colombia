@@ -17,7 +17,7 @@ React / Next.js 14 Web Application for **Alojamiento Solidario Colombia** (`webs
 
 ## 🌍 Environment Execution Guide
 
-### 1. LOCAL Environment (Offline / Development)
+### 1. LOCAL Environment (Offline / LocalStack)
 
 #### Option A: Built-in Mock Server (Zero Setup)
 Runs Next.js frontend with emergency local fallback data & browser `localStorage` PIN resolution:
@@ -27,27 +27,40 @@ npm run dev
 ```
 Open **`http://localhost:3000`** in your browser.
 
-#### Option B: Full Local Stack (Frontend + Local Lambda API)
-Terminal 1 (Local Lambda Server):
+#### Option B: Local API Server (Zero Docker)
+Terminal 1 (Local Serverless API):
 ```bash
 npm run dev:api
 ```
-Terminal 2 (Frontend with Local API Endpoint):
+Terminal 2 (Frontend connected to Local API):
 ```bash
 NEXT_PUBLIC_API_URL="http://localhost:4000/api/listings" npm run dev
 ```
 
 ---
 
-### 2. DEV Environment (AWS Development Sandbox)
+### 2. DEV Environment (Wired to Deployed Infrastructure / LocalStack)
 
-To build or preview the website against your AWS **DEV** infrastructure stack (`dev.alojamientosolidario.co`):
+To connect the React website to your deployed API Gateway endpoint (from LocalStack or AWS Sandbox):
 
+#### Step 1: Get Deployed API Gateway Endpoint
+Run `terraform output api_gateway_endpoint` inside `infra-proyecto-colombia`:
 ```bash
-NEXT_PUBLIC_API_URL="https://dev-api.alojamientosolidario.co/api/listings" npm run dev
+cd infra-proyecto-colombia
+terraform output api_gateway_endpoint
 ```
 
-To compile static HTML bundle targeting **DEV**:
+#### Step 2: Run Website in DEV Mode
+Pass the `api_gateway_endpoint` to the Next.js dev server:
+```bash
+cd website-proyecto-colombia
+
+# Example with LocalStack / AWS Dev endpoint:
+NEXT_PUBLIC_API_URL="https://nvlknrj2k9.execute-api.us-east-1.amazonaws.com/api/listings" npm run dev
+```
+Open **`http://localhost:3000`** (or `http://localhost:3001`).
+
+#### Step 3: Build Static HTML Bundle for DEV
 ```bash
 NEXT_PUBLIC_API_URL="https://dev-api.alojamientosolidario.co/api/listings" npm run build
 ```
@@ -61,7 +74,7 @@ To compile the production static HTML bundle targeting **PROD** (`alojamientosol
 ```bash
 NEXT_PUBLIC_API_URL="https://api.alojamientosolidario.co/api/listings" npm run build
 ```
-Static bundle will be output to `out/` ready for upload to S3 web bucket `proyecto-colombia-prod-web-hosting`.
+Static bundle will be output to `out/` ready for sync to S3 web bucket `proyecto-colombia-prod-web-hosting`.
 
 ---
 

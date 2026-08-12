@@ -123,76 +123,78 @@ Consideraciones de datos sensibles (ver también sección 7 — Política de Dat
 
 Formato para que los agentes generen issues/PRs automáticamente.
 
+Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubierto, [⬜] no iniciado.
+
 ### Épica 1 — Landing y navegación
-- **US-1.1**: Como usuario, veo una página de inicio con dos botones grandes
+- [🟡] **US-1.1**: Como usuario, veo una página de inicio con dos botones grandes
   ("Necesito alojamiento" / "Tengo alojamiento disponible") sin necesidad de login.
   - *Criterios de aceptación*: carga en <2s en 3G simulada; texto en español;
     accesible desde móvil (responsive, botones táctiles ≥44px).
-- **US-1.2**: Como usuario, puedo navegar al feed de publicaciones desde cualquier
+- [✅] **US-1.2**: Como usuario, puedo navegar al feed de publicaciones desde cualquier
   página vía un enlace persistente en el header.
-- **US-1.3**: Como usuario, veo un enlace visible a la política de datos
+- [✅] **US-1.3**: Como usuario, veo un enlace visible a la política de datos
   (`privacidad.html`) desde el footer de cualquier página.
 
 ### Épica 2 — Publicar oferta ("Tengo")
-- **US-2.1**: Como usuario con espacio disponible, completo un formulario corto
+- [✅] **US-2.1**: Como usuario con espacio disponible, completo un formulario corto
   (ciudad, barrio, personas, fechas, precio o gratis, descripción, WhatsApp) y
   publico en menos de 60 segundos.
   - *Criterios*: validación de campos obligatorios; número de WhatsApp validado
     con formato colombiano (+57); confirmación visual tras publicar; checkbox
     de aceptación de la política de datos antes de enviar (ver US-7.4).
-- **US-2.2**: Tras publicar, veo un botón "Compartir por WhatsApp" que abre un
+- [✅] **US-2.2**: Tras publicar, veo un botón "Compartir por WhatsApp" que abre un
   mensaje prellenado con el enlace a mi publicación.
 
 ### Épica 3 — Publicar solicitud ("Necesito")
-- **US-3.1**: Como usuario que necesita alojamiento, completo el mismo tipo de
+- [✅] **US-3.1**: Como usuario que necesita alojamiento, completo el mismo tipo de
   formulario (espejo del de oferta) indicando qué busco.
   - *Criterios*: mismos campos y validaciones que US-2.1.
 
 ### Épica 4 — Feed y búsqueda
-- **US-4.1**: Como usuario, veo un listado de publicaciones activas, más
+- [🟡] **US-4.1**: Como usuario, veo un listado de publicaciones activas, más
   recientes primero, filtrable por ciudad y tipo (ofrezco/necesito).
   - *Criterios*: filtro por ciudad con Pereira y Cali destacados por defecto;
     cada tarjeta muestra barrio, personas, fechas, precio y botón de WhatsApp;
     el número de WhatsApp completo no se expone en el HTML crudo salvo dentro
     del enlace `wa.me` (evitar scraping trivial de teléfonos).
-- **US-4.2**: Como usuario, puedo filtrar además por barrio (texto libre) y por
+- [✅] **US-4.2**: Como usuario, puedo filtrar además por barrio (texto libre) y por
   rango de precio (incluyendo "gratis").
-- **US-4.3 (fase 2)**: Vista de mapa con pines por barrio.
+- [⬜] **US-4.3 (fase 2)**: Vista de mapa con pines por barrio.
 
 ### Épica 5 — Contacto
-- **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un
+- [✅] **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un
   chat directo (`wa.me`) con un mensaje prellenado indicando referencia a la
   publicación específica.
 
 ### Épica 6 — Moderación y seguridad
-- **US-6.1**: Como usuario, puedo reportar una publicación sospechosa o
+- [🟡] **US-6.1**: Como usuario, puedo reportar una publicación sospechosa o
   resuelta con un botón visible en cada tarjeta.
   - *Criterios*: tras 3 reportes, el estado cambia automáticamente a
     "reportado" y desaparece del feed público hasta revisión.
-- **US-6.2**: Como administrador del proyecto, recibo un correo vía SES cuando
+- [🟡] **US-6.2**: Como administrador del proyecto, recibo un correo vía SES cuando
   una publicación alcanza el umbral de reportes, para revisarla en <24h.
-- **US-6.3**: Cada publicación tiene un botón "Marcar como resuelta" para que el
+- [✅] **US-6.3**: Cada publicación tiene un botón "Marcar como resuelta" para que el
   propio autor la retire del feed activo.
-- **US-6.4**: Como administrador, recibo un resumen diario por SES con el
+- [⬜] **US-6.4**: Como administrador, recibo un resumen diario por SES con el
   número de publicaciones activas, resueltas y reportadas por ciudad.
 
 ### Épica 7 — Política de datos y cumplimiento (Habeas Data)
-- **US-7.1**: Como usuario, puedo leer una política de datos clara en
+- [🟡] **US-7.1**: Como usuario, puedo leer una política de datos clara en
   `privacidad.html` que explica: qué datos se recolectan (barrio, número de
   WhatsApp, fechas, descripción), para qué se usan (únicamente conectar
   oferta/demanda de alojamiento), cuánto tiempo se conservan, y cómo solicitar
   su eliminación.
   - *Criterios*: lenguaje simple, no jurídico-denso; referencia explícita a la
     Ley 1581 de 2012 y el Decreto 1377 de 2013 (Habeas Data - Colombia).
-- **US-7.2**: Como administrador, tengo un proceso documentado (`docs/DATA_POLICY.md`)
+- [⬜] **US-7.2**: Como administrador, tengo un proceso documentado (`docs/DATA_POLICY.md`)
   para atender solicitudes de eliminación de datos personales, incluyendo un
   canal de contacto (correo o formulario) y un tiempo de respuesta comprometido.
-- **US-7.3**: Como sistema, las publicaciones con `estado = eliminado` o
+- [⬜] **US-7.3**: Como sistema, las publicaciones con `estado = eliminado` o
   vencidas (ver retención abajo) deben purgarse o anonimizarse de forma
   efectiva en la base de datos, no solo ocultarse del feed — esto debe
   coordinarse con el repo de infraestructura como un job programado (p. ej.
   Lambda con EventBridge) o un proceso documentado que el arquitecto ejecute.
-- **US-7.4**: Como usuario, debo marcar explícitamente una casilla de
+- [✅] **US-7.4**: Como usuario, debo marcar explícitamente una casilla de
   aceptación de la política de datos antes de poder enviar cualquier
   formulario ("Tengo" o "Necesito").
 
@@ -205,9 +207,9 @@ Formato para que los agentes generen issues/PRs automáticamente.
 - Solicitudes de eliminación manual: procesar en un máximo de 5 días hábiles.
 
 ### Épica 8 — Despliegue y CI/CD (frontend)
-- **US-8.1**: Como mantenedor, cada push a `main` en este repo despliega
+- [🟡] **US-8.1**: Como mantenedor, cada push a `main` en este repo despliega
   automáticamente el sitio a GitHub Pages vía GitHub Actions.
-- **US-8.2**: Como mantenedor, tengo un ambiente de *preview* (rama `staging`
+- [⬜] **US-8.2**: Como mantenedor, tengo un ambiente de *preview* (rama `staging`
   o PR preview) para probar cambios antes de producción, apuntando al
   ambiente de staging de la API (coordinado con el repo de infraestructura).
 

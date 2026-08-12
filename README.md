@@ -78,6 +78,26 @@ Static bundle will be output to `out/` ready for sync to S3 web bucket `proyecto
 
 ---
 
+## 🧪 Testing Strategy
+
+This project now supports both unit and end-to-end testing:
+
+- **Unit tests** with Vitest + Testing Library for component behavior such as hero CTA routing and modal interactions.
+- **E2E tests** with Playwright for critical flows such as opening the homepage, using the hero actions, and reaching the publish experience.
+
+### Run tests locally
+```bash
+npm run test
+npm run test:e2e
+```
+
+### Suggested first coverage
+- Hero CTA behavior on the landing page
+- Publish modal opening and validation
+- Feed filtering and listing visibility
+
+---
+
 ## 🛠️ Tech Stack & Prerequisites
 
 - **Framework**: Next.js 14 React Framework (`output: 'export'`)

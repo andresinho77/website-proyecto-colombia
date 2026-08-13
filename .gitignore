@@ -11,3 +11,12 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+
+# OpenWolf Local Runtime Data (Ignore transient session state & logs)
+.wolf/_scan-state.json
+.wolf/token-ledger.json
+.wolf/buglog.json
+.wolf/cron-state.json
+.wolf/memory.md
+.wolf/STATUS.md
+.codex/

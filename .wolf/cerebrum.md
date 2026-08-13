@@ -21,6 +21,7 @@
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
 <!-- Format: [YYYY-MM-DD] Description of what went wrong and what to do instead. -->
 - [2026-08-13] No usar `openwolf scan --check` directo en CI para `anatomy.md` porque siempre deriva por `Last scanned`. Normalizar/ignorar ese campo y alertar solo cuando haya drift estructural real.
+- [2026-08-13] Evitar `concurrency.group` global para CI+deploy de Pages; usar grupo por ref para CI y grupo dedicado para deploy a `main` para evitar cancelaciones cruzadas.
 
 ## Decision Log
 

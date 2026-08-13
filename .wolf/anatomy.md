@@ -1,11 +1,11 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-08-13T08:09:07.991Z
-> Files: 67 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-08-13T08:27:54.320Z
+> Files: 63 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
-- `.gitignore` — Git ignore rules (~45 tok)
+- `.gitignore` — Git ignore rules (~98 tok)
 - `AGENTS.md` — OpenWolf (~68 tok)
 - `CLAUDE.md` — OpenWolf (~57 tok)
 - `GEMINI.md` — OpenWolf (~68 tok)
@@ -30,16 +30,6 @@
 ## .claude/rules/
 
 - `openwolf.md` (~328 tok)
-
-## .codex/
-
-- `config.toml` (~7 tok)
-- `hooks.json` (~743 tok)
-
-## .codex/prompts/
-
-- `reframe.md` — Mode: migrate [framework] (~551 tok)
-- `security-audit.md` — Layer 1 — Dependencies (~510 tok)
 
 ## .github/workflows/
 

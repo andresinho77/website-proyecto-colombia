@@ -1,12 +1,12 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-08-13T08:27:54.320Z",
-    "fileCount": 63,
+    "lastScanned": "2026-08-13T11:09:46.823Z",
+    "fileCount": 41,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "2b7c1dbeb06f5f3cafcc199297437f60356edf49c463420575064681ac04a9a2",
-    "storeUpdatedAt": "2026-08-13T08:27:54.321Z"
+    "renderedHash": "a4ceea0d9a1247a29e9b45ff5539e251ca8f083de036fdd1051959e2d9b236b6",
+    "storeUpdatedAt": "2026-08-13T11:09:46.824Z"
   },
   "files": {
     ".claude/commands/reframe.md": {
@@ -14,8 +14,8 @@
       "tokens": 551,
       "hash": "17a75695be5d4629",
       "size": 2221,
-      "mtimeMs": 1786608517086.4436,
-      "updatedAt": "2026-08-13T08:27:54.297Z",
+      "mtimeMs": 1786613561175.0857,
+      "updatedAt": "2026-08-13T11:09:46.805Z",
       "source": "scan"
     },
     ".claude/commands/security-audit.md": {
@@ -23,8 +23,8 @@
       "tokens": 510,
       "hash": "e6f7e0b7337c9c86",
       "size": 2060,
-      "mtimeMs": 1786608517084.845,
-      "updatedAt": "2026-08-13T08:27:54.297Z",
+      "mtimeMs": 1786613561175.4033,
+      "updatedAt": "2026-08-13T11:09:46.806Z",
       "source": "scan"
     },
     ".claude/rules/openwolf.md": {
@@ -32,8 +32,8 @@
       "tokens": 328,
       "hash": "6d735b2c1c54a916",
       "size": 1323,
-      "mtimeMs": 1786608517037.5208,
-      "updatedAt": "2026-08-13T08:27:54.298Z",
+      "mtimeMs": 1786613561175.625,
+      "updatedAt": "2026-08-13T11:09:46.806Z",
       "source": "scan"
     },
     ".claude/settings.json": {
@@ -41,17 +41,17 @@
       "tokens": 514,
       "hash": "f68759bb50af5ee4",
       "size": 1799,
-      "mtimeMs": 1786608517035.9958,
-      "updatedAt": "2026-08-13T08:27:54.298Z",
+      "mtimeMs": 1786613561175.7893,
+      "updatedAt": "2026-08-13T11:09:46.807Z",
       "source": "scan"
     },
     ".github/workflows/frontend-ci.yml": {
       "description": "CI: \"Frontend Next.js CI/CD Pipeline\"",
-      "tokens": 198,
-      "hash": "c436617e1e0ae924",
-      "size": 692,
-      "mtimeMs": 1786608199805.9648,
-      "updatedAt": "2026-08-13T08:27:54.298Z",
+      "tokens": 601,
+      "hash": "d92973fa1310d87c",
+      "size": 2103,
+      "mtimeMs": 1786619293715.8547,
+      "updatedAt": "2026-08-13T11:09:46.807Z",
       "source": "scan"
     },
     ".gitignore": {
@@ -59,8 +59,8 @@
       "tokens": 98,
       "hash": "c4804e72ffddf6d2",
       "size": 366,
-      "mtimeMs": 1786608760473.0564,
-      "updatedAt": "2026-08-13T08:27:54.298Z",
+      "mtimeMs": 1786614247804.351,
+      "updatedAt": "2026-08-13T11:09:46.808Z",
       "source": "scan"
     },
     "AGENTS.md": {
@@ -68,8 +68,8 @@
       "tokens": 68,
       "hash": "8c90778623bf50ac",
       "size": 271,
-      "mtimeMs": 1786608199810.058,
-      "updatedAt": "2026-08-13T08:27:54.299Z",
+      "mtimeMs": 1786614247806.9238,
+      "updatedAt": "2026-08-13T11:09:46.808Z",
       "source": "scan"
     },
     "app/admin/page.tsx": {
@@ -77,8 +77,8 @@
       "tokens": 2234,
       "hash": "85298e87c1aa9ee1",
       "size": 7823,
-      "mtimeMs": 1786554567398.7363,
-      "updatedAt": "2026-08-13T08:27:54.300Z",
+      "mtimeMs": 1786561685268.907,
+      "updatedAt": "2026-08-13T11:09:46.810Z",
       "source": "scan",
       "symbols": [
         {
@@ -95,8 +95,8 @@
       "tokens": 261,
       "hash": "ba45e599d838bcbd",
       "size": 915,
-      "mtimeMs": 1786554491411.1172,
-      "updatedAt": "2026-08-13T08:27:54.300Z",
+      "mtimeMs": 1786561685269.004,
+      "updatedAt": "2026-08-13T11:09:46.810Z",
       "source": "scan"
     },
     "app/layout.tsx": {
@@ -104,8 +104,8 @@
       "tokens": 238,
       "hash": "5e381d1b88e711e7",
       "size": 840,
-      "mtimeMs": 1786554554419.8013,
-      "updatedAt": "2026-08-13T08:27:54.300Z",
+      "mtimeMs": 1786561685269.0955,
+      "updatedAt": "2026-08-13T11:09:46.811Z",
       "source": "scan"
     },
     "app/page.tsx": {
@@ -113,8 +113,8 @@
       "tokens": 1342,
       "hash": "e3b210cfd02385ae",
       "size": 4698,
-      "mtimeMs": 1786607868428.5327,
-      "updatedAt": "2026-08-13T08:27:54.301Z",
+      "mtimeMs": 1786598883091.1487,
+      "updatedAt": "2026-08-13T11:09:46.811Z",
       "source": "scan",
       "symbols": [
         {
@@ -131,8 +131,8 @@
       "tokens": 1096,
       "hash": "127a34891de6af81",
       "size": 3849,
-      "mtimeMs": 1786554562741.473,
-      "updatedAt": "2026-08-13T08:27:54.301Z",
+      "mtimeMs": 1786561685269.4517,
+      "updatedAt": "2026-08-13T11:09:46.812Z",
       "source": "scan",
       "symbols": [
         {
@@ -149,8 +149,8 @@
       "tokens": 57,
       "hash": "b1ca356fa9d5f3a6",
       "size": 225,
-      "mtimeMs": 1786608199810.181,
-      "updatedAt": "2026-08-13T08:27:54.301Z",
+      "mtimeMs": 1786613561181.6885,
+      "updatedAt": "2026-08-13T11:09:46.812Z",
       "source": "scan"
     },
     "components/EmergencyBanner.tsx": {
@@ -158,8 +158,8 @@
       "tokens": 523,
       "hash": "6081af233dddb63d",
       "size": 1830,
-      "mtimeMs": 1786554510962.258,
-      "updatedAt": "2026-08-13T08:27:54.302Z",
+      "mtimeMs": 1786561685269.6006,
+      "updatedAt": "2026-08-13T11:09:46.812Z",
       "source": "scan"
     },
     "components/Footer.tsx": {
@@ -167,8 +167,8 @@
       "tokens": 650,
       "hash": "b7d77ff6595aa277",
       "size": 2282,
-      "mtimeMs": 1786554550907.9158,
-      "updatedAt": "2026-08-13T08:27:54.302Z",
+      "mtimeMs": 1786561685269.6963,
+      "updatedAt": "2026-08-13T11:09:46.813Z",
       "source": "scan",
       "symbols": [
         {
@@ -185,8 +185,8 @@
       "tokens": 1094,
       "hash": "fe419066fdd1e7f3",
       "size": 3843,
-      "mtimeMs": 1786607868429.0645,
-      "updatedAt": "2026-08-13T08:27:54.303Z",
+      "mtimeMs": 1786598883091.3364,
+      "updatedAt": "2026-08-13T11:09:46.813Z",
       "source": "scan",
       "symbols": [
         {
@@ -203,8 +203,8 @@
       "tokens": 1238,
       "hash": "d5b319e1ce788d20",
       "size": 4340,
-      "mtimeMs": 1786554533956.1128,
-      "updatedAt": "2026-08-13T08:27:54.303Z",
+      "mtimeMs": 1786561685270.0664,
+      "updatedAt": "2026-08-13T11:09:46.814Z",
       "source": "scan",
       "symbols": [
         {
@@ -221,8 +221,8 @@
       "tokens": 3359,
       "hash": "e4ae1b04b6139169",
       "size": 11768,
-      "mtimeMs": 1786554525222.3098,
-      "updatedAt": "2026-08-13T08:27:54.303Z",
+      "mtimeMs": 1786561685270.2788,
+      "updatedAt": "2026-08-13T11:09:46.814Z",
       "source": "scan",
       "symbols": [
         {
@@ -239,8 +239,8 @@
       "tokens": 762,
       "hash": "c4a63f81a768faa3",
       "size": 2671,
-      "mtimeMs": 1786554530163.1926,
-      "updatedAt": "2026-08-13T08:27:54.304Z",
+      "mtimeMs": 1786561685270.3838,
+      "updatedAt": "2026-08-13T11:09:46.815Z",
       "source": "scan",
       "symbols": [
         {
@@ -257,8 +257,8 @@
       "tokens": 854,
       "hash": "e2239c632fd67a8d",
       "size": 2993,
-      "mtimeMs": 1786554507873.025,
-      "updatedAt": "2026-08-13T08:27:54.304Z",
+      "mtimeMs": 1786561685270.4746,
+      "updatedAt": "2026-08-13T11:09:46.815Z",
       "source": "scan",
       "symbols": [
         {
@@ -275,8 +275,8 @@
       "tokens": 1068,
       "hash": "c8bf18403d515063",
       "size": 3748,
-      "mtimeMs": 1786554547708.259,
-      "updatedAt": "2026-08-13T08:27:54.304Z",
+      "mtimeMs": 1786561685270.5874,
+      "updatedAt": "2026-08-13T11:09:46.816Z",
       "source": "scan",
       "symbols": [
         {
@@ -293,8 +293,8 @@
       "tokens": 3766,
       "hash": "91acedbf3ecff6d9",
       "size": 13194,
-      "mtimeMs": 1786554540114.6414,
-      "updatedAt": "2026-08-13T08:27:54.304Z",
+      "mtimeMs": 1786561685270.7454,
+      "updatedAt": "2026-08-13T11:09:46.816Z",
       "source": "scan",
       "symbols": [
         {
@@ -311,8 +311,8 @@
       "tokens": 1642,
       "hash": "aaa1e7a17627787c",
       "size": 5756,
-      "mtimeMs": 1786554518853.8918,
-      "updatedAt": "2026-08-13T08:27:54.305Z",
+      "mtimeMs": 1786561685270.969,
+      "updatedAt": "2026-08-13T11:09:46.816Z",
       "source": "scan",
       "symbols": [
         {
@@ -329,8 +329,8 @@
       "tokens": 1057,
       "hash": "975e2209cf1ec83a",
       "size": 3715,
-      "mtimeMs": 1786554543938.735,
-      "updatedAt": "2026-08-13T08:27:54.305Z",
+      "mtimeMs": 1786561685271.0667,
+      "updatedAt": "2026-08-13T11:09:46.817Z",
       "source": "scan",
       "symbols": [
         {
@@ -342,13 +342,31 @@
         }
       ]
     },
+    "docs/DATA_POLICY.md": {
+      "description": "DATA_POLICY",
+      "tokens": 467,
+      "hash": "938468bc6019ae31",
+      "size": 1868,
+      "mtimeMs": 1786617537072.489,
+      "updatedAt": "2026-08-13T11:09:46.817Z",
+      "source": "scan"
+    },
+    "docs/SAFETY.md": {
+      "description": "SAFETY",
+      "tokens": 367,
+      "hash": "eb0a2361373c264b",
+      "size": 1468,
+      "mtimeMs": 1786617537072.5159,
+      "updatedAt": "2026-08-13T11:09:46.817Z",
+      "source": "scan"
+    },
     "GEMINI.md": {
       "description": "OpenWolf",
       "tokens": 68,
       "hash": "8c90778623bf50ac",
       "size": 271,
-      "mtimeMs": 1786608199810.2896,
-      "updatedAt": "2026-08-13T08:27:54.305Z",
+      "mtimeMs": 1786614247807.1152,
+      "updatedAt": "2026-08-13T11:09:46.817Z",
       "source": "scan"
     },
     "lib/api.ts": {
@@ -356,8 +374,8 @@
       "tokens": 2103,
       "hash": "32e5d9f804bebaca",
       "size": 7369,
-      "mtimeMs": 1786554504200.6934,
-      "updatedAt": "2026-08-13T08:27:54.306Z",
+      "mtimeMs": 1786561685271.3423,
+      "updatedAt": "2026-08-13T11:09:46.818Z",
       "source": "scan"
     },
     "lib/localStorage.ts": {
@@ -365,8 +383,8 @@
       "tokens": 343,
       "hash": "850d8f5b21f86668",
       "size": 1198,
-      "mtimeMs": 1786554497814.6687,
-      "updatedAt": "2026-08-13T08:27:54.306Z",
+      "mtimeMs": 1786561685271.4595,
+      "updatedAt": "2026-08-13T11:09:46.818Z",
       "source": "scan"
     },
     "lib/types.ts": {
@@ -374,8 +392,8 @@
       "tokens": 262,
       "hash": "bfee21d3155891b7",
       "size": 914,
-      "mtimeMs": 1786554494107.2566,
-      "updatedAt": "2026-08-13T08:27:54.306Z",
+      "mtimeMs": 1786561685271.5488,
+      "updatedAt": "2026-08-13T11:09:46.818Z",
       "source": "scan"
     },
     "next-env.d.ts": {
@@ -383,8 +401,8 @@
       "tokens": 66,
       "hash": "9dd9d642cdb87d4d",
       "size": 228,
-      "mtimeMs": 1786554616391.4258,
-      "updatedAt": "2026-08-13T08:27:54.307Z",
+      "mtimeMs": 1786561685271.6523,
+      "updatedAt": "2026-08-13T11:09:46.818Z",
       "source": "scan"
     },
     "next.config.mjs": {
@@ -392,242 +410,17 @@
       "tokens": 54,
       "hash": "ef3e74407190ab29",
       "size": 201,
-      "mtimeMs": 1786554478834.9368,
-      "updatedAt": "2026-08-13T08:27:54.307Z",
+      "mtimeMs": 1786561685271.756,
+      "updatedAt": "2026-08-13T11:09:46.819Z",
       "source": "scan"
     },
-    "out/_next/static/baZi6li9jM6LKKUqcsSIf/_buildManifest.js": {
-      "description": "",
-      "tokens": 64,
-      "hash": "5068b95c9845e2ef",
-      "size": 224,
-      "mtimeMs": 1786554621170.6707,
-      "updatedAt": "2026-08-13T08:27:54.308Z",
-      "source": "scan"
-    },
-    "out/_next/static/baZi6li9jM6LKKUqcsSIf/_ssgManifest.js": {
-      "description": "",
-      "tokens": 23,
-      "hash": "678f6ce2cb80b1fe",
-      "size": 80,
-      "mtimeMs": 1786554621170.744,
-      "updatedAt": "2026-08-13T08:27:54.308Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/117-1e02df43ae98fde9.js": {
-      "description": "n: u, o, P + 12 more",
-      "tokens": 35610,
-      "hash": "c1ea07ec7c07dca4",
-      "size": 124635,
-      "mtimeMs": 1786554621169.806,
-      "updatedAt": "2026-08-13T08:27:54.309Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/553-a0e3144f561166e1.js": {
-      "description": "r: E, R, f, l",
-      "tokens": 8202,
-      "hash": "37da0840c88bf9af",
-      "size": 28706,
-      "mtimeMs": 1786554621169.6262,
-      "updatedAt": "2026-08-13T08:27:54.310Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/app/_not-found/page-6c6a9a71742e9aad.js": {
-      "description": "Declares s",
-      "tokens": 499,
-      "hash": "bb92d8394e0b6761",
-      "size": 1745,
-      "mtimeMs": 1786554621171.737,
-      "updatedAt": "2026-08-13T08:27:54.310Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/app/admin/page-94dfe751fe55ed2f.js": {
-      "description": "m: a, o, i + 4 more",
-      "tokens": 2840,
-      "hash": "dc23a947ab67c887",
-      "size": 9941,
-      "mtimeMs": 1786554621171.5508,
-      "updatedAt": "2026-08-13T08:27:54.310Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/app/layout-4defc4299f43c6cd.js": {
-      "description": "",
-      "tokens": 66,
-      "hash": "5123f6962900154e",
-      "size": 230,
-      "mtimeMs": 1786554621171.1768,
-      "updatedAt": "2026-08-13T08:27:54.310Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/app/page-26e23b8752bda89c.js": {
-      "description": "",
-      "tokens": 15041,
-      "hash": "035bf9ab6d294f0f",
-      "size": 52659,
-      "mtimeMs": 1786554621171.4365,
-      "updatedAt": "2026-08-13T08:27:54.311Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/app/terminos-y-privacidad/page-2f26052047e146fa.js": {
-      "description": "",
-      "tokens": 1313,
-      "hash": "3908d9e37d3c04af",
-      "size": 4595,
-      "mtimeMs": 1786554621171.6902,
-      "updatedAt": "2026-08-13T08:27:54.311Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/fd9d1056-a4cd4812f5295779.js": {
-      "description": "i: m, h, g + 42 more",
-      "tokens": 49382,
-      "hash": "b8bddf9481d859d6",
-      "size": 172834,
-      "mtimeMs": 1786554621170.1372,
-      "updatedAt": "2026-08-13T08:27:54.312Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/framework-f66176bb897dc684.js": {
-      "description": "f: m, h, w + 24 more",
-      "tokens": 39994,
-      "hash": "4250d53f0bc756ec",
-      "size": 139978,
-      "mtimeMs": 1786554621170.2764,
-      "updatedAt": "2026-08-13T08:27:54.313Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/main-16f69fe406c8616e.js": {
-      "description": "r: a, o, i + 13 more",
-      "tokens": 33295,
-      "hash": "10e61b16ed837b3d",
-      "size": 116532,
-      "mtimeMs": 1786554621170.6228,
-      "updatedAt": "2026-08-13T08:27:54.313Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/main-app-25e40f6dfbfb8cee.js": {
-      "description": "",
-      "tokens": 132,
-      "hash": "b6ed95f7dad3ddc4",
-      "size": 461,
-      "mtimeMs": 1786554621170.3618,
-      "updatedAt": "2026-08-13T08:27:54.313Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/pages/_app-72b849fbd24ac258.js": {
-      "description": "",
-      "tokens": 80,
-      "hash": "40df8f6358751c32",
-      "size": 280,
-      "mtimeMs": 1786554621171.3655,
-      "updatedAt": "2026-08-13T08:27:54.313Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/pages/_error-7ba65e1336b92748.js": {
-      "description": "",
-      "tokens": 71,
-      "hash": "a31af6773e8c90a5",
-      "size": 247,
-      "mtimeMs": 1786554621171.3496,
-      "updatedAt": "2026-08-13T08:27:54.313Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/polyfills-42372ed130431b0a.js": {
-      "description": "Declares e",
-      "tokens": 32155,
-      "hash": "0973c1d64c88adc8",
-      "size": 112594,
-      "mtimeMs": 1786554621170.9607,
-      "updatedAt": "2026-08-13T08:27:54.314Z",
-      "source": "scan"
-    },
-    "out/_next/static/chunks/webpack-03f7c6bc932ce1e3.js": {
-      "description": "Declares d",
-      "tokens": 1063,
-      "hash": "0c7b663410598590",
-      "size": 3718,
-      "mtimeMs": 1786554621170.45,
-      "updatedAt": "2026-08-13T08:27:54.314Z",
-      "source": "scan"
-    },
-    "out/_next/static/css/60974f517971ebd2.css": {
-      "description": "Styles: 130 vars, 3 animations",
-      "tokens": 8094,
-      "hash": "81f3965a10627406",
-      "size": 28327,
-      "mtimeMs": 1786554621170.5781,
-      "updatedAt": "2026-08-13T08:27:54.314Z",
-      "source": "scan"
-    },
-    "out/404/index.html": {
-      "description": "404: This page could not be found.",
-      "tokens": 1973,
-      "hash": "4bc053351bc084f1",
-      "size": 7415,
-      "mtimeMs": 1786554621263.5696,
-      "updatedAt": "2026-08-13T08:27:54.315Z",
-      "source": "scan"
-    },
-    "out/404.html": {
-      "description": "404: This page could not be found.",
-      "tokens": 1973,
-      "hash": "4bc053351bc084f1",
-      "size": 7415,
-      "mtimeMs": 1786554621263.563,
-      "updatedAt": "2026-08-13T08:27:54.315Z",
-      "source": "scan"
-    },
-    "out/admin/index.html": {
-      "description": "Alojamiento Solidario Colombia 🇨🇴 | Emergencia Terremoto 2026",
-      "tokens": 1804,
-      "hash": "c5509eb74f1e80c3",
-      "size": 6781,
-      "mtimeMs": 1786554621303.7012,
-      "updatedAt": "2026-08-13T08:27:54.315Z",
-      "source": "scan"
-    },
-    "out/admin/index.txt": {
-      "description": "",
-      "tokens": 766,
-      "hash": "89aa875174c03beb",
-      "size": 3073,
-      "mtimeMs": 1786554621307.5508,
-      "updatedAt": "2026-08-13T08:27:54.315Z",
-      "source": "scan"
-    },
-    "out/index.html": {
-      "description": "Alojamiento Solidario Colombia 🇨🇴 | Emergencia Terremoto 2026",
-      "tokens": 6586,
-      "hash": "21fc0ef91a16723a",
-      "size": 24751,
-      "mtimeMs": 1786554621304.0752,
-      "updatedAt": "2026-08-13T08:27:54.316Z",
-      "source": "scan"
-    },
-    "out/index.txt": {
-      "description": "",
-      "tokens": 683,
-      "hash": "57319161db7d5f8d",
-      "size": 2738,
-      "mtimeMs": 1786554621304.484,
-      "updatedAt": "2026-08-13T08:27:54.316Z",
-      "source": "scan"
-    },
-    "out/terminos-y-privacidad/index.html": {
-      "description": "Alojamiento Solidario Colombia 🇨🇴 | Emergencia Terremoto 2026",
-      "tokens": 5591,
-      "hash": "3523961ebb8d5f40",
-      "size": 21030,
-      "mtimeMs": 1786554621308.3154,
-      "updatedAt": "2026-08-13T08:27:54.316Z",
-      "source": "scan"
-    },
-    "out/terminos-y-privacidad/index.txt": {
-      "description": "",
-      "tokens": 2173,
-      "hash": "e348614eb2005c9c",
-      "size": 8716,
-      "mtimeMs": 1786554621308.768,
-      "updatedAt": "2026-08-13T08:27:54.316Z",
+    "openapi.yaml": {
+      "description": "API contract snapshot for frontend/backend integration",
+      "tokens": 452,
+      "hash": "d9e2b55cbb16683b",
+      "size": 1581,
+      "mtimeMs": 1786617537072.4968,
+      "updatedAt": "2026-08-13T11:09:46.820Z",
       "source": "scan"
     },
     "package-lock.json": {
@@ -635,8 +428,8 @@
       "tokens": 81808,
       "hash": "8ce79b03b3086911",
       "size": 286326,
-      "mtimeMs": 1786607892494.199,
-      "updatedAt": "2026-08-13T08:27:54.317Z",
+      "mtimeMs": 1786613571335.1042,
+      "updatedAt": "2026-08-13T11:09:46.820Z",
       "source": "scan"
     },
     "package.json": {
@@ -644,8 +437,8 @@
       "tokens": 285,
       "hash": "76a54598f7f3c42f",
       "size": 996,
-      "mtimeMs": 1786607895666.3574,
-      "updatedAt": "2026-08-13T08:27:54.317Z",
+      "mtimeMs": 1786614247807.5317,
+      "updatedAt": "2026-08-13T11:09:46.820Z",
       "source": "scan"
     },
     "postcss.config.mjs": {
@@ -653,17 +446,26 @@
       "tokens": 42,
       "hash": "efa65c65e17d51d5",
       "size": 157,
-      "mtimeMs": 1786554485998.7126,
-      "updatedAt": "2026-08-13T08:27:54.318Z",
+      "mtimeMs": 1786561685272.5557,
+      "updatedAt": "2026-08-13T11:09:46.821Z",
       "source": "scan"
     },
     "README.md": {
-      "description": "Project documentation",
-      "tokens": 909,
-      "hash": "2bf2d4b1c7ce5120",
-      "size": 3663,
-      "mtimeMs": 1786607868428.0461,
-      "updatedAt": "2026-08-13T08:27:54.318Z",
+      "description": "Project documentation with roadmap handoff note",
+      "tokens": 667,
+      "hash": "fd413ac6c4db4537",
+      "size": 2683,
+      "mtimeMs": 1786617653338.1475,
+      "updatedAt": "2026-08-13T11:09:46.821Z",
+      "source": "scan"
+    },
+    "ROADMAP.md": {
+      "description": "Product source of truth for architecture and epic status",
+      "tokens": 4777,
+      "hash": "9f2b838dbcb9236b",
+      "size": 19535,
+      "mtimeMs": 1786617537072.142,
+      "updatedAt": "2026-08-13T11:09:46.821Z",
       "source": "scan"
     },
     "scripts/local-server.mjs": {
@@ -671,8 +473,8 @@
       "tokens": 348,
       "hash": "dd6ff658b2155fa2",
       "size": 1309,
-      "mtimeMs": 1786562180648.863,
-      "updatedAt": "2026-08-13T08:27:54.318Z",
+      "mtimeMs": 1786568598144.1096,
+      "updatedAt": "2026-08-13T11:09:46.822Z",
       "source": "scan"
     },
     "tailwind.config.ts": {
@@ -680,8 +482,8 @@
       "tokens": 221,
       "hash": "ee1b2c46fe258a3f",
       "size": 772,
-      "mtimeMs": 1786554488350.4697,
-      "updatedAt": "2026-08-13T08:27:54.318Z",
+      "mtimeMs": 1786561685272.6511,
+      "updatedAt": "2026-08-13T11:09:46.822Z",
       "source": "scan"
     },
     "tsconfig.json": {
@@ -689,8 +491,8 @@
       "tokens": 171,
       "hash": "1c6463f0827b6213",
       "size": 598,
-      "mtimeMs": 1786554482320.1423,
-      "updatedAt": "2026-08-13T08:27:54.318Z",
+      "mtimeMs": 1786561685272.7666,
+      "updatedAt": "2026-08-13T11:09:46.823Z",
       "source": "scan"
     }
   }

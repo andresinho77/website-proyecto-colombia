@@ -35,8 +35,16 @@ jobs:
 
       - name: Verify OpenWolf project index
         run: |
-          if ! npx --yes openwolf@2.0.1 scan --check; then
-            echo "::warning title=OpenWolf::OpenWolf index is out of date (advisory only in CI). Run 'npx --yes openwolf@2.0.1 scan' locally and commit .wolf updates."
+          before_file="$(mktemp)"
+          after_file="$(mktemp)"
+
+          git show HEAD:.wolf/anatomy.md | sed -E 's/(Last scanned: ).*/\1<normalized>/' > "$before_file"
+          npx --yes openwolf@2.0.1 scan
+          sed -E 's/(Last scanned: ).*/\1<normalized>/' .wolf/anatomy.md > "$after_file"
+
+          if ! diff -u "$before_file" "$after_file" > /tmp/openwolf-anatomy.diff; then
+            echo "::warning title=OpenWolf::OpenWolf anatomy changed beyond timestamp metadata. Run 'npx --yes openwolf@2.0.1 scan' locally and commit .wolf updates."
+            cat /tmp/openwolf-anatomy.diff
           fi
 
       - name: Build Next.js Static Export

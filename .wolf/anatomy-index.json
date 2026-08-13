@@ -1,12 +1,12 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-08-13T11:04:07.289Z",
+    "lastScanned": "2026-08-13T11:09:46.823Z",
     "fileCount": 41,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "a55fd21399be7ab92d96c6551367bdc7c7c69b6f434daa586411198a854f20f9",
-    "storeUpdatedAt": "2026-08-13T11:04:07.289Z"
+    "renderedHash": "a4ceea0d9a1247a29e9b45ff5539e251ca8f083de036fdd1051959e2d9b236b6",
+    "storeUpdatedAt": "2026-08-13T11:09:46.824Z"
   },
   "files": {
     ".claude/commands/reframe.md": {
@@ -15,7 +15,7 @@
       "hash": "17a75695be5d4629",
       "size": 2221,
       "mtimeMs": 1786613561175.0857,
-      "updatedAt": "2026-08-13T11:04:07.271Z",
+      "updatedAt": "2026-08-13T11:09:46.805Z",
       "source": "scan"
     },
     ".claude/commands/security-audit.md": {
@@ -24,7 +24,7 @@
       "hash": "e6f7e0b7337c9c86",
       "size": 2060,
       "mtimeMs": 1786613561175.4033,
-      "updatedAt": "2026-08-13T11:04:07.272Z",
+      "updatedAt": "2026-08-13T11:09:46.806Z",
       "source": "scan"
     },
     ".claude/rules/openwolf.md": {
@@ -33,7 +33,7 @@
       "hash": "6d735b2c1c54a916",
       "size": 1323,
       "mtimeMs": 1786613561175.625,
-      "updatedAt": "2026-08-13T11:04:07.272Z",
+      "updatedAt": "2026-08-13T11:09:46.806Z",
       "source": "scan"
     },
     ".claude/settings.json": {
@@ -42,16 +42,16 @@
       "hash": "f68759bb50af5ee4",
       "size": 1799,
       "mtimeMs": 1786613561175.7893,
-      "updatedAt": "2026-08-13T11:04:07.273Z",
+      "updatedAt": "2026-08-13T11:09:46.807Z",
       "source": "scan"
     },
     ".github/workflows/frontend-ci.yml": {
       "description": "CI: \"Frontend Next.js CI/CD Pipeline\"",
-      "tokens": 494,
-      "hash": "329f5e188f52d16b",
-      "size": 1729,
-      "mtimeMs": 1786618952632.1843,
-      "updatedAt": "2026-08-13T11:04:07.273Z",
+      "tokens": 601,
+      "hash": "d92973fa1310d87c",
+      "size": 2103,
+      "mtimeMs": 1786619293715.8547,
+      "updatedAt": "2026-08-13T11:09:46.807Z",
       "source": "scan"
     },
     ".gitignore": {
@@ -60,7 +60,7 @@
       "hash": "c4804e72ffddf6d2",
       "size": 366,
       "mtimeMs": 1786614247804.351,
-      "updatedAt": "2026-08-13T11:04:07.273Z",
+      "updatedAt": "2026-08-13T11:09:46.808Z",
       "source": "scan"
     },
     "AGENTS.md": {
@@ -69,7 +69,7 @@
       "hash": "8c90778623bf50ac",
       "size": 271,
       "mtimeMs": 1786614247806.9238,
-      "updatedAt": "2026-08-13T11:04:07.274Z",
+      "updatedAt": "2026-08-13T11:09:46.808Z",
       "source": "scan"
     },
     "app/admin/page.tsx": {
@@ -78,7 +78,7 @@
       "hash": "85298e87c1aa9ee1",
       "size": 7823,
       "mtimeMs": 1786561685268.907,
-      "updatedAt": "2026-08-13T11:04:07.276Z",
+      "updatedAt": "2026-08-13T11:09:46.810Z",
       "source": "scan",
       "symbols": [
         {
@@ -96,7 +96,7 @@
       "hash": "ba45e599d838bcbd",
       "size": 915,
       "mtimeMs": 1786561685269.004,
-      "updatedAt": "2026-08-13T11:04:07.276Z",
+      "updatedAt": "2026-08-13T11:09:46.810Z",
       "source": "scan"
     },
     "app/layout.tsx": {
@@ -105,7 +105,7 @@
       "hash": "5e381d1b88e711e7",
       "size": 840,
       "mtimeMs": 1786561685269.0955,
-      "updatedAt": "2026-08-13T11:04:07.277Z",
+      "updatedAt": "2026-08-13T11:09:46.811Z",
       "source": "scan"
     },
     "app/page.tsx": {
@@ -114,7 +114,7 @@
       "hash": "e3b210cfd02385ae",
       "size": 4698,
       "mtimeMs": 1786598883091.1487,
-      "updatedAt": "2026-08-13T11:04:07.277Z",
+      "updatedAt": "2026-08-13T11:09:46.811Z",
       "source": "scan",
       "symbols": [
         {
@@ -132,7 +132,7 @@
       "hash": "127a34891de6af81",
       "size": 3849,
       "mtimeMs": 1786561685269.4517,
-      "updatedAt": "2026-08-13T11:04:07.277Z",
+      "updatedAt": "2026-08-13T11:09:46.812Z",
       "source": "scan",
       "symbols": [
         {
@@ -150,7 +150,7 @@
       "hash": "b1ca356fa9d5f3a6",
       "size": 225,
       "mtimeMs": 1786613561181.6885,
-      "updatedAt": "2026-08-13T11:04:07.277Z",
+      "updatedAt": "2026-08-13T11:09:46.812Z",
       "source": "scan"
     },
     "components/EmergencyBanner.tsx": {
@@ -159,7 +159,7 @@
       "hash": "6081af233dddb63d",
       "size": 1830,
       "mtimeMs": 1786561685269.6006,
-      "updatedAt": "2026-08-13T11:04:07.278Z",
+      "updatedAt": "2026-08-13T11:09:46.812Z",
       "source": "scan"
     },
     "components/Footer.tsx": {
@@ -168,7 +168,7 @@
       "hash": "b7d77ff6595aa277",
       "size": 2282,
       "mtimeMs": 1786561685269.6963,
-      "updatedAt": "2026-08-13T11:04:07.279Z",
+      "updatedAt": "2026-08-13T11:09:46.813Z",
       "source": "scan",
       "symbols": [
         {
@@ -186,7 +186,7 @@
       "hash": "fe419066fdd1e7f3",
       "size": 3843,
       "mtimeMs": 1786598883091.3364,
-      "updatedAt": "2026-08-13T11:04:07.279Z",
+      "updatedAt": "2026-08-13T11:09:46.813Z",
       "source": "scan",
       "symbols": [
         {
@@ -204,7 +204,7 @@
       "hash": "d5b319e1ce788d20",
       "size": 4340,
       "mtimeMs": 1786561685270.0664,
-      "updatedAt": "2026-08-13T11:04:07.279Z",
+      "updatedAt": "2026-08-13T11:09:46.814Z",
       "source": "scan",
       "symbols": [
         {
@@ -222,7 +222,7 @@
       "hash": "e4ae1b04b6139169",
       "size": 11768,
       "mtimeMs": 1786561685270.2788,
-      "updatedAt": "2026-08-13T11:04:07.280Z",
+      "updatedAt": "2026-08-13T11:09:46.814Z",
       "source": "scan",
       "symbols": [
         {
@@ -240,7 +240,7 @@
       "hash": "c4a63f81a768faa3",
       "size": 2671,
       "mtimeMs": 1786561685270.3838,
-      "updatedAt": "2026-08-13T11:04:07.280Z",
+      "updatedAt": "2026-08-13T11:09:46.815Z",
       "source": "scan",
       "symbols": [
         {
@@ -258,7 +258,7 @@
       "hash": "e2239c632fd67a8d",
       "size": 2993,
       "mtimeMs": 1786561685270.4746,
-      "updatedAt": "2026-08-13T11:04:07.281Z",
+      "updatedAt": "2026-08-13T11:09:46.815Z",
       "source": "scan",
       "symbols": [
         {
@@ -276,7 +276,7 @@
       "hash": "c8bf18403d515063",
       "size": 3748,
       "mtimeMs": 1786561685270.5874,
-      "updatedAt": "2026-08-13T11:04:07.281Z",
+      "updatedAt": "2026-08-13T11:09:46.816Z",
       "source": "scan",
       "symbols": [
         {
@@ -294,7 +294,7 @@
       "hash": "91acedbf3ecff6d9",
       "size": 13194,
       "mtimeMs": 1786561685270.7454,
-      "updatedAt": "2026-08-13T11:04:07.282Z",
+      "updatedAt": "2026-08-13T11:09:46.816Z",
       "source": "scan",
       "symbols": [
         {
@@ -312,7 +312,7 @@
       "hash": "aaa1e7a17627787c",
       "size": 5756,
       "mtimeMs": 1786561685270.969,
-      "updatedAt": "2026-08-13T11:04:07.282Z",
+      "updatedAt": "2026-08-13T11:09:46.816Z",
       "source": "scan",
       "symbols": [
         {
@@ -330,7 +330,7 @@
       "hash": "975e2209cf1ec83a",
       "size": 3715,
       "mtimeMs": 1786561685271.0667,
-      "updatedAt": "2026-08-13T11:04:07.282Z",
+      "updatedAt": "2026-08-13T11:09:46.817Z",
       "source": "scan",
       "symbols": [
         {
@@ -348,7 +348,7 @@
       "hash": "938468bc6019ae31",
       "size": 1868,
       "mtimeMs": 1786617537072.489,
-      "updatedAt": "2026-08-13T11:04:07.282Z",
+      "updatedAt": "2026-08-13T11:09:46.817Z",
       "source": "scan"
     },
     "docs/SAFETY.md": {
@@ -357,7 +357,7 @@
       "hash": "eb0a2361373c264b",
       "size": 1468,
       "mtimeMs": 1786617537072.5159,
-      "updatedAt": "2026-08-13T11:04:07.282Z",
+      "updatedAt": "2026-08-13T11:09:46.817Z",
       "source": "scan"
     },
     "GEMINI.md": {
@@ -366,7 +366,7 @@
       "hash": "8c90778623bf50ac",
       "size": 271,
       "mtimeMs": 1786614247807.1152,
-      "updatedAt": "2026-08-13T11:04:07.283Z",
+      "updatedAt": "2026-08-13T11:09:46.817Z",
       "source": "scan"
     },
     "lib/api.ts": {
@@ -375,7 +375,7 @@
       "hash": "32e5d9f804bebaca",
       "size": 7369,
       "mtimeMs": 1786561685271.3423,
-      "updatedAt": "2026-08-13T11:04:07.283Z",
+      "updatedAt": "2026-08-13T11:09:46.818Z",
       "source": "scan"
     },
     "lib/localStorage.ts": {
@@ -384,7 +384,7 @@
       "hash": "850d8f5b21f86668",
       "size": 1198,
       "mtimeMs": 1786561685271.4595,
-      "updatedAt": "2026-08-13T11:04:07.283Z",
+      "updatedAt": "2026-08-13T11:09:46.818Z",
       "source": "scan"
     },
     "lib/types.ts": {
@@ -393,7 +393,7 @@
       "hash": "bfee21d3155891b7",
       "size": 914,
       "mtimeMs": 1786561685271.5488,
-      "updatedAt": "2026-08-13T11:04:07.283Z",
+      "updatedAt": "2026-08-13T11:09:46.818Z",
       "source": "scan"
     },
     "next-env.d.ts": {
@@ -402,7 +402,7 @@
       "hash": "9dd9d642cdb87d4d",
       "size": 228,
       "mtimeMs": 1786561685271.6523,
-      "updatedAt": "2026-08-13T11:04:07.284Z",
+      "updatedAt": "2026-08-13T11:09:46.818Z",
       "source": "scan"
     },
     "next.config.mjs": {
@@ -411,7 +411,7 @@
       "hash": "ef3e74407190ab29",
       "size": 201,
       "mtimeMs": 1786561685271.756,
-      "updatedAt": "2026-08-13T11:04:07.284Z",
+      "updatedAt": "2026-08-13T11:09:46.819Z",
       "source": "scan"
     },
     "openapi.yaml": {
@@ -420,7 +420,7 @@
       "hash": "d9e2b55cbb16683b",
       "size": 1581,
       "mtimeMs": 1786617537072.4968,
-      "updatedAt": "2026-08-13T11:04:07.285Z",
+      "updatedAt": "2026-08-13T11:09:46.820Z",
       "source": "scan"
     },
     "package-lock.json": {
@@ -429,7 +429,7 @@
       "hash": "8ce79b03b3086911",
       "size": 286326,
       "mtimeMs": 1786613571335.1042,
-      "updatedAt": "2026-08-13T11:04:07.285Z",
+      "updatedAt": "2026-08-13T11:09:46.820Z",
       "source": "scan"
     },
     "package.json": {
@@ -438,7 +438,7 @@
       "hash": "76a54598f7f3c42f",
       "size": 996,
       "mtimeMs": 1786614247807.5317,
-      "updatedAt": "2026-08-13T11:04:07.285Z",
+      "updatedAt": "2026-08-13T11:09:46.820Z",
       "source": "scan"
     },
     "postcss.config.mjs": {
@@ -447,7 +447,7 @@
       "hash": "efa65c65e17d51d5",
       "size": 157,
       "mtimeMs": 1786561685272.5557,
-      "updatedAt": "2026-08-13T11:04:07.286Z",
+      "updatedAt": "2026-08-13T11:09:46.821Z",
       "source": "scan"
     },
     "README.md": {
@@ -456,7 +456,7 @@
       "hash": "fd413ac6c4db4537",
       "size": 2683,
       "mtimeMs": 1786617653338.1475,
-      "updatedAt": "2026-08-13T11:04:07.286Z",
+      "updatedAt": "2026-08-13T11:09:46.821Z",
       "source": "scan"
     },
     "ROADMAP.md": {
@@ -465,7 +465,7 @@
       "hash": "9f2b838dbcb9236b",
       "size": 19535,
       "mtimeMs": 1786617537072.142,
-      "updatedAt": "2026-08-13T11:04:07.286Z",
+      "updatedAt": "2026-08-13T11:09:46.821Z",
       "source": "scan"
     },
     "scripts/local-server.mjs": {
@@ -474,7 +474,7 @@
       "hash": "dd6ff658b2155fa2",
       "size": 1309,
       "mtimeMs": 1786568598144.1096,
-      "updatedAt": "2026-08-13T11:04:07.287Z",
+      "updatedAt": "2026-08-13T11:09:46.822Z",
       "source": "scan"
     },
     "tailwind.config.ts": {
@@ -483,7 +483,7 @@
       "hash": "ee1b2c46fe258a3f",
       "size": 772,
       "mtimeMs": 1786561685272.6511,
-      "updatedAt": "2026-08-13T11:04:07.287Z",
+      "updatedAt": "2026-08-13T11:09:46.822Z",
       "source": "scan"
     },
     "tsconfig.json": {
@@ -492,7 +492,7 @@
       "hash": "1c6463f0827b6213",
       "size": 598,
       "mtimeMs": 1786561685272.7666,
-      "updatedAt": "2026-08-13T11:04:07.287Z",
+      "updatedAt": "2026-08-13T11:09:46.823Z",
       "source": "scan"
     }
   }

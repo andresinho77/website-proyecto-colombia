@@ -25,7 +25,7 @@ jobs:
         run: npm ci
 
       - name: Verify OpenWolf project index
-        run: npx openwolf scan --check
+        run: npx --yes openwolf@2.0.1 scan --check
 
       - name: Build Next.js Static Export
         run: npm run build

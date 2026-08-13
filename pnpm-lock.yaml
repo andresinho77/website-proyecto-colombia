@@ -22,8 +22,8 @@ importers:
         version: 18.3.1(react@18.3.1)
     devDependencies:
       '@anthropic-ai/claude-code':
-        specifier: latest
-        version: 2.1.229
+        specifier: 1.0.57
+        version: 1.0.57
       '@types/node':
         specifier: ^20.14.12
         version: 20.19.43
@@ -43,7 +43,7 @@ importers:
         specifier: ^14.2.5
         version: 14.2.35(eslint@8.57.1)(typescript@5.9.3)
       openwolf:
-        specifier: latest
+        specifier: 2.0.1
         version: 2.0.1
       postcss:
         specifier: ^8.4.41
@@ -61,53 +61,9 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
 
-  '@anthropic-ai/claude-code-darwin-arm64@2.1.229':
-    resolution: {integrity: sha512-6/YkhbYifwrym4TnGHDjgJxrUhOSncK9hf8k0l95If97Fl3xjMGJ9RRhIzPo3n82xIkc2I75ToQ1lHRP8CDboQ==}
-    cpu: [arm64]
-    os: [darwin]
-
-  '@anthropic-ai/claude-code-darwin-x64@2.1.229':
-    resolution: {integrity: sha512-QpAUV9nqDMz1NsMd4nI6gn2c2khSdTAugVKfPoFQbxX+kVZVxE1kpvvfzRNu3bSGSV+kl712dOjH5zhn5FatlQ==}
-    cpu: [x64]
-    os: [darwin]
-
-  '@anthropic-ai/claude-code-linux-arm64-musl@2.1.229':
-    resolution: {integrity: sha512-/oCy14VyZiRSTqRDR37aps5f6qPcV40aiWZVRErnj6bcQ6cuNkM0Gh4Jl/m0EAV+rshAw9suvlMtxa9WBZTMjA==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [musl]
-
-  '@anthropic-ai/claude-code-linux-arm64@2.1.229':
-    resolution: {integrity: sha512-YYQcKKmc13q2looQ3iho0ZUroFYhnUXTXx4hGljeVghXAU/4f4pPkLbRR8ICafc98iA/W0/SvKXxpcP1V48Jgg==}
-    cpu: [arm64]
-    os: [linux]
-    libc: [glibc]
-
-  '@anthropic-ai/claude-code-linux-x64-musl@2.1.229':
-    resolution: {integrity: sha512-vjFzyLObQg8rhHmqqKt0AdbAySUzzsRbPE2FbhozMqHzhaA/ClotX1kUFU5mAAN5wdfoJ+D505HqMrs3fIJZgw==}
-    cpu: [x64]
-    os: [linux]
-    libc: [musl]
-
-  '@anthropic-ai/claude-code-linux-x64@2.1.229':
-    resolution: {integrity: sha512-YaENNcgyLJ8xjH1cdNTCAC7jLUzDTRISMQikArsvpBcEM32no6jmGgpVj61YQAOZedyUTLYxbKyq4TYGj7o2Vw==}
-    cpu: [x64]
-    os: [linux]
-    libc: [glibc]
-
-  '@anthropic-ai/claude-code-win32-arm64@2.1.229':
-    resolution: {integrity: sha512-BfIRhE9AwGEYYL/Lm9WDKp4Z2KqXGm9AY1vUVeUi9JYoDXfsZm0MECovd83SzaX7CCXVyJ5rcEYepg3r8ASgOA==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@anthropic-ai/claude-code-win32-x64@2.1.229':
-    resolution: {integrity: sha512-vZXu2GKE+ei47JmR37yIE66JmZfyoIhBvkoAAwjWj/dUTztV+GnLZORG9kKCHxwTIN2Wa9A77LowJ0/CIJ06Sg==}
-    cpu: [x64]
-    os: [win32]
-
-  '@anthropic-ai/claude-code@2.1.229':
-    resolution: {integrity: sha512-6HNg2iBe5DFvOxxdWTxdVaxg7buVvZMEpa+etJp3acBNatXXGdMBbqd3xjgPvqAoCz2ifQ/n5HSBd+xY8RBKfw==}
-    engines: {node: '>=22.0.0'}
+  '@anthropic-ai/claude-code@1.0.57':
+    resolution: {integrity: sha512-zMymGZzjG+JO9iKC5N5pAy8AxyHIMPCL6U3HYCR3vCj5M+Y0s3GAMma6GkvCXWFixRN6KSZItKw3HbQiaIBYlw==}
+    engines: {node: '>=18.0.0'}
     hasBin: true
 
   '@emnapi/core@1.10.0':
@@ -149,6 +105,73 @@ packages:
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
+
+  '@img/sharp-darwin-arm64@0.33.5':
+    resolution: {integrity: sha512-UT4p+iz/2H4twwAoLCqfA9UH5pI6DggwKEGuaPy7nCVQ8ZsiY5PIcrRvD1DzuY3qYL07NtIQcWnBSY/heikIFQ==}
+    engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@img/sharp-darwin-x64@0.33.5':
+    resolution: {integrity: sha512-fyHac4jIc1ANYGRDxtiqelIbdWkIuQaI84Mv45KvGRRxSAa7o7d1ZKAOBaYbnepLC1WqxfpimdeWfvqqSGwR2Q==}
+    engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
+    cpu: [x64]
+    os: [darwin]
+
+  '@img/sharp-libvips-darwin-arm64@1.0.4':
+    resolution: {integrity: sha512-XblONe153h0O2zuFfTAbQYAX2JhYmDHeWikp1LM9Hul9gVPjFY427k6dFEcOL72O01QxQsWi761svJ/ev9xEDg==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@img/sharp-libvips-darwin-x64@1.0.4':
+    resolution: {integrity: sha512-xnGR8YuZYfJGmWPvmlunFaWJsb9T/AO2ykoP3Fz/0X5XV2aoYBPkX6xqCQvUTKKiLddarLaxpzNe+b1hjeWHAQ==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@img/sharp-libvips-linux-arm64@1.0.4':
+    resolution: {integrity: sha512-9B+taZ8DlyyqzZQnoeIvDVR/2F4EbMepXMc/NdVbkzsJbzkUjhXv/70GQJ7tdLA4YJgNP25zukcxpX2/SueNrA==}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@img/sharp-libvips-linux-arm@1.0.5':
+    resolution: {integrity: sha512-gvcC4ACAOPRNATg/ov8/MnbxFDJqf/pDePbBnuBDcjsI8PssmjoKMAz4LtLaVi+OnSb5FK/yIOamqDwGmXW32g==}
+    cpu: [arm]
+    os: [linux]
+    libc: [glibc]
+
+  '@img/sharp-libvips-linux-x64@1.0.4':
+    resolution: {integrity: sha512-MmWmQ3iPFZr0Iev+BAgVMb3ZyC4KeFc3jFxnNbEPas60e1cIfevbtuyf9nDGIzOaW9PdnDciJm+wFFaTlj5xYw==}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@img/sharp-linux-arm64@0.33.5':
+    resolution: {integrity: sha512-JMVv+AMRyGOHtO1RFBiJy/MBsgz0x4AWrT6QoEVVTyh1E39TrCUpTRI7mx9VksGX4awWASxqCYLCV4wBZHAYxA==}
+    engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
+    cpu: [arm64]
+    os: [linux]
+    libc: [glibc]
+
+  '@img/sharp-linux-arm@0.33.5':
+    resolution: {integrity: sha512-JTS1eldqZbJxjvKaAkxhZmBqPRGmxgu+qFKSInv8moZ2AmT5Yib3EQ1c6gp493HvrvV8QgdOXdyaIBrhvFhBMQ==}
+    engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
+    cpu: [arm]
+    os: [linux]
+    libc: [glibc]
+
+  '@img/sharp-linux-x64@0.33.5':
+    resolution: {integrity: sha512-opC+Ok5pRNAzuvq1AG0ar+1owsu842/Ab+4qvU879ippJBHvyY5n2mxF1izXqkPYlGuP/M556uh53jRLJmzTWA==}
+    engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
+    cpu: [x64]
+    os: [linux]
+    libc: [glibc]
+
+  '@img/sharp-win32-x64@0.33.5':
+    resolution: {integrity: sha512-MpY/o8/8kj+EcnxwvrP4aTJSWw/aZ7JIGR4aBeZkZw5B7/Jn+tY9/VNwtcoGmdT7GfggGIU4kygOMSbYnOrAbg==}
+    engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
+    cpu: [x64]
+    os: [win32]
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
@@ -2359,40 +2382,14 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
-  '@anthropic-ai/claude-code-darwin-arm64@2.1.229':
-    optional: true
-
-  '@anthropic-ai/claude-code-darwin-x64@2.1.229':
-    optional: true
-
-  '@anthropic-ai/claude-code-linux-arm64-musl@2.1.229':
-    optional: true
-
-  '@anthropic-ai/claude-code-linux-arm64@2.1.229':
-    optional: true
-
-  '@anthropic-ai/claude-code-linux-x64-musl@2.1.229':
-    optional: true
-
-  '@anthropic-ai/claude-code-linux-x64@2.1.229':
-    optional: true
-
-  '@anthropic-ai/claude-code-win32-arm64@2.1.229':
-    optional: true
-
-  '@anthropic-ai/claude-code-win32-x64@2.1.229':
-    optional: true
-
-  '@anthropic-ai/claude-code@2.1.229':
+  '@anthropic-ai/claude-code@1.0.57':
     optionalDependencies:
-      '@anthropic-ai/claude-code-darwin-arm64': 2.1.229
-      '@anthropic-ai/claude-code-darwin-x64': 2.1.229
-      '@anthropic-ai/claude-code-linux-arm64': 2.1.229
-      '@anthropic-ai/claude-code-linux-arm64-musl': 2.1.229
-      '@anthropic-ai/claude-code-linux-x64': 2.1.229
-      '@anthropic-ai/claude-code-linux-x64-musl': 2.1.229
-      '@anthropic-ai/claude-code-win32-arm64': 2.1.229
-      '@anthropic-ai/claude-code-win32-x64': 2.1.229
+      '@img/sharp-darwin-arm64': 0.33.5
+      '@img/sharp-darwin-x64': 0.33.5
+      '@img/sharp-linux-arm': 0.33.5
+      '@img/sharp-linux-arm64': 0.33.5
+      '@img/sharp-linux-x64': 0.33.5
+      '@img/sharp-win32-x64': 0.33.5
 
   '@emnapi/core@1.10.0':
     dependencies:
@@ -2444,6 +2441,49 @@ snapshots:
   '@humanwhocodes/module-importer@1.0.1': {}
 
   '@humanwhocodes/object-schema@2.0.3': {}
+
+  '@img/sharp-darwin-arm64@0.33.5':
+    optionalDependencies:
+      '@img/sharp-libvips-darwin-arm64': 1.0.4
+    optional: true
+
+  '@img/sharp-darwin-x64@0.33.5':
+    optionalDependencies:
+      '@img/sharp-libvips-darwin-x64': 1.0.4
+    optional: true
+
+  '@img/sharp-libvips-darwin-arm64@1.0.4':
+    optional: true
+
+  '@img/sharp-libvips-darwin-x64@1.0.4':
+    optional: true
+
+  '@img/sharp-libvips-linux-arm64@1.0.4':
+    optional: true
+
+  '@img/sharp-libvips-linux-arm@1.0.5':
+    optional: true
+
+  '@img/sharp-libvips-linux-x64@1.0.4':
+    optional: true
+
+  '@img/sharp-linux-arm64@0.33.5':
+    optionalDependencies:
+      '@img/sharp-libvips-linux-arm64': 1.0.4
+    optional: true
+
+  '@img/sharp-linux-arm@0.33.5':
+    optionalDependencies:
+      '@img/sharp-libvips-linux-arm': 1.0.5
+    optional: true
+
+  '@img/sharp-linux-x64@0.33.5':
+    optionalDependencies:
+      '@img/sharp-libvips-linux-x64': 1.0.4
+    optional: true
+
+  '@img/sharp-win32-x64@0.33.5':
+    optional: true
 
   '@isaacs/cliui@8.0.2':
     dependencies:

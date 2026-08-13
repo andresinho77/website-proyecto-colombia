@@ -7,6 +7,9 @@
 ## User Preferences
 
 <!-- How the user likes things done. Code style, tools, patterns, communication. -->
+- User wants `ROADMAP.md` to be the single source of truth for feature status and future direction.
+- User prefers `README.md` to stay focused on basic project information and setup, not epic-by-epic status.
+- User wants both documentation domains reconciled together: product/engineering docs and OpenWolf process docs.
 
 ## Key Learnings
 
@@ -21,3 +24,5 @@
 ## Decision Log
 
 <!-- Significant technical decisions with rationale. Why X was chosen over Y. -->
+- [2026-08-13] Delivery split formalized: this repo publishes a permanent public mock on GitHub Pages; production deployment path (S3/CloudFront and infra automation) is owned by `infra-proyecto-colombia`.
+- [2026-08-13] Documentation governance formalized: when docs disagree, `ROADMAP.md` prevails until reconciliation.

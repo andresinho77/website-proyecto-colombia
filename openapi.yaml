@@ -1,0 +1,60 @@
+openapi: 3.0.3
+info:
+  title: Alojamiento Solidario Colombia API Contract
+  version: 0.1.0
+  description: >-
+    Contrato minimo esperado por el frontend para publicar, listar, reportar y
+    resolver publicaciones de alojamiento temporal.
+servers:
+  - url: https://api.alojamientosolidario.co/api
+    description: Produccion (referencial)
+  - url: https://dev-api.alojamientosolidario.co/api
+    description: Staging (referencial)
+paths:
+  /listings:
+    get:
+      summary: Obtener publicaciones activas
+      parameters:
+        - in: query
+          name: ciudad
+          schema:
+            type: string
+        - in: query
+          name: tipo
+          schema:
+            type: string
+            enum: [ofrezco, necesito, todos]
+        - in: query
+          name: barrio
+          schema:
+            type: string
+        - in: query
+          name: maxPrecio
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Respuesta de publicaciones
+    post:
+      summary: Crear publicacion
+      responses:
+        "200":
+          description: Publicacion creada
+  /listings/report:
+    post:
+      summary: Reportar publicacion
+      responses:
+        "200":
+          description: Reporte registrado
+  /listings/resolve:
+    post:
+      summary: Marcar publicacion como resuelta con PIN
+      responses:
+        "200":
+          description: Publicacion resuelta
+  /listings/upload-url:
+    post:
+      summary: Obtener URL prefirmada para imagenes
+      responses:
+        "200":
+          description: URL prefirmada generada

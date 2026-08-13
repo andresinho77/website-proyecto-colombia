@@ -1,7 +1,7 @@
 # anatomy.md
 
 > Auto-maintained by OpenWolf. Last scanned: 2026-08-13T08:27:54.320Z
-> Files: 63 tracked | Anatomy hits: 0 | Misses: 0
+> Files: 68 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -11,12 +11,19 @@
 - `GEMINI.md` — OpenWolf (~68 tok)
 - `next-env.d.ts` — / <reference types="next" /> (~66 tok)
 - `next.config.mjs` — Next.js configuration (~54 tok)
+- `openapi.yaml` — API contract snapshot for frontend/backend integration (~420 tok)
 - `package-lock.json` — npm lock file (~81808 tok)
 - `package.json` — Node.js package manifest (~285 tok)
 - `postcss.config.mjs` — Declares config (~42 tok)
-- `README.md` — Project documentation (~909 tok)
+- `README.md` — Project documentation with roadmap handoff note (~909 tok)
+- `ROADMAP.md` — Product source of truth for architecture and epic status (~7600 tok)
 - `tailwind.config.ts` — Tailwind CSS configuration (~221 tok)
 - `tsconfig.json` — TypeScript configuration (~171 tok)
+
+## docs/
+
+- `DATA_POLICY.md` — Operational process for data deletion/anon requests and SLA (~780 tok)
+- `SAFETY.md` — Abuse/fraud response runbook and escalation policy (~620 tok)
 
 ## .claude/
 
@@ -46,6 +53,11 @@
 
 - `page.tsx` — API_BASE_URL — renders form — uses useState (~2234 tok)
   - fn `AdminPage` L9-202 (~2147 tok)
+
+## .wolf/
+
+- `STATUS.md` — Session handoff: concluded work and next quest (~560 tok)
+- `memory.md` — Session action log table (~140 tok)
 
 ## app/terminos-y-privacidad/
 

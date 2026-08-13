@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-08-13T08:01:49.307Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-08-13T08:09:07.991Z
 > Files: 67 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -43,7 +43,7 @@
 
 ## .github/workflows/
 
-- `frontend-ci.yml` — CI: "Frontend Next.js CI/CD Pipeline" (~162 tok)
+- `frontend-ci.yml` — CI: "Frontend Next.js CI/CD Pipeline" (~198 tok)
 
 ## app/
 

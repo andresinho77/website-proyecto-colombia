@@ -1,12 +1,12 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-08-13T11:09:46.823Z",
-    "fileCount": 41,
+    "lastScanned": "2026-08-14T21:53:16.639Z",
+    "fileCount": 43,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "a4ceea0d9a1247a29e9b45ff5539e251ca8f083de036fdd1051959e2d9b236b6",
-    "storeUpdatedAt": "2026-08-13T11:09:46.824Z"
+    "renderedHash": "0ea2cc8ec72b2a1c49aad69a1fbf721c62846b9572fd806333ae040fe4bec464",
+    "storeUpdatedAt": "2026-08-14T21:53:16.639Z"
   },
   "files": {
     ".claude/commands/reframe.md": {
@@ -14,8 +14,8 @@
       "tokens": 551,
       "hash": "17a75695be5d4629",
       "size": 2221,
-      "mtimeMs": 1786613561175.0857,
-      "updatedAt": "2026-08-13T11:09:46.805Z",
+      "mtimeMs": 1786619696833.968,
+      "updatedAt": "2026-08-14T21:53:16.623Z",
       "source": "scan"
     },
     ".claude/commands/security-audit.md": {
@@ -23,8 +23,8 @@
       "tokens": 510,
       "hash": "e6f7e0b7337c9c86",
       "size": 2060,
-      "mtimeMs": 1786613561175.4033,
-      "updatedAt": "2026-08-13T11:09:46.806Z",
+      "mtimeMs": 1786619696834.0857,
+      "updatedAt": "2026-08-14T21:53:16.623Z",
       "source": "scan"
     },
     ".claude/rules/openwolf.md": {
@@ -32,8 +32,8 @@
       "tokens": 328,
       "hash": "6d735b2c1c54a916",
       "size": 1323,
-      "mtimeMs": 1786613561175.625,
-      "updatedAt": "2026-08-13T11:09:46.806Z",
+      "mtimeMs": 1786619696834.2131,
+      "updatedAt": "2026-08-14T21:53:16.624Z",
       "source": "scan"
     },
     ".claude/settings.json": {
@@ -41,26 +41,44 @@
       "tokens": 514,
       "hash": "f68759bb50af5ee4",
       "size": 1799,
-      "mtimeMs": 1786613561175.7893,
-      "updatedAt": "2026-08-13T11:09:46.807Z",
+      "mtimeMs": 1786619696834.3071,
+      "updatedAt": "2026-08-14T21:53:16.624Z",
+      "source": "scan"
+    },
+    ".eslintrc.json": {
+      "description": "ESLint configuration",
+      "tokens": 33,
+      "hash": "4d6d2817d1e3ae0a",
+      "size": 114,
+      "mtimeMs": 1786743254647.6836,
+      "updatedAt": "2026-08-14T21:53:16.625Z",
       "source": "scan"
     },
     ".github/workflows/frontend-ci.yml": {
       "description": "CI: \"Frontend Next.js CI/CD Pipeline\"",
-      "tokens": 601,
-      "hash": "d92973fa1310d87c",
-      "size": 2103,
-      "mtimeMs": 1786619293715.8547,
-      "updatedAt": "2026-08-13T11:09:46.807Z",
+      "tokens": 788,
+      "hash": "d92062c84a556d55",
+      "size": 2756,
+      "mtimeMs": 1786743317212.184,
+      "updatedAt": "2026-08-14T21:53:16.625Z",
       "source": "scan"
     },
     ".gitignore": {
       "description": "Git ignore rules",
-      "tokens": 98,
-      "hash": "c4804e72ffddf6d2",
-      "size": 366,
-      "mtimeMs": 1786614247804.351,
-      "updatedAt": "2026-08-13T11:09:46.808Z",
+      "tokens": 244,
+      "hash": "62b621f3d763d379",
+      "size": 913,
+      "mtimeMs": 1786744352062.741,
+      "updatedAt": "2026-08-14T21:53:16.625Z",
+      "source": "scan"
+    },
+    ".nvmrc": {
+      "description": "",
+      "tokens": 1,
+      "hash": "68ca3fba3b7e8647",
+      "size": 3,
+      "mtimeMs": 1786743319043.3904,
+      "updatedAt": "2026-08-14T21:53:16.625Z",
       "source": "scan"
     },
     "AGENTS.md": {
@@ -68,24 +86,24 @@
       "tokens": 68,
       "hash": "8c90778623bf50ac",
       "size": 271,
-      "mtimeMs": 1786614247806.9238,
-      "updatedAt": "2026-08-13T11:09:46.808Z",
+      "mtimeMs": 1786619696838.947,
+      "updatedAt": "2026-08-14T21:53:16.625Z",
       "source": "scan"
     },
     "app/admin/page.tsx": {
-      "description": "API_BASE_URL — renders form — uses useState",
-      "tokens": 2234,
-      "hash": "85298e87c1aa9ee1",
-      "size": 7823,
-      "mtimeMs": 1786561685268.907,
-      "updatedAt": "2026-08-13T11:09:46.810Z",
+      "description": "AdminPage — renders form — uses useState",
+      "tokens": 2216,
+      "hash": "ac9810b81bf1f8a1",
+      "size": 7760,
+      "mtimeMs": 1786743301717.986,
+      "updatedAt": "2026-08-14T21:53:16.627Z",
       "source": "scan",
       "symbols": [
         {
           "name": "AdminPage",
           "kind": "fn",
-          "startLine": 9,
-          "endLine": 202,
+          "startLine": 8,
+          "endLine": 201,
           "tokens": 2147
         }
       ]
@@ -96,7 +114,7 @@
       "hash": "ba45e599d838bcbd",
       "size": 915,
       "mtimeMs": 1786561685269.004,
-      "updatedAt": "2026-08-13T11:09:46.810Z",
+      "updatedAt": "2026-08-14T21:53:16.627Z",
       "source": "scan"
     },
     "app/layout.tsx": {
@@ -105,7 +123,7 @@
       "hash": "5e381d1b88e711e7",
       "size": 840,
       "mtimeMs": 1786561685269.0955,
-      "updatedAt": "2026-08-13T11:09:46.811Z",
+      "updatedAt": "2026-08-14T21:53:16.627Z",
       "source": "scan"
     },
     "app/page.tsx": {
@@ -114,7 +132,7 @@
       "hash": "e3b210cfd02385ae",
       "size": 4698,
       "mtimeMs": 1786598883091.1487,
-      "updatedAt": "2026-08-13T11:09:46.811Z",
+      "updatedAt": "2026-08-14T21:53:16.628Z",
       "source": "scan",
       "symbols": [
         {
@@ -132,7 +150,7 @@
       "hash": "127a34891de6af81",
       "size": 3849,
       "mtimeMs": 1786561685269.4517,
-      "updatedAt": "2026-08-13T11:09:46.812Z",
+      "updatedAt": "2026-08-14T21:53:16.628Z",
       "source": "scan",
       "symbols": [
         {
@@ -149,8 +167,8 @@
       "tokens": 57,
       "hash": "b1ca356fa9d5f3a6",
       "size": 225,
-      "mtimeMs": 1786613561181.6885,
-      "updatedAt": "2026-08-13T11:09:46.812Z",
+      "mtimeMs": 1786619696839.0356,
+      "updatedAt": "2026-08-14T21:53:16.628Z",
       "source": "scan"
     },
     "components/EmergencyBanner.tsx": {
@@ -159,7 +177,7 @@
       "hash": "6081af233dddb63d",
       "size": 1830,
       "mtimeMs": 1786561685269.6006,
-      "updatedAt": "2026-08-13T11:09:46.812Z",
+      "updatedAt": "2026-08-14T21:53:16.628Z",
       "source": "scan"
     },
     "components/Footer.tsx": {
@@ -168,7 +186,7 @@
       "hash": "b7d77ff6595aa277",
       "size": 2282,
       "mtimeMs": 1786561685269.6963,
-      "updatedAt": "2026-08-13T11:09:46.813Z",
+      "updatedAt": "2026-08-14T21:53:16.630Z",
       "source": "scan",
       "symbols": [
         {
@@ -186,7 +204,7 @@
       "hash": "fe419066fdd1e7f3",
       "size": 3843,
       "mtimeMs": 1786598883091.3364,
-      "updatedAt": "2026-08-13T11:09:46.813Z",
+      "updatedAt": "2026-08-14T21:53:16.630Z",
       "source": "scan",
       "symbols": [
         {
@@ -204,7 +222,7 @@
       "hash": "d5b319e1ce788d20",
       "size": 4340,
       "mtimeMs": 1786561685270.0664,
-      "updatedAt": "2026-08-13T11:09:46.814Z",
+      "updatedAt": "2026-08-14T21:53:16.631Z",
       "source": "scan",
       "symbols": [
         {
@@ -222,7 +240,7 @@
       "hash": "e4ae1b04b6139169",
       "size": 11768,
       "mtimeMs": 1786561685270.2788,
-      "updatedAt": "2026-08-13T11:09:46.814Z",
+      "updatedAt": "2026-08-14T21:53:16.631Z",
       "source": "scan",
       "symbols": [
         {
@@ -240,7 +258,7 @@
       "hash": "c4a63f81a768faa3",
       "size": 2671,
       "mtimeMs": 1786561685270.3838,
-      "updatedAt": "2026-08-13T11:09:46.815Z",
+      "updatedAt": "2026-08-14T21:53:16.631Z",
       "source": "scan",
       "symbols": [
         {
@@ -258,7 +276,7 @@
       "hash": "e2239c632fd67a8d",
       "size": 2993,
       "mtimeMs": 1786561685270.4746,
-      "updatedAt": "2026-08-13T11:09:46.815Z",
+      "updatedAt": "2026-08-14T21:53:16.632Z",
       "source": "scan",
       "symbols": [
         {
@@ -276,7 +294,7 @@
       "hash": "c8bf18403d515063",
       "size": 3748,
       "mtimeMs": 1786561685270.5874,
-      "updatedAt": "2026-08-13T11:09:46.816Z",
+      "updatedAt": "2026-08-14T21:53:16.632Z",
       "source": "scan",
       "symbols": [
         {
@@ -294,7 +312,7 @@
       "hash": "91acedbf3ecff6d9",
       "size": 13194,
       "mtimeMs": 1786561685270.7454,
-      "updatedAt": "2026-08-13T11:09:46.816Z",
+      "updatedAt": "2026-08-14T21:53:16.633Z",
       "source": "scan",
       "symbols": [
         {
@@ -312,7 +330,7 @@
       "hash": "aaa1e7a17627787c",
       "size": 5756,
       "mtimeMs": 1786561685270.969,
-      "updatedAt": "2026-08-13T11:09:46.816Z",
+      "updatedAt": "2026-08-14T21:53:16.633Z",
       "source": "scan",
       "symbols": [
         {
@@ -330,7 +348,7 @@
       "hash": "975e2209cf1ec83a",
       "size": 3715,
       "mtimeMs": 1786561685271.0667,
-      "updatedAt": "2026-08-13T11:09:46.817Z",
+      "updatedAt": "2026-08-14T21:53:16.633Z",
       "source": "scan",
       "symbols": [
         {
@@ -347,8 +365,8 @@
       "tokens": 467,
       "hash": "938468bc6019ae31",
       "size": 1868,
-      "mtimeMs": 1786617537072.489,
-      "updatedAt": "2026-08-13T11:09:46.817Z",
+      "mtimeMs": 1786619708019.1338,
+      "updatedAt": "2026-08-14T21:53:16.633Z",
       "source": "scan"
     },
     "docs/SAFETY.md": {
@@ -356,8 +374,8 @@
       "tokens": 367,
       "hash": "eb0a2361373c264b",
       "size": 1468,
-      "mtimeMs": 1786617537072.5159,
-      "updatedAt": "2026-08-13T11:09:46.817Z",
+      "mtimeMs": 1786619708019.4006,
+      "updatedAt": "2026-08-14T21:53:16.634Z",
       "source": "scan"
     },
     "GEMINI.md": {
@@ -365,18 +383,27 @@
       "tokens": 68,
       "hash": "8c90778623bf50ac",
       "size": 271,
-      "mtimeMs": 1786614247807.1152,
-      "updatedAt": "2026-08-13T11:09:46.817Z",
+      "mtimeMs": 1786619696839.1467,
+      "updatedAt": "2026-08-14T21:53:16.634Z",
       "source": "scan"
     },
     "lib/api.ts": {
-      "description": "Default API Gateway endpoint URL (replaced dynamically when deployed)",
-      "tokens": 2103,
-      "hash": "32e5d9f804bebaca",
-      "size": 7369,
-      "mtimeMs": 1786561685271.3423,
-      "updatedAt": "2026-08-13T11:09:46.818Z",
-      "source": "scan"
+      "description": "Contrato de `NEXT_PUBLIC_API_URL` (ver README → \"Validación local\"):",
+      "tokens": 2470,
+      "hash": "7cb3ca683a79c90c",
+      "size": 8667,
+      "mtimeMs": 1786743298242.5776,
+      "updatedAt": "2026-08-14T21:53:16.635Z",
+      "source": "scan",
+      "symbols": [
+        {
+          "name": "resolveApiBaseUrl",
+          "kind": "fn",
+          "startLine": 18,
+          "endLine": 251,
+          "tokens": 2217
+        }
+      ]
     },
     "lib/localStorage.ts": {
       "description": "Exports SavedAuthorListing, getMyListings, saveMyListing, removeMyListing",
@@ -384,7 +411,7 @@
       "hash": "850d8f5b21f86668",
       "size": 1198,
       "mtimeMs": 1786561685271.4595,
-      "updatedAt": "2026-08-13T11:09:46.818Z",
+      "updatedAt": "2026-08-14T21:53:16.635Z",
       "source": "scan"
     },
     "lib/types.ts": {
@@ -393,7 +420,7 @@
       "hash": "bfee21d3155891b7",
       "size": 914,
       "mtimeMs": 1786561685271.5488,
-      "updatedAt": "2026-08-13T11:09:46.818Z",
+      "updatedAt": "2026-08-14T21:53:16.635Z",
       "source": "scan"
     },
     "next-env.d.ts": {
@@ -402,7 +429,7 @@
       "hash": "9dd9d642cdb87d4d",
       "size": 228,
       "mtimeMs": 1786561685271.6523,
-      "updatedAt": "2026-08-13T11:09:46.818Z",
+      "updatedAt": "2026-08-14T21:53:16.635Z",
       "source": "scan"
     },
     "next.config.mjs": {
@@ -411,7 +438,7 @@
       "hash": "ef3e74407190ab29",
       "size": 201,
       "mtimeMs": 1786561685271.756,
-      "updatedAt": "2026-08-13T11:09:46.819Z",
+      "updatedAt": "2026-08-14T21:53:16.635Z",
       "source": "scan"
     },
     "openapi.yaml": {
@@ -419,8 +446,8 @@
       "tokens": 452,
       "hash": "d9e2b55cbb16683b",
       "size": 1581,
-      "mtimeMs": 1786617537072.4968,
-      "updatedAt": "2026-08-13T11:09:46.820Z",
+      "mtimeMs": 1786619708019.9946,
+      "updatedAt": "2026-08-14T21:53:16.636Z",
       "source": "scan"
     },
     "package-lock.json": {
@@ -428,17 +455,17 @@
       "tokens": 81808,
       "hash": "8ce79b03b3086911",
       "size": 286326,
-      "mtimeMs": 1786613571335.1042,
-      "updatedAt": "2026-08-13T11:09:46.820Z",
+      "mtimeMs": 1786619696841.2466,
+      "updatedAt": "2026-08-14T21:53:16.636Z",
       "source": "scan"
     },
     "package.json": {
       "description": "Node.js package manifest",
-      "tokens": 285,
-      "hash": "76a54598f7f3c42f",
-      "size": 996,
-      "mtimeMs": 1786614247807.5317,
-      "updatedAt": "2026-08-13T11:09:46.820Z",
+      "tokens": 379,
+      "hash": "acdc314ed2890ce4",
+      "size": 1324,
+      "mtimeMs": 1786743276110.94,
+      "updatedAt": "2026-08-14T21:53:16.636Z",
       "source": "scan"
     },
     "postcss.config.mjs": {
@@ -447,25 +474,25 @@
       "hash": "efa65c65e17d51d5",
       "size": 157,
       "mtimeMs": 1786561685272.5557,
-      "updatedAt": "2026-08-13T11:09:46.821Z",
+      "updatedAt": "2026-08-14T21:53:16.636Z",
       "source": "scan"
     },
     "README.md": {
-      "description": "Project documentation with roadmap handoff note",
-      "tokens": 667,
-      "hash": "fd413ac6c4db4537",
-      "size": 2683,
-      "mtimeMs": 1786617653338.1475,
-      "updatedAt": "2026-08-13T11:09:46.821Z",
+      "description": "Project documentation",
+      "tokens": 1273,
+      "hash": "4988254d3502b732",
+      "size": 5124,
+      "mtimeMs": 1786743689730.8962,
+      "updatedAt": "2026-08-14T21:53:16.637Z",
       "source": "scan"
     },
     "ROADMAP.md": {
-      "description": "Product source of truth for architecture and epic status",
-      "tokens": 4777,
-      "hash": "9f2b838dbcb9236b",
-      "size": 19535,
-      "mtimeMs": 1786617537072.142,
-      "updatedAt": "2026-08-13T11:09:46.821Z",
+      "description": "Refugio Temporal — Plataforma de Alojamiento de Emergencia",
+      "tokens": 5400,
+      "hash": "eb61e9628064d750",
+      "size": 22073,
+      "mtimeMs": 1786743737440.0564,
+      "updatedAt": "2026-08-14T21:53:16.637Z",
       "source": "scan"
     },
     "scripts/local-server.mjs": {
@@ -474,7 +501,7 @@
       "hash": "dd6ff658b2155fa2",
       "size": 1309,
       "mtimeMs": 1786568598144.1096,
-      "updatedAt": "2026-08-13T11:09:46.822Z",
+      "updatedAt": "2026-08-14T21:53:16.637Z",
       "source": "scan"
     },
     "tailwind.config.ts": {
@@ -483,7 +510,7 @@
       "hash": "ee1b2c46fe258a3f",
       "size": 772,
       "mtimeMs": 1786561685272.6511,
-      "updatedAt": "2026-08-13T11:09:46.822Z",
+      "updatedAt": "2026-08-14T21:53:16.638Z",
       "source": "scan"
     },
     "tsconfig.json": {
@@ -492,7 +519,7 @@
       "hash": "1c6463f0827b6213",
       "size": 598,
       "mtimeMs": 1786561685272.7666,
-      "updatedAt": "2026-08-13T11:09:46.823Z",
+      "updatedAt": "2026-08-14T21:53:16.638Z",
       "source": "scan"
     }
   }

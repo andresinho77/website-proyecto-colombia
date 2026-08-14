@@ -12,6 +12,9 @@
         ".git",
         "dist",
         "build",
+        "out",
+        "playwright-report",
+        "test-results",
         ".wolf",
         ".next",
         ".nuxt",
@@ -26,7 +29,9 @@
         ".netlify",
         ".output",
         "*.min.js",
-        "*.min.css"
+        "*.min.css",
+        "*.tsbuildinfo",
+        "settings.local.json"
       ]
     },
     "token_audit": {

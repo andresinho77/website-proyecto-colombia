@@ -1,11 +1,13 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-08-13T11:09:46.823Z
-> Files: 41 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-08-14T21:53:16.639Z
+> Files: 43 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
-- `.gitignore` — Git ignore rules (~98 tok)
+- `.eslintrc.json` — ESLint configuration (~33 tok)
+- `.gitignore` — Git ignore rules (~244 tok)
+- `.nvmrc` (~1 tok)
 - `AGENTS.md` — OpenWolf (~68 tok)
 - `CLAUDE.md` — OpenWolf (~57 tok)
 - `GEMINI.md` — OpenWolf (~68 tok)
@@ -13,10 +15,10 @@
 - `next.config.mjs` — Next.js configuration (~54 tok)
 - `openapi.yaml` — API contract snapshot for frontend/backend integration (~452 tok)
 - `package-lock.json` — npm lock file (~81808 tok)
-- `package.json` — Node.js package manifest (~285 tok)
+- `package.json` — Node.js package manifest (~379 tok)
 - `postcss.config.mjs` — Declares config (~42 tok)
-- `README.md` — Project documentation with roadmap handoff note (~667 tok)
-- `ROADMAP.md` — Product source of truth for architecture and epic status (~4777 tok)
+- `README.md` — Project documentation (~1273 tok)
+- `ROADMAP.md` — Refugio Temporal — Plataforma de Alojamiento de Emergencia (~5400 tok)
 - `tailwind.config.ts` — Tailwind CSS configuration (~221 tok)
 - `tsconfig.json` — TypeScript configuration (~171 tok)
 
@@ -35,7 +37,7 @@
 
 ## .github/workflows/
 
-- `frontend-ci.yml` — CI: "Frontend Next.js CI/CD Pipeline" (~601 tok)
+- `frontend-ci.yml` — CI: "Frontend Next.js CI/CD Pipeline" (~788 tok)
 
 ## app/
 
@@ -46,8 +48,8 @@
 
 ## app/admin/
 
-- `page.tsx` — API_BASE_URL — renders form — uses useState (~2234 tok)
-  - fn `AdminPage` L9-202 (~2147 tok)
+- `page.tsx` — AdminPage — renders form — uses useState (~2216 tok)
+  - fn `AdminPage` L8-201 (~2147 tok)
 
 ## app/terminos-y-privacidad/
 
@@ -85,7 +87,8 @@
 
 ## lib/
 
-- `api.ts` — Default API Gateway endpoint URL (replaced dynamically when deployed) (~2103 tok)
+- `api.ts` — Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"): (~2470 tok)
+  - fn `resolveApiBaseUrl` L18-251 (~2217 tok)
 - `localStorage.ts` — Exports SavedAuthorListing, getMyListings, saveMyListing, removeMyListing (~343 tok)
 - `types.ts` — Exports ListingType, ListingStatus, Listing, FilterState, CreateListingInput (~262 tok)
 

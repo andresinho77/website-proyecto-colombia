@@ -9,10 +9,14 @@
     "dev": "next dev",
     "dev:api": "node scripts/local-server.mjs",
     "build": "next build",
+    "build:local": "NEXT_PUBLIC_API_URL=\"${NEXT_PUBLIC_API_URL:-http://localhost:4000/api/listings}\" next build",
     "start": "next start",
-    "lint": "next lint",
-    "test": "vitest run",
-    "test:e2e": "playwright test"
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint --max-warnings=0",
+    "test": "vitest run --passWithNoTests",
+    "test:e2e": "playwright test",
+    "validate": "npm run typecheck && npm run lint && npm run test && npm run build:local",
+    "validate:clean": "npm ci && npm run validate"
   },
   "dependencies": {
     "lucide-react": "^0.428.0",

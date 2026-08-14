@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, Lock, Trash2, CheckCircle, RefreshCw, AlertTriangle } from 'lucide-react';
 import { Listing } from '../../lib/types';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.alojamientosolidario.co/api/listings';
+import { API_BASE_URL } from '../../lib/api';
 
 export default function AdminPage() {
   const [adminKey, setAdminKey] = useState('');

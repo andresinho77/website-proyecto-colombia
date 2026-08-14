@@ -1,7 +1,37 @@
 import { Listing, CreateListingInput, FilterState } from './types';
 
-// Default API Gateway endpoint URL (replaced dynamically when deployed)
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.alojamientosolidario.co/api/listings';
+/**
+ * Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"):
+ *
+ * - Build de despliegue (`next build`, NODE_ENV=production): la variable es
+ *   OBLIGATORIA. El valor queda incrustado en el bundle estático, así que un
+ *   default silencioso apuntaría el artefacto a un endpoint adivinado. Si falta,
+ *   el build falla con instrucciones explícitas.
+ * - Desarrollo local (`next dev`): si falta, se usa deliberadamente el servidor
+ *   mock local (`npm run dev:api`). Nunca se cae a producción por defecto, para
+ *   que un `npm run dev` no escriba datos reales por accidente.
+ * - Validación local (`npm run validate`): usa `build:local`, que inyecta el
+ *   mismo endpoint local salvo que ya haya un valor en el entorno.
+ */
+export const LOCAL_API_BASE_URL = 'http://localhost:4000/api/listings';
+
+function resolveApiBaseUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (configured) return configured.replace(/\/+$/, '');
+
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'NEXT_PUBLIC_API_URL is required to build a deployable bundle.\n' +
+        '  · Deploy build:      NEXT_PUBLIC_API_URL="https://<api-host>/api/listings" npm run build\n' +
+        `  · Local validation:  npm run validate   (uses ${LOCAL_API_BASE_URL})\n` +
+        '  · CI: set the NEXT_PUBLIC_API_URL repository variable.'
+    );
+  }
+
+  return LOCAL_API_BASE_URL;
+}
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 // Emergency sample mock data for offline/demo fallback
 const MOCK_LISTINGS: Listing[] = [

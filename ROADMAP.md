@@ -51,7 +51,8 @@ Este proyecto tiene dos repositorios:
 | Notificaciones | Amazon SES | Alertas al equipo moderador (reportes, resumen diario), bajo costo, integra bien con el resto del stack AWS |
 | Autenticación de usuarios finales | Ninguna para MVP | Fricción cero es la prioridad; moderación se hace por reporte + revisión manual (ver sección 7) |
 | Contacto entre usuarios | Enlaces `https://wa.me/<numero>?text=...` | No requiere WhatsApp Business API; funciona en cualquier navegador/dispositivo |
-| CI/CD frontend | GitHub Actions en este repo → build/type-check + artefacto estático reutilizable | Valida cada cambio y produce el bundle que consume el repo de infraestructura |
+| CI/CD frontend | GitHub Actions en este repo → paridad con `npm run validate` (typecheck, lint, tests, build) + artefacto estático reutilizable | Valida cada cambio con exactamente los mismos checks que el flujo local y produce el bundle que consume el repo de infraestructura |
+| Validación de cambios | **Local-first**: `npm run validate` es el contrato único; sin preview ni staging propio del frontend | Sin ambientes intermedios que mantener durante la crisis; lo que pasa en local es lo que exige CI |
 | CI/CD infraestructura | Definido en el repo de IaC (fuera del alcance de este documento) | Propiedad del arquitecto/DevOps |
 
 **Ownership de despliegue (acordado):**
@@ -63,6 +64,16 @@ Este proyecto tiene dos repositorios:
 únicamente a través de una URL base configurable (variable de entorno, por ejemplo
 `NEXT_PUBLIC_API_URL`), para que el equipo de infraestructura pueda cambiar
 endpoints, dominios o versiones sin requerir cambios en el código del frontend.
+
+**Contrato de `NEXT_PUBLIC_API_URL` (resuelto en `lib/api.ts`):**
+- En build de despliegue (`NODE_ENV=production`) la variable es **obligatoria**;
+  si falta, el build falla con instrucciones. El valor queda incrustado en el
+  bundle estático, así que un default silencioso enviaría el artefacto a un
+  endpoint adivinado.
+- En desarrollo (`next dev`) se usa un fallback local deliberado
+  (`http://localhost:4000/api/listings`, el servidor de `npm run dev:api`).
+  Nunca se cae a producción por defecto.
+- `npm run validate` inyecta ese mismo endpoint local vía `npm run build:local`.
 
 **Alineación con el repo actual:** este plan asume que el repo mantiene la
 implementación actual del MVP (landing, feed, formularios, moderación, PIN de autor,
@@ -85,7 +96,9 @@ lanzamiento inicial estable y seguro.
 ├── scripts/                    # scripts locales de desarrollo / API mock
 ├── openapi.yaml                # contrato vigente del frontend con el backend
 ├── next.config.mjs             # configuración de exportación estática
-├── package.json                # dependencias y scripts del frontend
+├── .eslintrc.json              # configuración de lint (next/core-web-vitals)
+├── .nvmrc                      # versión de Node compartida por local y CI
+├── package.json                # dependencias y scripts (incl. `npm run validate`)
 ├── ROADMAP.md                  # este archivo (fuente de verdad)
 └── README.md                   # guía de ejecución y despliegue
 ```
@@ -138,7 +151,7 @@ Consideraciones de datos sensibles (ver también sección 7 — Política de Dat
 
 Formato para que los agentes generen issues/PRs automáticamente.
 
-Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubierto, [⬜] no iniciado.
+Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubierto, [⬜] no iniciado, [⏸️] aplazado por decisión explícita.
 
 ### Épica 1 — Landing y navegación
 - [✅] **US-1.1**: Como usuario, veo una página de inicio con dos botones grandes
@@ -223,12 +236,23 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 - Solicitudes de eliminación manual: procesar en un máximo de 5 días hábiles.
 
 ### Épica 8 — Despliegue y CI/CD (frontend)
-- [✅] **US-8.1**: Como mantenedor, cada push y PR a `main`/`dev` ejecuta build y
-  type-check vía GitHub Actions y publica un artefacto estático (`out/`)
-  reutilizable por el repo de infraestructura para el despliegue productivo.
-- [⬜] **US-8.2**: Como mantenedor, tengo un ambiente de *preview* (rama `staging`
-  o PR preview) para probar cambios antes de producción, apuntando al
-  ambiente de staging de la API (coordinado con el repo de infraestructura).
+- [✅] **US-8.1**: Como mantenedor, cada push y PR a `main`/`dev` ejecuta en GitHub
+  Actions los mismos checks que el flujo local (type-check, lint, tests, build) y
+  publica un artefacto estático (`out/`) reutilizable por el repo de
+  infraestructura para el despliegue productivo.
+- [✅] **US-8.3**: Como contribuidor, tengo **un solo comando local determinista**
+  (`npm run validate`) que cubre exactamente lo que exige CI, ejecutable desde un
+  clon limpio en macOS con `npm ci && npm run validate`.
+  - *Criterios*: orden fijo typecheck → lint → test → build; falla en el primer
+    error; produce `out/`; documentado en `README.md`.
+- [🟡] **US-8.4**: Como mantenedor, el gate de tests deja de ser vacío: hoy corre
+  con `--passWithNoTests` porque aún no existen suites. Falta un smoke test de
+  render de la landing y del feed para que el paso 3 tenga valor real.
+- [⏸️] **US-8.2 (aplazado — decisión 2026-08-14)**: ambiente de *preview*/staging
+  del frontend. **No se construye por ahora.** La validación previa a producción
+  se hace con paridad local↔CI (`npm run validate`); no se crean ramas,
+  environments ni artefactos de preview. Reabrir solo si el volumen de cambios
+  o la coordinación con la API de staging lo justifica.
 
 ### Épica 9 — Rendimiento y optimización de carga (fase 2)
 - [⬜] **PERF-1**: Como usuario, la página de inicio y el feed cargan de forma
@@ -290,17 +314,29 @@ que el equipo está usando para la integración inicial.
 
 ## 8. Pipeline de CI/CD del frontend (`.github/workflows/frontend-ci.yml`)
 
+**Principio rector: paridad local ↔ CI.** CI no ejecuta ningún check que un
+contribuidor no pueda correr con `npm run validate`, y `npm run validate` no
+omite ningún check que CI exija. Si divergen, se corrige el workflow.
+
 El workflow del frontend debe:
 1. Dispararse en `push` a `main` y `dev`, y en PRs hacia esas ramas.
-2. Instalar dependencias del repo.
-3. Ejecutar validaciones de build y type-check del proyecto Next.js.
-4. Inyectar la URL base de la API como variable de entorno (`NEXT_PUBLIC_API_URL`)
-   según el ambiente (producción vs staging), coordinada con el repo de infraestructura.
+2. Fijar la versión de Node desde `.nvmrc` (misma que en local) e instalar
+   dependencias con `npm ci`.
+3. Ejecutar los mismos checks que `npm run validate`, en pasos separados para que
+   la anotación de fallo apunte al check exacto: `npm run typecheck`,
+   `npm run lint`, `npm run test`.
+4. Resolver la URL base de la API (`NEXT_PUBLIC_API_URL`) desde la repository
+   variable, coordinada con el repo de infraestructura. Si no está configurada,
+   emite un `::warning` y usa el endpoint de producción para no publicar un
+   artefacto roto.
 5. Generar el build estático y publicar un artefacto (`out/`) reutilizable para
    despliegues productivos desde el repo de infraestructura
    (`infra-proyecto-colombia`) hacia S3/CloudFront.
-6. Fallar el pipeline si hay errores de lint/build, para evitar romper el sitio
-   en producción durante una crisis activa.
+6. Fallar el pipeline si hay errores de type-check, lint, tests o build, para
+   evitar romper el sitio en producción durante una crisis activa.
+
+**Sin preview ni staging (decisión 2026-08-14):** el workflow no crea ramas,
+environments ni artefactos de preview. La única salida es `static-export`.
 
 *(El pipeline productivo de infraestructura — RDS, Lambda/API, SES, S3,
 CloudFront — vive en el repo de IaC del arquitecto y está fuera del alcance de

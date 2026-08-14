@@ -35,8 +35,8 @@ y Armenia como siguientes.
 ## 2. Decisiones de arquitectura
 
 Este proyecto tiene dos repositorios:
-- **Este repo (frontend)**: aplicación Next.js con exportación estática. Publica una
-  versión pública de referencia (mock/sandbox) en GitHub Pages para pruebas abiertas.
+- **Este repo (frontend)**: aplicación Next.js con exportación estática. Genera un
+  artefacto estático (`out/`) listo para desplegar en la infraestructura productiva.
 - **Repo de infraestructura (IaC)**: mantenido por el arquitecto/DevOps del equipo,
   contiene la definición de la infraestructura AWS (RDS, Lambda/API, redes, SES).
   Este documento asume que ese repo existe por separado y solo describe el
@@ -44,20 +44,20 @@ Este proyecto tiene dos repositorios:
 
 | Capa | Elección | Razón |
 |---|---|---|
-| Hosting frontend | GitHub Pages (mock público) + S3/CloudFront (producción real) | Mantener una versión siempre accesible para validación comunitaria desde este repo y separar la entrega productiva en el repo de infraestructura |
+| Hosting frontend | S3 + CloudFront (producción real) | Entrega productiva del build estático desde el repo de infraestructura |
 | Framework | Next.js 14 con exportación estática (`output: 'export'`) + Tailwind | Mantiene un desarrollo ágil, componentes reutilizables y un build listo para S3/CloudFront |
 | Base de datos | AWS RDS (PostgreSQL) | Definido y administrado por el repo de infraestructura del arquitecto; control total sobre performance, escalado y cumplimiento de datos |
 | Capa de API | API Gateway + Lambda (o equivalente definido en el repo de IaC) frente a RDS | El frontend estático necesita una API HTTP intermedia para crear, listar, reportar y resolver publicaciones |
 | Notificaciones | Amazon SES | Alertas al equipo moderador (reportes, resumen diario), bajo costo, integra bien con el resto del stack AWS |
 | Autenticación de usuarios finales | Ninguna para MVP | Fricción cero es la prioridad; moderación se hace por reporte + revisión manual (ver sección 7) |
 | Contacto entre usuarios | Enlaces `https://wa.me/<numero>?text=...` | No requiere WhatsApp Business API; funciona en cualquier navegador/dispositivo |
-| CI/CD frontend | GitHub Actions en este repo → build/type-check + publicación mock en GitHub Pages | Asegura disponibilidad pública continua del MVP simulado y validación rápida de cambios |
+| CI/CD frontend | GitHub Actions en este repo → build/type-check + artefacto estático reutilizable | Valida cada cambio y produce el bundle que consume el repo de infraestructura |
 | CI/CD infraestructura | Definido en el repo de IaC (fuera del alcance de este documento) | Propiedad del arquitecto/DevOps |
 
 **Ownership de despliegue (acordado):**
 - **Producción** (`S3 + CloudFront`): se implementa y opera en
-  `infra-proyecto-colombia`.
-- **Mock público permanente** (`GitHub Pages`): se implementa y opera en este repo.
+  `infra-proyecto-colombia`, consumiendo el artefacto estático que produce este repo.
+- **CI del frontend** (build/type-check + artefacto estático): se opera en este repo.
 
 **Punto de integración clave para el agente:** el frontend debe consumir la API
 únicamente a través de una URL base configurable (variable de entorno, por ejemplo
@@ -223,8 +223,9 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 - Solicitudes de eliminación manual: procesar en un máximo de 5 días hábiles.
 
 ### Épica 8 — Despliegue y CI/CD (frontend)
-- [🟡] **US-8.1**: Como mantenedor, cada push a `main` en este repo despliega
-  automáticamente el sitio **mock público** a GitHub Pages vía GitHub Actions.
+- [✅] **US-8.1**: Como mantenedor, cada push y PR a `main`/`dev` ejecuta build y
+  type-check vía GitHub Actions y publica un artefacto estático (`out/`)
+  reutilizable por el repo de infraestructura para el despliegue productivo.
 - [⬜] **US-8.2**: Como mantenedor, tengo un ambiente de *preview* (rama `staging`
   o PR preview) para probar cambios antes de producción, apuntando al
   ambiente de staging de la API (coordinado con el repo de infraestructura).
@@ -295,19 +296,19 @@ El workflow del frontend debe:
 3. Ejecutar validaciones de build y type-check del proyecto Next.js.
 4. Inyectar la URL base de la API como variable de entorno (`NEXT_PUBLIC_API_URL`)
    según el ambiente (producción vs staging), coordinada con el repo de infraestructura.
-5. Generar el build estático y publicar el **mock público** en GitHub Pages.
-6. Generar artefacto estático reutilizable para despliegues productivos desde el
-  repo de infraestructura (`infra-proyecto-colombia`) hacia S3/CloudFront.
-7. Fallar el pipeline si hay errores de lint/build, para evitar romper el sitio
+5. Generar el build estático y publicar un artefacto (`out/`) reutilizable para
+   despliegues productivos desde el repo de infraestructura
+   (`infra-proyecto-colombia`) hacia S3/CloudFront.
+6. Fallar el pipeline si hay errores de lint/build, para evitar romper el sitio
    en producción durante una crisis activa.
 
 *(El pipeline productivo de infraestructura — RDS, Lambda/API, SES, S3,
 CloudFront — vive en el repo de IaC del arquitecto y está fuera del alcance de
 este documento.)*
 
-**Nota de despliegue:** este repo garantiza una versión pública permanente en
-GitHub Pages para validación comunitaria, mientras que la ruta productiva sigue
-siendo build estático hacia S3/CloudFront desde el repo de infraestructura.
+**Nota de despliegue:** este repo solo valida el frontend y expone el artefacto
+estático; la ruta productiva es build estático hacia S3/CloudFront desde el repo
+de infraestructura.
 
 ---
 

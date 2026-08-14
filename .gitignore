@@ -19,4 +19,7 @@ yarn-error.log*
 .wolf/cron-state.json
 .wolf/memory.md
 .wolf/STATUS.md
+.wolf/hooks/_session.json
+_precompact-snapshot.json
 .codex/
+

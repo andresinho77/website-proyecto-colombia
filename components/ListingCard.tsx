@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Sparkles,
+  ShieldAlert,
 } from 'lucide-react';
 import { Listing } from '../lib/types';
 import { reportListing, resolveListing } from '../lib/api';
@@ -197,6 +198,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           <MessageSquare className="w-4 h-4" />
           Contactar por WhatsApp (+57)
         </a>
+        <p className="flex items-center justify-center gap-1 text-[10px] text-slate-500">
+          <ShieldAlert className="w-3 h-3 text-amber-500 flex-shrink-0" />
+          Nunca compartas datos bancarios ni pagues por adelantado.
+        </p>
 
         {/* Secondary Utility Buttons */}
         <div className="flex items-center justify-between gap-2 pt-1">

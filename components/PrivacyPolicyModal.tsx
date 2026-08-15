@@ -40,28 +40,39 @@ export const PrivacyPolicyModal: React.FC<PrivacyPolicyModalProps> = ({
 
         <div className="space-y-4 text-xs leading-relaxed text-slate-300 max-h-96 overflow-y-auto pr-2">
           <section>
-            <h3 className="font-bold text-white text-sm mb-1">1. Objeto y Finalidad</h3>
+            <h3 className="font-bold text-white text-sm mb-1">1. Qué datos recolectamos</h3>
             <p>
-              La plataforma pública <strong>Alojamiento Solidario Colombia</strong> recolecta y trata datos personales de contacto (Nombre, Celular/WhatsApp, Ciudad y Barrio) con la <strong>única y exclusiva finalidad</strong> de conectar a personas damnificadas por el terremoto del 10 de agosto de 2026 con voluntarios o ciudadanos que ofrecen alojamiento temporal de emergencia.
+              Al publicar, la plataforma pública <strong>Alojamiento Solidario Colombia</strong> recolecta únicamente: número de <strong>Celular/WhatsApp</strong>, <strong>Ciudad</strong>, <strong>Barrio/Sector</strong>, cantidad de personas, fechas de disponibilidad, precio (si aplica), la descripción que escribas y, si decides adjuntarlas, fotos del espacio. No solicitamos ni almacenamos tu nombre, documento de identidad ni dirección exacta.
             </p>
           </section>
 
           <section>
-            <h3 className="font-bold text-white text-sm mb-1">2. Consentimiento Informado</h3>
+            <h3 className="font-bold text-white text-sm mb-1">2. Para qué se usan</h3>
             <p>
-              Al publicar en la plataforma, el usuario otorga su autorización previa, expresa e informada para que sus datos de contacto sean publicados en el feed abierto de la web y accesibles mediante enlaces directos a WhatsApp (`wa.me`).
+              Estos datos se usan con la <strong>única y exclusiva finalidad</strong> de conectar directamente, por WhatsApp, a personas damnificadas por el terremoto del 10 de agosto de 2026 con voluntarios o ciudadanos que ofrecen alojamiento temporal de emergencia. Al publicar, autorizas que tu número y los demás datos de la publicación sean visibles en el feed abierto de la web y accesibles mediante el enlace directo a WhatsApp (`wa.me`).
             </p>
           </section>
 
           <section>
-            <h3 className="font-bold text-white text-sm mb-1">3. Derechos ARCO</h3>
+            <h3 className="font-bold text-white text-sm mb-1">3. Cuánto tiempo se conservan</h3>
             <p>
-              Conforme a la Ley 1581 de 2012, el titular de los datos tiene derecho a conocer, actualizar, rectificar y suprimir sus datos en cualquier momento. El autor puede suprimir o marcar como &ldquo;Resuelta&rdquo; su publicación de forma inmediata utilizando el PIN de 4 dígitos generado o el botón de supresión directa.
+              Vencimiento funcional a los <strong>15 días</strong> de inactividad; los datos de contacto y la descripción se <strong>anonimizan a los 30 días</strong> de que la publicación quede resuelta o vencida; y se <strong>eliminan por completo a los 90 días</strong>, salvo obligación legal de conservarlos.
             </p>
           </section>
 
           <section>
-            <h3 className="font-bold text-white text-sm mb-1">4. Seguridad y No Comercialización</h3>
+            <h3 className="font-bold text-white text-sm mb-1">4. Derechos ARCO y cómo eliminar tus datos</h3>
+            <p>
+              Conforme a la Ley 1581 de 2012, el titular de los datos tiene derecho a conocer, actualizar, rectificar y suprimir sus datos en cualquier momento. La vía inmediata es marcar la publicación como &ldquo;Resuelta&rdquo; con el PIN de 4 dígitos que recibiste al publicar, lo que la retira del feed público al instante. Para solicitudes formales (por ejemplo, si perdiste el PIN), escribe a{' '}
+              <a href="mailto:pendiente-definir@alojamientosolidario.co" className="text-emerald-400 underline">
+                pendiente-definir@alojamientosolidario.co
+              </a>{' '}
+              — canal oficial de solicitudes de datos personales, en proceso de habilitación. Confirmamos la recepción en máximo 24 horas y resolvemos en máximo 5 días hábiles.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="font-bold text-white text-sm mb-1">5. Seguridad y No Comercialización</h3>
             <p>
               Los datos recolectados no serán bajo ninguna circunstancia cedidos, comercializados ni utilizados para fines publicitarios o lucrativos.
             </p>

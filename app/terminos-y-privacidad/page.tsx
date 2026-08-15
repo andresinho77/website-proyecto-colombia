@@ -47,20 +47,34 @@ export default function TerminosYPrivacidadPage() {
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
                   <Lock className="w-4 h-4 text-emerald-400" />
-                  2. Finalidad Exclusiva del Tratamiento
+                  2. Qué Datos Recolectamos y Para Qué
                 </h2>
                 <p>
-                  Los datos personales de contacto solicitados (Nombre, Celular/WhatsApp, Ciudad y Barrio) son tratados con la <strong>única y exclusiva finalidad</strong> de facilitar la comunicación directa, voluntaria y sin intermediarios entre ciudadanos que ofrecen espacio disponible y personas afectadas por el desastre natural del 10 de agosto de 2026.
+                  Al publicar, recolectamos únicamente: número de <strong>Celular/WhatsApp</strong>, <strong>Ciudad</strong>, <strong>Barrio/Sector</strong>, cantidad de personas, fechas de disponibilidad, precio (si aplica), la descripción que escribas y, si decides adjuntarlas, fotos del espacio. No solicitamos ni almacenamos tu nombre, documento de identidad ni dirección exacta. Estos datos se tratan con la <strong>única y exclusiva finalidad</strong> de facilitar la comunicación directa, voluntaria y sin intermediarios entre ciudadanos que ofrecen espacio disponible y personas afectadas por el desastre natural del 10 de agosto de 2026, a través de un enlace directo a WhatsApp (`wa.me`).
                 </p>
               </section>
 
               <section className="space-y-2">
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  3. Derechos de los Titulares (Derechos ARCO)
+                  3. Tiempo de Conservación (Retención)
                 </h2>
                 <p>
-                  Todo titular de los datos tiene derecho a conocer, actualizar, rectificar y solicitar la supresión de su información. El usuario puede retirar o modificar su publicación en cualquier momento utilizando el PIN de 4 dígitos generado al publicar o mediante el botón directo de marcar como &ldquo;Resuelta&rdquo;.
+                  Vencimiento funcional a los <strong>15 días</strong> de inactividad; los datos de contacto y la descripción se <strong>anonimizan a los 30 días</strong> de que la publicación quede resuelta o vencida; y se <strong>eliminan por completo a los 90 días</strong>, salvo obligación legal de conservarlos.
+                </p>
+              </section>
+
+              <section className="space-y-2">
+                <h2 className="text-base font-bold text-white flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                  4. Derechos de los Titulares (Derechos ARCO) y Cómo Solicitar la Eliminación
+                </h2>
+                <p>
+                  Todo titular de los datos tiene derecho a conocer, actualizar, rectificar y solicitar la supresión de su información. La vía inmediata es marcar la publicación como &ldquo;Resuelta&rdquo; con el PIN de 4 dígitos generado al publicar, lo que la retira del feed público al instante. Para solicitudes formales (por ejemplo, si perdiste el PIN), escribe a{' '}
+                  <a href="mailto:pendiente-definir@alojamientosolidario.co" className="text-emerald-400 underline">
+                    pendiente-definir@alojamientosolidario.co
+                  </a>{' '}
+                  — canal oficial de solicitudes de datos personales, en proceso de habilitación. Confirmamos la recepción en máximo 24 horas y resolvemos en máximo 5 días hábiles.
                 </p>
               </section>
             </div>

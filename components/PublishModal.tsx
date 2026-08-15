@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X, Send, ShieldCheck, AlertCircle, Home, Heart } from 'lucide-react';
+import { X, Send, ShieldAlert, AlertCircle, Home, Heart } from 'lucide-react';
 import { ListingType, Listing } from '../lib/types';
 import { createListing } from '../lib/api';
 import { saveMyListing } from '../lib/localStorage';
@@ -157,6 +157,14 @@ export const PublishModal: React.FC<PublishModalProps> = ({
           <h2 className="text-2xl font-bold text-white">
             {tipo === 'ofrezco' ? 'Ofrecer Alojamiento 🏡' : 'Solicitar Alojamiento 🆘'}
           </h2>
+        </div>
+
+        {/* Mandatory anti-fraud warning (docs/SAFETY.md) */}
+        <div className="mb-4 p-3 rounded-xl bg-amber-950/60 border border-amber-700/60 text-amber-200 text-xs flex items-start gap-2">
+          <ShieldAlert className="w-4 h-4 flex-shrink-0 mt-0.5 text-amber-400" />
+          <span>
+            <strong>Advertencia de seguridad:</strong> Nunca compartas datos bancarios ni realices pagos por adelantado a través de este sitio.
+          </span>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

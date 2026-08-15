@@ -54,28 +54,28 @@
 
 ## app/terminos-y-privacidad/
 
-- `page.tsx` — TerminosYPrivacidadPage (~1096 tok)
-  - fn `TerminosYPrivacidadPage` L7-75 (~1030 tok)
+- `page.tsx` — TerminosYPrivacidadPage; data collected/purpose/15-30-90 retention/deletion channel, matches PrivacyPolicyModal.tsx content (no "Nombre" field, US-7.1) (~1096 tok)
+  - fn `TerminosYPrivacidadPage` L7-88 (~1030 tok)
 
 ## components/
 
 - `EmergencyBanner.tsx` — EmergencyBanner (~523 tok)
-- `Footer.tsx` — Footer (~650 tok)
-  - section `FooterProps` L7-59 (~612 tok)
+- `Footer.tsx` — Footer; OFFICIAL_CHANNELS array renders external links to Cruz Roja Colombiana, UNGRD, gov.co (alcaldías) with target=_blank rel=noopener noreferrer (~750 tok)
+  - section `FooterProps` L7-79 (~612 tok)
 - `HeroButtons.tsx` — HeroButtons (~1094 tok)
   - section `HeroButtonsProps` L6-71 (~1068 tok)
 - `ImageUploader.tsx` — ImageUploader — uses useState (~1238 tok)
   - section `ImageUploaderProps` L7-131 (~1184 tok)
-- `ListingCard.tsx` — ListingCard — renders form, map — uses useState (~3359 tok)
-  - section `ListingCardProps` L21-301 (~3250 tok)
+- `ListingCard.tsx` — ListingCard — renders form, map — uses useState; one-line anti-fraud reinforcement under the WhatsApp button (~3420 tok)
+  - section `ListingCardProps` L21-305 (~3250 tok)
 - `ListingGrid.tsx` — ListingGrid (~762 tok)
   - section `ListingGridProps` L8-83 (~713 tok)
 - `Navbar.tsx` — Navbar (~854 tok)
   - section `NavbarProps` L7-68 (~809 tok)
-- `PrivacyPolicyModal.tsx` — PrivacyPolicyModal (~1068 tok)
-  - section `PrivacyPolicyModalProps` L6-83 (~1040 tok)
-- `PublishModal.tsx` — CITIES — renders form — uses useState, useEffect; resets the full form (incl. `tipo` from `defaultTipo`) on every open since the component never unmounts (~3900 tok)
-  - section `PublishModalProps` L10-368 (~3670 tok)
+- `PrivacyPolicyModal.tsx` — PrivacyPolicyModal; data collected/purpose/15-30-90 retention/deletion channel, matches terminos-y-privacidad/page.tsx content (no "Nombre" field, US-7.1) (~1250 tok)
+  - section `PrivacyPolicyModalProps` L6-93 (~1040 tok)
+- `PublishModal.tsx` — CITIES — renders form — uses useState, useEffect; resets the full form (incl. `tipo` from `defaultTipo`) on every open since the component never unmounts; mandatory anti-fraud warning banner below the header (~4050 tok)
+  - section `PublishModalProps` L10-375 (~3670 tok)
 - `SearchFilters.tsx` — CITIES — renders map (~1642 tok)
   - section `SearchFiltersProps` L7-145 (~1595 tok)
 - `ShareModal.tsx` — ShareModal (~1057 tok)

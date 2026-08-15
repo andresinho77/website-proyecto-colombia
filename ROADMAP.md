@@ -208,11 +208,15 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   número de publicaciones activas, resueltas y reportadas por ciudad.
 
 ### Épica 7 — Política de datos y cumplimiento (Habeas Data)
-- [🟡] **US-7.1**: Como usuario, puedo leer una política de datos clara en
-  `privacidad.html` que explica: qué datos se recolectan (barrio, número de
-  WhatsApp, fechas, descripción), para qué se usan (únicamente conectar
-  oferta/demanda de alojamiento), cuánto tiempo se conservan, y cómo solicitar
-  su eliminación.
+- [✅] **US-7.1**: Como usuario, puedo leer una política de datos clara (modal
+  `PrivacyPolicyModal.tsx` y página `/terminos-y-privacidad`, reemplaza la
+  referencia original a un `privacidad.html` estático que nunca se construyó)
+  que explica: qué datos se recolectan (celular/WhatsApp, ciudad, barrio,
+  personas, fechas, precio, descripción y fotos opcionales — explícitamente
+  sin nombre ni documento de identidad), para qué se usan (únicamente
+  conectar oferta/demanda de alojamiento), cuánto tiempo se conservan (15/30/90
+  días) y cómo solicitar su eliminación (autoservicio con PIN o el canal
+  documentado en `docs/DATA_POLICY.md`).
   - *Criterios*: lenguaje simple, no jurídico-denso; referencia explícita a la
     Ley 1581 de 2012 y el Decreto 1377 de 2013 (Habeas Data - Colombia).
 - [✅] **US-7.2**: Como administrador, tengo un proceso documentado (`docs/DATA_POLICY.md`)

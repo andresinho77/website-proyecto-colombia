@@ -245,9 +245,13 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   clon limpio en macOS con `npm ci && npm run validate`.
   - *Criterios*: orden fijo typecheck → lint → test → build; falla en el primer
     error; produce `out/`; documentado en `README.md`.
-- [🟡] **US-8.4**: Como mantenedor, el gate de tests deja de ser vacío: hoy corre
-  con `--passWithNoTests` porque aún no existen suites. Falta un smoke test de
-  render de la landing y del feed para que el paso 3 tenga valor real.
+- [✅] **US-8.4**: Como mantenedor, el gate de tests tiene valor real: se eliminó
+  `--passWithNoTests` y el paso 3 corre suites de render de la landing y del feed.
+  - *Entregado (2026-08-15)*: `vitest.config.mts` (jsdom, `tests/setup.ts`, alias
+    `@`), `tests/landing.test.tsx` (4 casos, mockea `fetchListings`),
+    `tests/feed.test.tsx` (4 casos sobre `ListingGrid`) y `tests/fixtures/`.
+  - *Criterios*: 8/8 verdes; sin acceso a red; `npm run validate` exit 0; un test
+    en rojo corta la cadena antes del build (verificado con un canario).
 - [⏸️] **US-8.2 (aplazado — decisión 2026-08-14)**: ambiente de *preview*/staging
   del frontend. **No se construye por ahora.** La validación previa a producción
   se hace con paridad local↔CI (`npm run validate`); no se crean ramas,

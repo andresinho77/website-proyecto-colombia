@@ -22,7 +22,7 @@ npm run validate
 |---|---|---|
 | 1 | `npm run typecheck` | `tsc --noEmit` — no TypeScript errors |
 | 2 | `npm run lint` | `next lint --max-warnings=0` — zero ESLint warnings/errors |
-| 3 | `npm run test` | `vitest run --passWithNoTests` — unit tests (no suites yet; the gate is wired for when they land) |
+| 3 | `npm run test` | `vitest run` — render tests of the landing and the feed (jsdom + Testing Library) |
 | 4 | `npm run build:local` | `next build` against the local API endpoint — produces the static export in `out/` |
 
 Shortcut that also reinstalls dependencies from the lockfile:
@@ -30,6 +30,21 @@ Shortcut that also reinstalls dependencies from the lockfile:
 ```bash
 npm run validate:clean   # npm ci && npm run validate
 ```
+
+### Tests
+
+Suites live in `tests/` and are configured by `vitest.config.mts` (jsdom, `tests/setup.ts`,
+`include: tests/**/*.test.{ts,tsx}`). Shared data lives in `tests/fixtures/`, deliberately separate
+from the demo `MOCK_LISTINGS` of `lib/api.ts` so that changing demo data cannot break the gate.
+
+```bash
+npm run test              # single run (what validate and CI execute)
+npx vitest                # watch mode while developing
+```
+
+Network is never hit: the landing suite mocks `fetchListings`, and the feed suite renders
+`ListingGrid` with props. `npm run test:e2e` (Playwright) is a separate track and is **not** part of
+`npm run validate`.
 
 `.github/workflows/frontend-ci.yml` runs the same four checks on push/PR to `main` and `dev`, then uploads `out/` as the `static-export` artifact consumed by `infra-proyecto-colombia`. If `npm run validate` is green locally, CI should be green too.
 

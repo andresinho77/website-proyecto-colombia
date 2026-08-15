@@ -19,6 +19,10 @@
 - [2026-08-14] **Validation contract:** `npm run validate` = typecheck → lint → test → build:local. CI (`frontend-ci.yml`) runs the same four checks as separate steps. Never add a CI check that has no local equivalent.
 - [2026-08-14] `next build` inlines `NEXT_PUBLIC_API_URL` at build time. `lib/api.ts` therefore throws when it is missing in a production build (fail fast) and falls back to `http://localhost:4000/api/listings` only in dev. `app/admin/page.tsx` imports `API_BASE_URL` from `lib/api.ts` — do not re-declare it.
 - [2026-08-14] Node version is pinned in `.nvmrc` (24) and consumed by CI via `node-version-file`; `engines` allows >=20.
+- [2026-08-15] **Test layout:** suites live in `tests/` (not `__tests__/`, not co-located), config is `vitest.config.mts`, shared data in `tests/fixtures/`. `globals: false` — import `describe/it/expect/vi` explicitly from `vitest`; adding a `types` array to `tsconfig.json` would have restricted ambient types, so jest-dom matcher types come from importing `@testing-library/jest-dom/vitest` in `tests/setup.ts`. Playwright (`tests/e2e/`, `npm run test:e2e`) is excluded from the vitest run and is not part of `validate`.
+- [2026-08-15] Rendering any component that pulls in `next/link` (Navbar, Footer, and therefore the landing) needs an `IntersectionObserver` stub in jsdom — Link uses it for prefetch. It is stubbed globally in `tests/setup.ts`.
+- [2026-08-15] `ListingCard` wraps `listing.descripcion` in typographic quotes (`&ldquo;…&rdquo;`) inside a single `<p>`, so `getByText(description)` fails on an exact match. Use `{ exact: false }`.
+- [2026-08-15] `tsconfig.json` includes `**/*.ts(x)`, so `tests/` is type-checked by both `npm run typecheck` and `next build`. A type error in a test breaks the build, not just the test step.
 - **Project:** website-proyecto-colombia
 - **Description:** React / Next.js 14 Web Application for **Alojamiento Solidario Colombia** (`website-proyecto-colombia`). Designed for survivors, volunteers, and citizens following the August 10, 2026 earthquake in Co
 
@@ -30,6 +34,9 @@
 - [2026-08-13] Evitar `concurrency.group` global para CI+deploy de Pages; usar grupo por ref para CI y grupo dedicado para deploy a `main` para evitar cancelaciones cruzadas. (Histórico: el deploy de Pages se eliminó el 2026-08-14; ver Decision Log.)
 
 - [2026-08-14] No declarar scripts de validación sin su configuración: `next lint` sin `.eslintrc*` abre un wizard interactivo y cuelga runners no interactivos; `vitest run` sin suites sale con código 1. Verificar que cada script del contrato corre limpio en no-TTY antes de meterlo en `validate`/CI.
+- [2026-08-15] No nombrar la config de Vitest `vitest.config.ts` en este repo: el `package.json` no declara `"type": "module"`, así que Vite la carga como CJS y advierte por sintaxis ESM en cada corrida. Usar `.mts` y `fileURLToPath(new URL('./', import.meta.url))` en vez de `__dirname` (que también dispara warning bajo `configLoader: 'native'`).
+- [2026-08-15] `npm ci` verde en macOS **no** garantiza `npm ci` verde en el runner linux. Cuando se agrega una devDep que arrastra binarios nativos o fallbacks wasm (vite 8/rolldown, `@unrs/resolver`, `@emnapi/*`), npm actualizando el lockfile de forma incremental puede omitir entradas top-level que linux sí necesita → `EUSAGE ... Missing: X from lock file`. Regenerar el lockfile limpio (`rm -rf node_modules package-lock.json && npm install`) y, si hay dudas, verificar con `docker run --rm -v <dir>:/app -w /app node:24 npm ci` sobre una copia de `package.json` + `package-lock.json` (nunca sobre el repo montado: `npm ci` borraría el `node_modules` local).
+- [2026-08-15] No dar por bueno un gate de tests solo porque las suites pasan: verificar además que un test en rojo hace fallar la cadena (canario temporal, borrar después). Un `include` mal escrito deja el paso verde sin correr nada.
 - [2026-08-14] Antes de dar por buena una regeneración de `anatomy.md`, revisar el conteo de archivos: artefactos locales (`out/`, `*.tsbuildinfo`, `settings.local.json`) no existen en CI y provocan drift falso. Excluirlos en `.wolf/config.json`.
 
 ## Decision Log

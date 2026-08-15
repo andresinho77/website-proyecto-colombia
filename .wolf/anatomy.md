@@ -74,8 +74,8 @@
   - section `NavbarProps` L7-68 (~809 tok)
 - `PrivacyPolicyModal.tsx` — PrivacyPolicyModal (~1068 tok)
   - section `PrivacyPolicyModalProps` L6-83 (~1040 tok)
-- `PublishModal.tsx` — CITIES — renders form — uses useState (~3766 tok)
-  - section `PublishModalProps` L10-346 (~3670 tok)
+- `PublishModal.tsx` — CITIES — renders form — uses useState, useEffect; resets the full form (incl. `tipo` from `defaultTipo`) on every open since the component never unmounts (~3900 tok)
+  - section `PublishModalProps` L10-368 (~3670 tok)
 - `SearchFilters.tsx` — CITIES — renders map (~1642 tok)
   - section `SearchFiltersProps` L7-145 (~1595 tok)
 - `ShareModal.tsx` — ShareModal (~1057 tok)
@@ -88,7 +88,7 @@
 
 ## lib/
 
-- `api.ts` — Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"): (~2470 tok)
+- `api.ts` — Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"); `fetchListings` aplica `toPublicFeed` (solo `estado=activo`, orden `creadoEn` desc) a la respuesta de API y al fallback mock; `resolveListing` valida PIN contra el mock en el fallback offline. (~2470 tok)
   - fn `resolveApiBaseUrl` L18-251 (~2217 tok)
 - `localStorage.ts` — Exports SavedAuthorListing, getMyListings, saveMyListing, removeMyListing (~343 tok)
 - `types.ts` — Exports ListingType, ListingStatus, Listing, FilterState, CreateListingInput (~262 tok)

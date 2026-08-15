@@ -109,6 +109,11 @@ const MOCK_LISTINGS: Listing[] = [
   }
 ];
 
+// Public feed contract: only `activo` listings, newest (creadoEn) first.
+// Applied consistently to both the API response and the offline/mock fallback.
+const toPublicFeed = (items: Listing[]): Listing[] =>
+  items.filter((i) => i.estado === 'activo').sort((a, b) => b.creadoEn - a.creadoEn);
+
 export const fetchListings = async (filters?: Partial<FilterState>): Promise<Listing[]> => {
   try {
     const params = new URLSearchParams();
@@ -124,9 +129,9 @@ export const fetchListings = async (filters?: Partial<FilterState>): Promise<Lis
 
     const data = await res.json();
     if (data.items && Array.isArray(data.items)) {
-      return data.items;
+      return toPublicFeed(data.items);
     }
-    return MOCK_LISTINGS;
+    return toPublicFeed(MOCK_LISTINGS);
   } catch (err) {
     console.warn('API connection unavailable, serving emergency local mock listings:', err);
     let items = [...MOCK_LISTINGS];
@@ -140,7 +145,7 @@ export const fetchListings = async (filters?: Partial<FilterState>): Promise<Lis
     if (filters?.barrio) {
       items = items.filter((i) => i.barrio.toLowerCase().includes(filters.barrio!.toLowerCase()));
     }
-    return items;
+    return toPublicFeed(items);
   }
 };
 
@@ -244,7 +249,11 @@ export const resolveListing = async (id: string, pin: string): Promise<{ success
     return { success: true };
   } catch (err) {
     const item = MOCK_LISTINGS.find((i) => i.id === id);
-    if (item) item.estado = 'resuelto';
+    if (!item) return { success: false, error: 'Publicación no encontrada.' };
+    if (!item.pin || item.pin !== pin) {
+      return { success: false, error: 'PIN incorrecto.' };
+    }
+    item.estado = 'resuelto';
     return { success: true };
   }
 };

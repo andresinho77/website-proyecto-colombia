@@ -180,7 +180,7 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   - *Criterios*: mismos campos y validaciones que US-2.1.
 
 ### Épica 4 — Feed y búsqueda
-- [🟡] **US-4.1**: Como usuario, veo un listado de publicaciones activas, más
+- [✅] **US-4.1**: Como usuario, veo un listado de publicaciones activas, más
   recientes primero, filtrable por ciudad y tipo (ofrezco/necesito).
   - *Criterios*: filtro por ciudad con Pereira y Cali destacados por defecto;
     cada tarjeta muestra barrio, personas, fechas, precio y botón de WhatsApp;
@@ -196,7 +196,7 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   publicación específica.
 
 ### Épica 6 — Moderación y seguridad
-- [🟡] **US-6.1**: Como usuario, puedo reportar una publicación sospechosa o
+- [✅] **US-6.1**: Como usuario, puedo reportar una publicación sospechosa o
   resuelta con un botón visible en cada tarjeta.
   - *Criterios*: tras 3 reportes, el estado cambia automáticamente a
     "reportado" y desaparece del feed público hasta revisión.

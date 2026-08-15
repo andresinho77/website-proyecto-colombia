@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Send, ShieldCheck, AlertCircle, Home, Heart } from 'lucide-react';
 import { ListingType, Listing } from '../lib/types';
 import { createListing } from '../lib/api';
@@ -39,6 +39,29 @@ export const PublishModal: React.FC<PublishModalProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  // The modal never unmounts (parent toggles `isOpen`), so state persists across
+  // opens. Reset the whole form on every open: `defaultTipo` must win each time
+  // (e.g. hero "Necesito" then "Ofrezco"), and stale data from a closed/cancelled
+  // draft must not leak into the next publish flow.
+  useEffect(() => {
+    if (!isOpen) return;
+    setTipo(defaultTipo);
+    setCiudad(CITIES[0]);
+    setBarrio('');
+    setPersonas(2);
+    setFechaDesde(new Date().toISOString().split('T')[0]);
+    setIsIndefinido(true);
+    setFechaHasta('');
+    setIsGratis(true);
+    setPrecio(0);
+    setDescripcion('');
+    setWhatsapp('');
+    setImagenes([]);
+    setHabeasData(true);
+    setHoneypot('');
+    setFormError(null);
+  }, [isOpen, defaultTipo]);
 
   if (!isOpen) return null;
 

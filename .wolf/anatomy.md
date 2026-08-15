@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-08-14T21:53:16.639Z
-> Files: 43 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-08-14T22:09:03.677Z
+> Files: 48 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -14,13 +14,14 @@
 - `next-env.d.ts` — / <reference types="next" /> (~66 tok)
 - `next.config.mjs` — Next.js configuration (~54 tok)
 - `openapi.yaml` — API contract snapshot for frontend/backend integration (~452 tok)
-- `package-lock.json` — npm lock file (~81808 tok)
-- `package.json` — Node.js package manifest (~379 tok)
+- `package-lock.json` — npm lock file (~82487 tok)
+- `package.json` — Node.js package manifest (~398 tok)
 - `postcss.config.mjs` — Declares config (~42 tok)
-- `README.md` — Project documentation (~1273 tok)
-- `ROADMAP.md` — Refugio Temporal — Plataforma de Alojamiento de Emergencia (~5400 tok)
+- `README.md` — Project documentation (~1432 tok)
+- `ROADMAP.md` — Refugio Temporal — Plataforma de Alojamiento de Emergencia (~5479 tok)
 - `tailwind.config.ts` — Tailwind CSS configuration (~221 tok)
 - `tsconfig.json` — TypeScript configuration (~171 tok)
+- `vitest.config.mts` — Configuración del paso 3 del contrato de validación (`npm run validate`). (~321 tok)
 
 ## .claude/
 
@@ -95,3 +96,13 @@
 ## scripts/
 
 - `local-server.mjs` — Declares PORT (~348 tok)
+
+## tests/
+
+- `feed.test.tsx` — onOpenPublish (~639 tok)
+- `landing.test.tsx` — La landing es la única superficie que llama a la API en el primer render. (~700 tok)
+- `setup.ts` — `next/link` (Navbar, Footer) observa el viewport para prefetch. jsdom no (~194 tok)
+
+## tests/fixtures/
+
+- `listings.ts` — Fixtures deterministas para las suites de render. No se reutilizan los (~329 tok)

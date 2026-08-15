@@ -1,12 +1,12 @@
 {
   "version": 1,
   "meta": {
-    "lastScanned": "2026-08-14T21:53:16.639Z",
-    "fileCount": 43,
+    "lastScanned": "2026-08-14T22:09:03.677Z",
+    "fileCount": 48,
     "hits": 0,
     "misses": 0,
-    "renderedHash": "0ea2cc8ec72b2a1c49aad69a1fbf721c62846b9572fd806333ae040fe4bec464",
-    "storeUpdatedAt": "2026-08-14T21:53:16.639Z"
+    "renderedHash": "97ce0d20e09c15e58dbc21e278461b552d3679899d20c1d5a49f108490ed9ff4",
+    "storeUpdatedAt": "2026-08-14T22:09:03.677Z"
   },
   "files": {
     ".claude/commands/reframe.md": {
@@ -15,7 +15,7 @@
       "hash": "17a75695be5d4629",
       "size": 2221,
       "mtimeMs": 1786619696833.968,
-      "updatedAt": "2026-08-14T21:53:16.623Z",
+      "updatedAt": "2026-08-14T22:09:03.658Z",
       "source": "scan"
     },
     ".claude/commands/security-audit.md": {
@@ -24,7 +24,7 @@
       "hash": "e6f7e0b7337c9c86",
       "size": 2060,
       "mtimeMs": 1786619696834.0857,
-      "updatedAt": "2026-08-14T21:53:16.623Z",
+      "updatedAt": "2026-08-14T22:09:03.658Z",
       "source": "scan"
     },
     ".claude/rules/openwolf.md": {
@@ -33,7 +33,7 @@
       "hash": "6d735b2c1c54a916",
       "size": 1323,
       "mtimeMs": 1786619696834.2131,
-      "updatedAt": "2026-08-14T21:53:16.624Z",
+      "updatedAt": "2026-08-14T22:09:03.658Z",
       "source": "scan"
     },
     ".claude/settings.json": {
@@ -42,7 +42,7 @@
       "hash": "f68759bb50af5ee4",
       "size": 1799,
       "mtimeMs": 1786619696834.3071,
-      "updatedAt": "2026-08-14T21:53:16.624Z",
+      "updatedAt": "2026-08-14T22:09:03.659Z",
       "source": "scan"
     },
     ".eslintrc.json": {
@@ -50,8 +50,8 @@
       "tokens": 33,
       "hash": "4d6d2817d1e3ae0a",
       "size": 114,
-      "mtimeMs": 1786743254647.6836,
-      "updatedAt": "2026-08-14T21:53:16.625Z",
+      "mtimeMs": 1786744779243.1624,
+      "updatedAt": "2026-08-14T22:09:03.659Z",
       "source": "scan"
     },
     ".github/workflows/frontend-ci.yml": {
@@ -59,8 +59,8 @@
       "tokens": 788,
       "hash": "d92062c84a556d55",
       "size": 2756,
-      "mtimeMs": 1786743317212.184,
-      "updatedAt": "2026-08-14T21:53:16.625Z",
+      "mtimeMs": 1786744779243.3425,
+      "updatedAt": "2026-08-14T22:09:03.660Z",
       "source": "scan"
     },
     ".gitignore": {
@@ -68,8 +68,8 @@
       "tokens": 244,
       "hash": "62b621f3d763d379",
       "size": 913,
-      "mtimeMs": 1786744352062.741,
-      "updatedAt": "2026-08-14T21:53:16.625Z",
+      "mtimeMs": 1786744779243.486,
+      "updatedAt": "2026-08-14T22:09:03.660Z",
       "source": "scan"
     },
     ".nvmrc": {
@@ -77,8 +77,8 @@
       "tokens": 1,
       "hash": "68ca3fba3b7e8647",
       "size": 3,
-      "mtimeMs": 1786743319043.3904,
-      "updatedAt": "2026-08-14T21:53:16.625Z",
+      "mtimeMs": 1786744779243.5854,
+      "updatedAt": "2026-08-14T22:09:03.661Z",
       "source": "scan"
     },
     "AGENTS.md": {
@@ -87,7 +87,7 @@
       "hash": "8c90778623bf50ac",
       "size": 271,
       "mtimeMs": 1786619696838.947,
-      "updatedAt": "2026-08-14T21:53:16.625Z",
+      "updatedAt": "2026-08-14T22:09:03.661Z",
       "source": "scan"
     },
     "app/admin/page.tsx": {
@@ -95,8 +95,8 @@
       "tokens": 2216,
       "hash": "ac9810b81bf1f8a1",
       "size": 7760,
-      "mtimeMs": 1786743301717.986,
-      "updatedAt": "2026-08-14T21:53:16.627Z",
+      "mtimeMs": 1786744779245.1782,
+      "updatedAt": "2026-08-14T22:09:03.663Z",
       "source": "scan",
       "symbols": [
         {
@@ -114,7 +114,7 @@
       "hash": "ba45e599d838bcbd",
       "size": 915,
       "mtimeMs": 1786561685269.004,
-      "updatedAt": "2026-08-14T21:53:16.627Z",
+      "updatedAt": "2026-08-14T22:09:03.663Z",
       "source": "scan"
     },
     "app/layout.tsx": {
@@ -123,7 +123,7 @@
       "hash": "5e381d1b88e711e7",
       "size": 840,
       "mtimeMs": 1786561685269.0955,
-      "updatedAt": "2026-08-14T21:53:16.627Z",
+      "updatedAt": "2026-08-14T22:09:03.663Z",
       "source": "scan"
     },
     "app/page.tsx": {
@@ -132,7 +132,7 @@
       "hash": "e3b210cfd02385ae",
       "size": 4698,
       "mtimeMs": 1786598883091.1487,
-      "updatedAt": "2026-08-14T21:53:16.628Z",
+      "updatedAt": "2026-08-14T22:09:03.664Z",
       "source": "scan",
       "symbols": [
         {
@@ -150,7 +150,7 @@
       "hash": "127a34891de6af81",
       "size": 3849,
       "mtimeMs": 1786561685269.4517,
-      "updatedAt": "2026-08-14T21:53:16.628Z",
+      "updatedAt": "2026-08-14T22:09:03.664Z",
       "source": "scan",
       "symbols": [
         {
@@ -168,7 +168,7 @@
       "hash": "b1ca356fa9d5f3a6",
       "size": 225,
       "mtimeMs": 1786619696839.0356,
-      "updatedAt": "2026-08-14T21:53:16.628Z",
+      "updatedAt": "2026-08-14T22:09:03.664Z",
       "source": "scan"
     },
     "components/EmergencyBanner.tsx": {
@@ -177,7 +177,7 @@
       "hash": "6081af233dddb63d",
       "size": 1830,
       "mtimeMs": 1786561685269.6006,
-      "updatedAt": "2026-08-14T21:53:16.628Z",
+      "updatedAt": "2026-08-14T22:09:03.665Z",
       "source": "scan"
     },
     "components/Footer.tsx": {
@@ -186,7 +186,7 @@
       "hash": "b7d77ff6595aa277",
       "size": 2282,
       "mtimeMs": 1786561685269.6963,
-      "updatedAt": "2026-08-14T21:53:16.630Z",
+      "updatedAt": "2026-08-14T22:09:03.665Z",
       "source": "scan",
       "symbols": [
         {
@@ -204,7 +204,7 @@
       "hash": "fe419066fdd1e7f3",
       "size": 3843,
       "mtimeMs": 1786598883091.3364,
-      "updatedAt": "2026-08-14T21:53:16.630Z",
+      "updatedAt": "2026-08-14T22:09:03.665Z",
       "source": "scan",
       "symbols": [
         {
@@ -222,7 +222,7 @@
       "hash": "d5b319e1ce788d20",
       "size": 4340,
       "mtimeMs": 1786561685270.0664,
-      "updatedAt": "2026-08-14T21:53:16.631Z",
+      "updatedAt": "2026-08-14T22:09:03.666Z",
       "source": "scan",
       "symbols": [
         {
@@ -240,7 +240,7 @@
       "hash": "e4ae1b04b6139169",
       "size": 11768,
       "mtimeMs": 1786561685270.2788,
-      "updatedAt": "2026-08-14T21:53:16.631Z",
+      "updatedAt": "2026-08-14T22:09:03.667Z",
       "source": "scan",
       "symbols": [
         {
@@ -258,7 +258,7 @@
       "hash": "c4a63f81a768faa3",
       "size": 2671,
       "mtimeMs": 1786561685270.3838,
-      "updatedAt": "2026-08-14T21:53:16.631Z",
+      "updatedAt": "2026-08-14T22:09:03.667Z",
       "source": "scan",
       "symbols": [
         {
@@ -276,7 +276,7 @@
       "hash": "e2239c632fd67a8d",
       "size": 2993,
       "mtimeMs": 1786561685270.4746,
-      "updatedAt": "2026-08-14T21:53:16.632Z",
+      "updatedAt": "2026-08-14T22:09:03.667Z",
       "source": "scan",
       "symbols": [
         {
@@ -294,7 +294,7 @@
       "hash": "c8bf18403d515063",
       "size": 3748,
       "mtimeMs": 1786561685270.5874,
-      "updatedAt": "2026-08-14T21:53:16.632Z",
+      "updatedAt": "2026-08-14T22:09:03.668Z",
       "source": "scan",
       "symbols": [
         {
@@ -312,7 +312,7 @@
       "hash": "91acedbf3ecff6d9",
       "size": 13194,
       "mtimeMs": 1786561685270.7454,
-      "updatedAt": "2026-08-14T21:53:16.633Z",
+      "updatedAt": "2026-08-14T22:09:03.668Z",
       "source": "scan",
       "symbols": [
         {
@@ -330,7 +330,7 @@
       "hash": "aaa1e7a17627787c",
       "size": 5756,
       "mtimeMs": 1786561685270.969,
-      "updatedAt": "2026-08-14T21:53:16.633Z",
+      "updatedAt": "2026-08-14T22:09:03.669Z",
       "source": "scan",
       "symbols": [
         {
@@ -348,7 +348,7 @@
       "hash": "975e2209cf1ec83a",
       "size": 3715,
       "mtimeMs": 1786561685271.0667,
-      "updatedAt": "2026-08-14T21:53:16.633Z",
+      "updatedAt": "2026-08-14T22:09:03.669Z",
       "source": "scan",
       "symbols": [
         {
@@ -366,7 +366,7 @@
       "hash": "938468bc6019ae31",
       "size": 1868,
       "mtimeMs": 1786619708019.1338,
-      "updatedAt": "2026-08-14T21:53:16.633Z",
+      "updatedAt": "2026-08-14T22:09:03.669Z",
       "source": "scan"
     },
     "docs/SAFETY.md": {
@@ -375,7 +375,7 @@
       "hash": "eb0a2361373c264b",
       "size": 1468,
       "mtimeMs": 1786619708019.4006,
-      "updatedAt": "2026-08-14T21:53:16.634Z",
+      "updatedAt": "2026-08-14T22:09:03.669Z",
       "source": "scan"
     },
     "GEMINI.md": {
@@ -384,7 +384,7 @@
       "hash": "8c90778623bf50ac",
       "size": 271,
       "mtimeMs": 1786619696839.1467,
-      "updatedAt": "2026-08-14T21:53:16.634Z",
+      "updatedAt": "2026-08-14T22:09:03.670Z",
       "source": "scan"
     },
     "lib/api.ts": {
@@ -392,8 +392,8 @@
       "tokens": 2470,
       "hash": "7cb3ca683a79c90c",
       "size": 8667,
-      "mtimeMs": 1786743298242.5776,
-      "updatedAt": "2026-08-14T21:53:16.635Z",
+      "mtimeMs": 1786744779245.4119,
+      "updatedAt": "2026-08-14T22:09:03.670Z",
       "source": "scan",
       "symbols": [
         {
@@ -411,7 +411,7 @@
       "hash": "850d8f5b21f86668",
       "size": 1198,
       "mtimeMs": 1786561685271.4595,
-      "updatedAt": "2026-08-14T21:53:16.635Z",
+      "updatedAt": "2026-08-14T22:09:03.671Z",
       "source": "scan"
     },
     "lib/types.ts": {
@@ -420,7 +420,7 @@
       "hash": "bfee21d3155891b7",
       "size": 914,
       "mtimeMs": 1786561685271.5488,
-      "updatedAt": "2026-08-14T21:53:16.635Z",
+      "updatedAt": "2026-08-14T22:09:03.671Z",
       "source": "scan"
     },
     "next-env.d.ts": {
@@ -429,7 +429,7 @@
       "hash": "9dd9d642cdb87d4d",
       "size": 228,
       "mtimeMs": 1786561685271.6523,
-      "updatedAt": "2026-08-14T21:53:16.635Z",
+      "updatedAt": "2026-08-14T22:09:03.671Z",
       "source": "scan"
     },
     "next.config.mjs": {
@@ -438,7 +438,7 @@
       "hash": "ef3e74407190ab29",
       "size": 201,
       "mtimeMs": 1786561685271.756,
-      "updatedAt": "2026-08-14T21:53:16.635Z",
+      "updatedAt": "2026-08-14T22:09:03.671Z",
       "source": "scan"
     },
     "openapi.yaml": {
@@ -447,25 +447,25 @@
       "hash": "d9e2b55cbb16683b",
       "size": 1581,
       "mtimeMs": 1786619708019.9946,
-      "updatedAt": "2026-08-14T21:53:16.636Z",
+      "updatedAt": "2026-08-14T22:09:03.671Z",
       "source": "scan"
     },
     "package-lock.json": {
       "description": "npm lock file",
-      "tokens": 81808,
-      "hash": "8ce79b03b3086911",
-      "size": 286326,
-      "mtimeMs": 1786619696841.2466,
-      "updatedAt": "2026-08-14T21:53:16.636Z",
+      "tokens": 82487,
+      "hash": "89d43f39f1399557",
+      "size": 288703,
+      "mtimeMs": 1786745071502.8687,
+      "updatedAt": "2026-08-14T22:09:03.672Z",
       "source": "scan"
     },
     "package.json": {
       "description": "Node.js package manifest",
-      "tokens": 379,
-      "hash": "acdc314ed2890ce4",
-      "size": 1324,
-      "mtimeMs": 1786743276110.94,
-      "updatedAt": "2026-08-14T21:53:16.636Z",
+      "tokens": 398,
+      "hash": "6131b978d774eabd",
+      "size": 1390,
+      "mtimeMs": 1786745075036.5771,
+      "updatedAt": "2026-08-14T22:09:03.672Z",
       "source": "scan"
     },
     "postcss.config.mjs": {
@@ -474,25 +474,25 @@
       "hash": "efa65c65e17d51d5",
       "size": 157,
       "mtimeMs": 1786561685272.5557,
-      "updatedAt": "2026-08-14T21:53:16.636Z",
+      "updatedAt": "2026-08-14T22:09:03.672Z",
       "source": "scan"
     },
     "README.md": {
       "description": "Project documentation",
-      "tokens": 1273,
-      "hash": "4988254d3502b732",
-      "size": 5124,
-      "mtimeMs": 1786743689730.8962,
-      "updatedAt": "2026-08-14T21:53:16.637Z",
+      "tokens": 1432,
+      "hash": "93235b4582950d65",
+      "size": 5759,
+      "mtimeMs": 1786745227159.905,
+      "updatedAt": "2026-08-14T22:09:03.672Z",
       "source": "scan"
     },
     "ROADMAP.md": {
       "description": "Refugio Temporal — Plataforma de Alojamiento de Emergencia",
-      "tokens": 5400,
-      "hash": "eb61e9628064d750",
-      "size": 22073,
-      "mtimeMs": 1786743737440.0564,
-      "updatedAt": "2026-08-14T21:53:16.637Z",
+      "tokens": 5479,
+      "hash": "98549d59756975a8",
+      "size": 22388,
+      "mtimeMs": 1786745234674.3037,
+      "updatedAt": "2026-08-14T22:09:03.673Z",
       "source": "scan"
     },
     "scripts/local-server.mjs": {
@@ -501,7 +501,7 @@
       "hash": "dd6ff658b2155fa2",
       "size": 1309,
       "mtimeMs": 1786568598144.1096,
-      "updatedAt": "2026-08-14T21:53:16.637Z",
+      "updatedAt": "2026-08-14T22:09:03.674Z",
       "source": "scan"
     },
     "tailwind.config.ts": {
@@ -510,7 +510,43 @@
       "hash": "ee1b2c46fe258a3f",
       "size": 772,
       "mtimeMs": 1786561685272.6511,
-      "updatedAt": "2026-08-14T21:53:16.638Z",
+      "updatedAt": "2026-08-14T22:09:03.674Z",
+      "source": "scan"
+    },
+    "tests/feed.test.tsx": {
+      "description": "onOpenPublish",
+      "tokens": 639,
+      "hash": "3dbdeb70f5a40f40",
+      "size": 2240,
+      "mtimeMs": 1786745100935.1667,
+      "updatedAt": "2026-08-14T22:09:03.674Z",
+      "source": "scan"
+    },
+    "tests/fixtures/listings.ts": {
+      "description": "Fixtures deterministas para las suites de render. No se reutilizan los",
+      "tokens": 329,
+      "hash": "a2225434f93b9bf0",
+      "size": 1155,
+      "mtimeMs": 1786745041220.72,
+      "updatedAt": "2026-08-14T22:09:03.675Z",
+      "source": "scan"
+    },
+    "tests/landing.test.tsx": {
+      "description": "La landing es la única superficie que llama a la API en el primer render.",
+      "tokens": 700,
+      "hash": "4b56c5d16431de88",
+      "size": 2452,
+      "mtimeMs": 1786745102953.5923,
+      "updatedAt": "2026-08-14T22:09:03.675Z",
+      "source": "scan"
+    },
+    "tests/setup.ts": {
+      "description": "`next/link` (Navbar, Footer) observa el viewport para prefetch. jsdom no",
+      "tokens": 194,
+      "hash": "62f580ef503515b6",
+      "size": 680,
+      "mtimeMs": 1786745044695.2537,
+      "updatedAt": "2026-08-14T22:09:03.675Z",
       "source": "scan"
     },
     "tsconfig.json": {
@@ -519,7 +555,16 @@
       "hash": "1c6463f0827b6213",
       "size": 598,
       "mtimeMs": 1786561685272.7666,
-      "updatedAt": "2026-08-14T21:53:16.638Z",
+      "updatedAt": "2026-08-14T22:09:03.675Z",
+      "source": "scan"
+    },
+    "vitest.config.mts": {
+      "description": "Configuración del paso 3 del contrato de validación (`npm run validate`).",
+      "tokens": 321,
+      "hash": "7b80d7c3e590ab46",
+      "size": 1206,
+      "mtimeMs": 1786745170450.1602,
+      "updatedAt": "2026-08-14T22:09:03.676Z",
       "source": "scan"
     }
   }

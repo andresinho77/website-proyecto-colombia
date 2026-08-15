@@ -49,8 +49,8 @@
 
 ## app/admin/
 
-- `page.tsx` — AdminPage — renders form — uses useState (~2216 tok)
-  - fn `AdminPage` L8-201 (~2147 tok)
+- `page.tsx` — AdminPage — renders form — uses useState, useCallback, useMemo; reusable `loadListings` (login + manual refresh, via `fetchAdminListings`), 4 explicit status actions incl. `reportado`, `sortForTriage` (reportado → reportes desc → newest), status filter row with live counts, offline/demo banner (~3200 tok)
+  - fn `AdminPage` L8-296 (~3100 tok)
 
 ## app/terminos-y-privacidad/
 
@@ -88,7 +88,7 @@
 
 ## lib/
 
-- `api.ts` — Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"); `fetchListings` aplica `toPublicFeed` (solo `estado=activo`, orden `creadoEn` desc) a la respuesta de API y al fallback mock; `resolveListing` valida PIN contra el mock en el fallback offline. (~2470 tok)
+- `api.ts` — Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"); `fetchListings` aplica `toPublicFeed` (solo `estado=activo`, orden `creadoEn` desc) a la respuesta de API y al fallback mock; `resolveListing` valida PIN contra el mock en el fallback offline; `fetchAdminListings`/`setAdminListingStatus` centralizan el loader y las acciones de `/admin` (mismo contrato de wire, con fallback offline a `MOCK_LISTINGS` para las 2 claves demo). (~3050 tok)
   - fn `resolveApiBaseUrl` L18-251 (~2217 tok)
 - `localStorage.ts` — Exports SavedAuthorListing, getMyListings, saveMyListing, removeMyListing (~343 tok)
 - `types.ts` — Exports ListingType, ListingStatus, Listing, FilterState, CreateListingInput (~262 tok)

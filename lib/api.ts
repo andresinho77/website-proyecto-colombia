@@ -1,4 +1,4 @@
-import { Listing, CreateListingInput, FilterState } from './types';
+import { Listing, ListingStatus, CreateListingInput, FilterState } from './types';
 
 /**
  * Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"):
@@ -234,6 +234,70 @@ export const reportListing = async (id: string): Promise<{ success: boolean; mes
       if (item.reportes >= 3) item.estado = 'reportado';
     }
     return { success: true, message: 'Reporte registrado localmente.' };
+  }
+};
+
+// Admin/moderation surface (app/admin). Wire contract is unchanged: POST
+// `${API_BASE_URL}/admin` with `x-admin-key` + `{ action, adminKey }` (list) or
+// `{ id, action, adminKey }` (status change) — this only centralizes it so the
+// page has one reusable loader instead of duplicating fetch/catch inline, and so
+// the offline fallback (used for moderation triage when infra is unavailable)
+// lives next to the other MOCK_LISTINGS fallbacks above.
+const ADMIN_DEMO_KEYS = ['colombia2026admin', 'admin'];
+
+export interface AdminListingsResult {
+  success: boolean;
+  items: Listing[];
+  offline: boolean;
+  error?: string;
+}
+
+export const fetchAdminListings = async (adminKey: string): Promise<AdminListingsResult> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body: JSON.stringify({ action: 'list_all', adminKey }),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      return { success: true, items: data.items || [], offline: false };
+    }
+    if (ADMIN_DEMO_KEYS.includes(adminKey)) {
+      // Backend reachable but rejected the key or returned an unexpected shape;
+      // the local demo key still unlocks offline triage so moderation isn't
+      // blocked by incomplete/unavailable infra.
+      return { success: true, items: [...MOCK_LISTINGS], offline: true };
+    }
+    return { success: false, items: [], offline: false, error: data.error || 'Clave de administrador incorrecta.' };
+  } catch (err) {
+    if (ADMIN_DEMO_KEYS.includes(adminKey)) {
+      return { success: true, items: [...MOCK_LISTINGS], offline: true };
+    }
+    return { success: false, items: [], offline: true, error: 'No se pudo conectar con el servidor de moderación.' };
+  }
+};
+
+export const setAdminListingStatus = async (
+  id: string,
+  action: ListingStatus,
+  adminKey: string
+): Promise<{ success: boolean; offline: boolean; error?: string }> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+      body: JSON.stringify({ id, action, adminKey }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      return { success: false, offline: false, error: data.error || 'No se pudo actualizar el estado.' };
+    }
+    return { success: true, offline: false };
+  } catch (err) {
+    const item = MOCK_LISTINGS.find((i) => i.id === id);
+    if (item) item.estado = action;
+    return { success: true, offline: true };
   }
 };
 

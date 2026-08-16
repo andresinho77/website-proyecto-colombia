@@ -1,3 +1,12 @@
+// Default local development environment variables targeting LocalStack
+process.env.AWS_ENDPOINT_URL = process.env.AWS_ENDPOINT_URL || 'http://localhost:4566';
+process.env.AWS_REGION = process.env.AWS_REGION || 'us-east-1';
+process.env.AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID || 'test';
+process.env.AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY || 'test';
+process.env.DYNAMODB_TABLE = process.env.DYNAMODB_TABLE || 'proyecto-colombia-local-listings';
+process.env.MEDIA_BUCKET = process.env.MEDIA_BUCKET || 'proyecto-colombia-local-media-storage';
+process.env.USE_LOCALSTACK = 'true';
+
 import { createServer } from 'http';
 import { handler } from '../../infra-proyecto-colombia/lambda/listings/index.mjs';
 

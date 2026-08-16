@@ -63,6 +63,13 @@ trap cleanup SIGINT SIGTERM EXIT
 echo "⚡ Starting Local Serverless API on port 4000..."
 (
   cd "$WEBSITE_DIR"
+  export AWS_ENDPOINT_URL="http://localhost:4566"
+  export AWS_REGION="us-east-1"
+  export AWS_ACCESS_KEY_ID="test"
+  export AWS_SECRET_ACCESS_KEY="test"
+  export DYNAMODB_TABLE="proyecto-colombia-local-listings"
+  export MEDIA_BUCKET="proyecto-colombia-local-media-storage"
+  export USE_LOCALSTACK="true"
   node scripts/local-server.mjs
 ) &
 API_PID=$!
@@ -75,4 +82,9 @@ echo "🚀 Starting Next.js website on http://localhost:3000..."
 cd "$WEBSITE_DIR"
 export NEXT_PUBLIC_API_URL="http://localhost:4000/api/listings"
 export NEXT_PUBLIC_TURNSTILE_SITE_KEY="1x00000000000000000000AA"
+export AWS_ENDPOINT_URL="http://localhost:4566"
+export AWS_REGION="us-east-1"
+export AWS_ACCESS_KEY_ID="test"
+export AWS_SECRET_ACCESS_KEY="test"
+export USE_LOCALSTACK="true"
 npx next dev

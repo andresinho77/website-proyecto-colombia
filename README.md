@@ -66,28 +66,54 @@ The frontend talks to the backend **only** through this variable (resolved once 
 
 ## 🌍 Environment Execution Guide
 
-### 1. LOCAL Environment (Offline / LocalStack)
+### 1. LOCAL Environment (LocalStack & Full Serverless Stack)
 
-#### Option A: Built-in Mock Server (Zero Setup)
+#### Option A: 1-Command LocalStack Full-Stack Dev (Recommended 🚀)
+Runs the entire local stack in a single automated step:
+1. Verifies that **Docker** is active and ensures the **LocalStack** container (`proyecto-colombia-localstack`) is running on port `4566`.
+2. Applies the **Terraform** local infrastructure (`environments/local.tfvars`, `use_localstack=true`).
+3. Seeds realistic sample disaster-relief listings into LocalStack DynamoDB (`proyecto-colombia-local-listings`).
+4. Launches the local Serverless API server on port `4000` with LocalStack environment variables.
+5. Launches the **Next.js** dev server on **`http://localhost:3000`** with hot-reload.
+
+```bash
+npm run dev:local
+```
+Open **`http://localhost:3000`** in your browser. All listings, publications, reports, and PIN resolution will interact directly with your local LocalStack DynamoDB table!
+
+---
+
+#### Option B: Manual Multi-Terminal Workflow
+If you prefer running services independently across dedicated terminal sessions:
+
+**Terminal 1 (Infrastructure & LocalStack Seed):**
+```bash
+cd ../infra-proyecto-colombia
+docker compose up -d
+terraform apply -var-file=environments/local.tfvars -var="use_localstack=true" -state=terraform.local.tfstate -auto-approve
+npm run seed:local
+```
+
+**Terminal 2 (Local Serverless API Handler):**
+```bash
+cd website-proyecto-colombia
+npm run dev:api
+```
+
+**Terminal 3 (Next.js Frontend):**
+```bash
+cd website-proyecto-colombia
+npm run dev
+```
+
+---
+
+#### Option C: Offline Client-Only Mock Mode (Zero Docker)
 Runs the Next.js frontend with emergency local fallback data & browser `localStorage` PIN resolution:
 ```bash
 npm run dev
 ```
 Open **`http://localhost:3000`** in your browser. Without `NEXT_PUBLIC_API_URL` the client points at `http://localhost:4000/api/listings`; if nothing is listening there, `lib/api.ts` serves its in-memory emergency mock listings.
-
-#### Option B: Local API Server (Zero Docker)
-Terminal 1 (Local Serverless API):
-```bash
-npm run dev:api
-```
-Terminal 2 (Frontend connected to the Local API):
-```bash
-npm run dev
-```
-The default endpoint already matches `dev:api`. To point at a different local port:
-```bash
-NEXT_PUBLIC_API_URL="http://localhost:4000/api/listings" npm run dev
-```
 
 ---
 
@@ -126,6 +152,33 @@ The bundle is written to `out/`, ready to sync to the S3 web bucket `proyecto-co
 
 ---
 
+## ⚙️ Environment Variables Reference
+
+| Variable Name | Description | Example (Local) | Example (Production) |
+|---|---|---|---|
+| `NEXT_PUBLIC_API_URL` | Base HTTP endpoint for listings API | `http://localhost:4000/api/listings` | `https://s1kxeu5lol.execute-api.us-east-1.amazonaws.com/api/listings` |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile CAPTCHA public site key | `1x00000000000000000000AA` *(Always passes)* | `0x4AAAAAA...` *(Live key)* |
+
+---
+
+## 📜 Available NPM Scripts
+
+| Script | Command | Purpose |
+|---|---|---|
+| `npm run dev:local` | `bash scripts/start-local-dev.sh` | **1-Command local full-stack dev** (Docker + Terraform + Seed + API + Next.js) |
+| `npm run dev` | `next dev` | Start standard Next.js dev server on `http://localhost:3000` |
+| `npm run dev:api` | `node scripts/local-server.mjs` | Start local serverless API server on `http://localhost:4000` |
+| `npm run validate` | `npm run typecheck && npm run lint && npm run test && npm run build:local` | Run complete local CI gate sequence |
+| `npm run validate:clean` | `npm ci && npm run validate` | Clean install dependencies from lockfile and validate |
+| `npm run typecheck` | `tsc --noEmit` | Check TypeScript types across project |
+| `npm run lint` | `next lint --max-warnings=0` | Run ESLint with zero-warning threshold |
+| `npm run build` | `next build` | Compile static production export to `out/` directory |
+| `npm run build:local` | `NEXT_PUBLIC_API_URL="..." next build` | Compile static bundle against local API endpoint |
+| `npm test` | `vitest run` | Execute unit test suite with Vitest |
+| `npm run test:e2e` | `playwright test` | Execute end-to-end browser tests with Playwright |
+
+---
+
 ## 🛠️ Tech Stack & Prerequisites
 
 - **Framework**: Next.js 14 React Framework (`output: 'export'`)
@@ -134,3 +187,4 @@ The bundle is written to `out/`, ready to sync to the S3 web bucket `proyecto-co
 - **Icons**: Lucide React
 - **Uploads**: Direct browser-to-S3 photo uploads via pre-signed URLs (up to 3 photos per listing)
 - **Security**: Cloudflare Turnstile CAPTCHA + Hidden Honeypot trap (`b_hp_fax`)
+

@@ -50,6 +50,12 @@ Network is never hit: the landing suite mocks `fetchListings`, and the feed suit
 
 ---
 
+## 📜 OpenAPI 3.0.3 API Contract (`openapi.yaml`)
+
+The complete API contract expected and implemented by this frontend client is defined in [`openapi.yaml`](openapi.yaml). It details request schemas, query parameters, phone format validations, error envelopes, and administrator moderation endpoints.
+
+---
+
 ## 🔑 `NEXT_PUBLIC_API_URL` contract
 
 The frontend talks to the backend **only** through this variable (resolved once in `lib/api.ts` and reused by `app/admin/page.tsx`):

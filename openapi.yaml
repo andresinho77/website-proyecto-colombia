@@ -1,60 +1,593 @@
 openapi: 3.0.3
 info:
-  title: Alojamiento Solidario Colombia API Contract
-  version: 0.1.0
+  title: Alojamiento Solidario Colombia — API Specification
+  version: 1.0.0
   description: >-
-    Contrato minimo esperado por el frontend para publicar, listar, reportar y
-    resolver publicaciones de alojamiento temporal.
+    OpenAPI Specification (OAS 3.0.3) for Alojamiento Solidario Colombia serverless APIs,
+    serviced via AWS HTTP API Gateway v2, AWS Lambda, DynamoDB, and Amazon S3.
 servers:
   - url: https://api.alojamientosolidario.co/api
-    description: Produccion (referencial)
+    description: Production Environment (AWS CloudFront CDN + API Gateway)
   - url: https://dev-api.alojamientosolidario.co/api
-    description: Staging (referencial)
+    description: Development Sandbox Environment
+  - url: http://localhost:4000/api
+    description: LocalStack / Local Development Server
 paths:
   /listings:
     get:
-      summary: Obtener publicaciones activas
+      tags:
+        - Listings
+      summary: List active emergency listings
+      description: Retrieve public active disaster-relief shelter offerings and requests, sorted newest first. Supports in-memory filtering.
+      operationId: getListings
       parameters:
         - in: query
           name: ciudad
           schema:
             type: string
+          description: Target city filter (e.g. Pereira, Cali, Quibdó, Manizales, Armenia)
+          example: Pereira
         - in: query
           name: tipo
           schema:
             type: string
             enum: [ofrezco, necesito, todos]
+            default: todos
+          description: Filter by offering shelter (ofrezco), seeking shelter (necesito), or all (todos)
+          example: ofrezco
         - in: query
           name: barrio
           schema:
             type: string
+          description: Case-insensitive substring match on neighborhood / sector name
+          example: Circunvalar
         - in: query
           name: maxPrecio
           schema:
             type: string
+          description: Maximum price filter (0 indicates 100% free / gratis)
+          example: "0"
       responses:
         "200":
-          description: Respuesta de publicaciones
+          description: List of active listings retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListingListResponse"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
     post:
-      summary: Crear publicacion
+      tags:
+        - Listings
+      summary: Create a new emergency listing
+      description: Publish a new offering or request with E.164 WhatsApp phone validation, mandatory Ley 1581 Habeas Data consent, anti-bot honeypot check, and optional Cloudflare Turnstile token validation. Auto-generates a 4-digit management PIN.
+      operationId: createListing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateListingInput"
       responses:
         "200":
-          description: Publicacion creada
-  /listings/report:
-    post:
-      summary: Reportar publicacion
-      responses:
-        "200":
-          description: Reporte registrado
-  /listings/resolve:
-    post:
-      summary: Marcar publicacion como resuelta con PIN
-      responses:
-        "200":
-          description: Publicacion resuelta
+          description: Listing created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateListingResponse"
+        "400":
+          description: Validation error (e.g., missing required fields, invalid phone format, unaccepted Habeas Data, failed Turnstile).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /listings/upload-url:
     post:
-      summary: Obtener URL prefirmada para imagenes
+      tags:
+        - Media Uploads
+      summary: Generate pre-signed S3 upload URL
+      description: Request an authorized AWS S3 pre-signed PUT URL to directly upload a photo from the client browser.
+      operationId: requestUploadUrl
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadUrlRequest"
       responses:
         "200":
-          description: URL prefirmada generada
+          description: Pre-signed upload URL generated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadUrlResponse"
+        "400":
+          description: Invalid or unsupported content type.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error generating pre-signed URL.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /listings/report:
+    post:
+      tags:
+        - Moderation
+      summary: Report listing abuse or spam
+      description: Increment the community abuse report counter on a listing. When a listing accumulates 3 or more reports, its status automatically transitions to 'reportado' and is hidden from the public feed.
+      operationId: reportListing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportListingRequest"
+      responses:
+        "200":
+          description: Report registered successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportListingResponse"
+        "400":
+          description: Missing listing ID.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /listings/resolve:
+    post:
+      tags:
+        - Moderation
+      summary: Author marks listing as resolved
+      description: Transition a listing status to 'resuelto' by verifying the author's private 4-digit PIN generated during initial publication.
+      operationId: resolveListing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResolveListingRequest"
+      responses:
+        "200":
+          description: Listing resolved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResolveListingResponse"
+        "400":
+          description: Missing listing ID or PIN.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Incorrect PIN.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Listing not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /listings/admin:
+    post:
+      tags:
+        - Admin
+      summary: Administrator moderation console
+      description: Perform administrative actions on listings (list all records including hidden/reported, override status to 'activo', 'resuelto', or 'eliminado') protected by admin API key authentication.
+      operationId: adminAction
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminActionRequest"
+      responses:
+        "200":
+          description: Administrative action executed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminActionResponse"
+        "400":
+          description: Invalid parameters or action.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized - invalid admin key.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-admin-key
+      description: Secret administrative key for emergency coordination moderation
+
+  schemas:
+    ListingType:
+      type: string
+      enum:
+        - ofrezco
+        - necesito
+      description: Category of the publication (offering shelter vs seeking shelter)
+
+    ListingStatus:
+      type: string
+      enum:
+        - activo
+        - resuelto
+        - reportado
+        - eliminado
+      description: Current moderation status of the listing
+
+    Listing:
+      type: object
+      required:
+        - id
+        - tipo
+        - ciudad
+        - barrio
+        - personas
+        - fechaDesde
+        - precio
+        - descripcion
+        - whatsapp
+        - creadoEn
+        - estado
+        - reportes
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "7e96c311-9309-42fe-b44a-6c6d76c5cab1"
+        tipo:
+          $ref: "#/components/schemas/ListingType"
+        ciudad:
+          type: string
+          example: "Pereira"
+        barrio:
+          type: string
+          example: "Circunvalar"
+        personas:
+          type: integer
+          minimum: 1
+          example: 4
+        fechaDesde:
+          type: string
+          format: date
+          example: "2026-08-16"
+        fechaHasta:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-08-30"
+        precio:
+          type: number
+          minimum: 0
+          description: Monthly price in COP (0 indicates 100% free emergency accommodation)
+          example: 0
+        descripcion:
+          type: string
+          maxLength: 280
+          example: "Habitación amplia amoblada disponible con 2 camas dobles. Agua potable, luz y baño privado."
+        whatsapp:
+          type: string
+          pattern: "^\\+573[0-9]{9}$"
+          description: Colombian mobile number in E.164 international format (+57...)
+          example: "+573105550123"
+        imagenes:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: URLs of uploaded shelter photos (up to 3 images)
+          example:
+            - "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267"
+        pin:
+          type: string
+          description: 4-digit author security PIN for marking listing resolved
+          example: "9092"
+        creadoEn:
+          type: integer
+          format: int64
+          description: Unix timestamp in milliseconds when publication was created
+          example: 1786898527808
+        estado:
+          $ref: "#/components/schemas/ListingStatus"
+        reportes:
+          type: integer
+          minimum: 0
+          description: Cumulative community abuse reports
+          example: 0
+
+    ListingListResponse:
+      type: object
+      required:
+        - success
+        - total
+        - items
+      properties:
+        success:
+          type: boolean
+          example: true
+        total:
+          type: integer
+          example: 6
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Listing"
+
+    CreateListingInput:
+      type: object
+      required:
+        - tipo
+        - ciudad
+        - barrio
+        - personas
+        - fechaDesde
+        - precio
+        - descripcion
+        - whatsapp
+        - habeasData
+      properties:
+        tipo:
+          $ref: "#/components/schemas/ListingType"
+        ciudad:
+          type: string
+          example: "Pereira"
+        barrio:
+          type: string
+          example: "Alamos"
+        personas:
+          type: integer
+          minimum: 1
+          example: 2
+        fechaDesde:
+          type: string
+          format: date
+          example: "2026-08-16"
+        fechaHasta:
+          type: string
+          format: date
+          nullable: true
+          example: "2026-08-31"
+        precio:
+          type: number
+          minimum: 0
+          example: 0
+        descripcion:
+          type: string
+          maxLength: 280
+          example: "Apartamento temporal disponible para damnificados."
+        whatsapp:
+          type: string
+          pattern: "^\\+573[0-9]{9}$"
+          example: "+573001234567"
+        imagenes:
+          type: array
+          items:
+            type: string
+          example: []
+        habeasData:
+          type: boolean
+          description: Mandatory consent to Personal Data Treatment terms under Colombian Ley 1581 de 2012
+          example: true
+        b_hp_fax:
+          type: string
+          description: Hidden honeypot field (must be left empty by legitimate users)
+          example: ""
+        turnstileToken:
+          type: string
+          description: Cloudflare Turnstile verification response token
+          example: "1x00000000000000000000AA"
+
+    CreateListingResponse:
+      type: object
+      required:
+        - success
+        - message
+        - listing
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Publicación creada con éxito."
+        listing:
+          $ref: "#/components/schemas/Listing"
+
+    UploadUrlRequest:
+      type: object
+      required:
+        - contentType
+      properties:
+        contentType:
+          type: string
+          enum:
+            - image/jpeg
+            - image/jpg
+            - image/png
+            - image/webp
+          example: "image/jpeg"
+
+    UploadUrlResponse:
+      type: object
+      required:
+        - success
+        - uploadUrl
+        - fileKey
+        - fileUrl
+      properties:
+        success:
+          type: boolean
+          example: true
+        uploadUrl:
+          type: string
+          format: uri
+          description: S3 pre-signed PUT upload URL valid for 15 minutes
+          example: "https://proyecto-colombia-media-storage.s3.amazonaws.com/listings/123.jpg?..."
+        fileKey:
+          type: string
+          example: "listings/7e96c311_1786905783255.jpg"
+        fileUrl:
+          type: string
+          format: uri
+          description: Public CDN URL through which the uploaded image will be delivered
+          example: "https://api.alojamientosolidario.co/listings/7e96c311_1786905783255.jpg"
+
+    ReportListingRequest:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: "loc-pereira-01"
+
+    ReportListingResponse:
+      type: object
+      required:
+        - success
+        - message
+        - reportes
+        - estado
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Publicación reportada correctamente."
+        reportes:
+          type: integer
+          example: 1
+        estado:
+          $ref: "#/components/schemas/ListingStatus"
+
+    ResolveListingRequest:
+      type: object
+      required:
+        - id
+        - pin
+      properties:
+        id:
+          type: string
+          example: "loc-pereira-01"
+        pin:
+          type: string
+          example: "1234"
+
+    ResolveListingResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Publicación marcada como resuelta."
+
+    AdminActionRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - list_all
+            - activo
+            - resuelto
+            - eliminado
+          example: "list_all"
+        id:
+          type: string
+          description: Listing ID required when changing status
+          example: "loc-pereira-01"
+        adminKey:
+          type: string
+          description: Optional fallback admin key passed in body if x-admin-key header is absent
+          example: "colombia2026admin"
+
+    AdminActionResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Estado de publicación actualizado con éxito."
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Listing"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          example: "Todos los campos marcados son obligatorios."
+        details:
+          type: string
+          example: "Validation failed on whatsapp format."

@@ -306,6 +306,62 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     junto a `barrio` (ahora opcional). Ver el mensaje resumen entregado al
     mantenedor en el chat de esta sesión para compartir con el colega tal
     cual.
+- [⬜] **US-4.5**: Como usuario, la búsqueda de "Necesito alojamiento" y de
+  "Tengo espacio disponible" son experiencias separadas, no un mismo feed
+  mezclado con un filtro de tipo.
+  - *Origen*: feedback del mantenedor 2026-08-18 — "improve result listing
+    journey overall... merits separate listing page for estoy buscando y
+    estoy ofreciendo". Hoy `/[ciudad]/` es un único feed con un filtro
+    "Tipo de Publicación" (todos/ofrezco/necesito) mezclado con zona/barrio/
+    precio; el hero ya empuja al usuario a elegir una intención desde el
+    principio (US-1.1) pero el feed no continúa esa separación.
+  - *Criterios (a definir con el mantenedor antes de construir)*: evaluar
+    rutas separadas (p. ej. `/[ciudad]/necesito/` y `/[ciudad]/ofrezco/`) vs.
+    mantener una sola ruta con la intención como estado prominente en vez de
+    un filtro más; cada camino debe tener su propia copy, orden de
+    filtros/facetas relevante a esa intención (quien necesita probablemente
+    prioriza precio/fecha, quien ofrece quizás prioriza capacidad) y CTA de
+    publicar contextual; no debe duplicar lógica de fetch/filtrado —
+    reutilizar `CityFeedPage`/`fetchListings` con la intención como
+    parámetro fijo en vez de reimplementar el feed dos veces.
+- [⬜] **US-4.6**: Como usuario, el feed pagina o carga progresivamente los
+  resultados en vez de traer todas las publicaciones activas de una ciudad
+  de una sola vez.
+  - *Origen*: mismo feedback 2026-08-18 — "pagination". Hoy `fetchListings`
+    trae todo el feed filtrado en una sola respuesta; no es un problema con
+    2-6 publicaciones de demo, pero no escala si una ciudad acumula cientos
+    de publicaciones activas durante una crisis prolongada.
+  - *Criterios*: decidir paginación clásica (numerada) vs. scroll infinito
+    vs. "cargar más" — dado el contexto de conexión limitada/3G mencionado
+    en la sección 9 de este documento, favorecer carga progresiva bajo
+    demanda sobre traer todo de una vez; requiere que el contrato de
+    `GET /listings` soporte `page`/`cursor` + `pageSize` (coordinar con
+    infra, ver patrón de coordinación ya usado en US-4.4/US-6.5); mientras
+    no exista soporte del backend, evaluar un stub frontend-only (paginado
+    client-side sobre el array ya traído) como paso intermedio, igual que
+    `lib/zones.ts` para US-4.4.
+- [⬜] **US-4.7**: Como usuario, filtro y exploro resultados con controles
+  más ricos y accesibles al estilo de un e-commerce (Mercado Libre,
+  Fincaraíz), no con la tabla de filtros plana actual.
+  - *Origen*: mismo feedback 2026-08-18 — "the table view is a bit outdated
+    we would go way better with a more e-commerce approach for filters...
+    something aside from list of content with some elegant/accessible/rich-
+    UX controls over the list of results". El `SearchFilters` actual
+    (Tipo/Zona/Barrio/Precio en un grid de `<select>`s planos) funciona pero
+    no comunica cuántos resultados deja cada filtro, no permite quitar un
+    filtro individual de un vistazo, y no ofrece ninguna forma de ordenar
+    los resultados (hoy siempre más reciente primero).
+  - *Criterios (a definir con el mantenedor antes de construir, candidato a
+    pasar por `/reframe` o una skill de diseño dedicada)*: explorar patrones
+    tipo panel de filtros con chips removibles para los filtros activos,
+    contador de resultados por filtro antes de aplicarlo, control de orden
+    (más reciente / precio asc-desc / capacidad), y una alternativa a la
+    grilla de tarjetas actual para cuando hay muchos resultados (lista
+    compacta vs. tarjetas, densidad ajustable); debe seguir siendo
+    accesible por teclado/lector de pantalla y mantener el mismo contrato de
+    `FilterState` (o extenderlo de forma no disruptiva) para no romper
+    US-4.1/US-4.2/US-4.4; validar con `npm run designqc`/capturas en ambos
+    temas (claro/oscuro, ver US-1.4) antes de cerrar.
 
 ### Épica 5 — Contacto
 - [✅] **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un

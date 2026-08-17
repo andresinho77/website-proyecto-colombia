@@ -75,6 +75,13 @@ endpoints, dominios o versiones sin requerir cambios en el código del frontend.
   Nunca se cae a producción por defecto.
 - `npm run validate` inyecta ese mismo endpoint local vía `npm run build:local`.
 
+**Pendiente de coordinación (2026-08-17):** el colega de infraestructura/backend
+reportó por chat que una nueva versión de la API ("Api listo") está lista para
+bajar/desplegar, en el contexto de la discusión sobre el catálogo de zonas
+(ver US-4.4). Falta confirmar con él el contrato exacto expuesto (endpoints,
+forma del catálogo de zonas) y reflejarlo en `openapi.yaml` antes de
+consumirlo desde este repo.
+
 **Alineación con el repo actual:** este plan asume que el repo mantiene la
 implementación actual del MVP (landing, feed, formularios, moderación, PIN de autor,
 imágenes y fallback local/offline) y que se refina para dejarlo listo para un
@@ -163,6 +170,15 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   página vía un enlace persistente en el header.
 - [✅] **US-1.3**: Como usuario, veo un enlace visible a la política de datos
   (`privacidad.html`) desde el footer de cualquier página.
+- [⬜] **US-1.4**: Como usuario, el sitio respeta mi preferencia de tema
+  (claro/oscuro) del sistema operativo/navegador (`prefers-color-scheme`,
+  incluyendo Night Shift/modo nocturno automático de macOS/iOS), sin requerir
+  un toggle manual para el MVP.
+  - *Criterios*: paleta oscura con contraste suficiente (WCAG AA) en landing,
+    feed, modales y admin; sin parpadeo de tema incorrecto al cargar
+    (`color-scheme` en `<html>` + CSS variables o soporte `dark:` de Tailwind);
+    el logo/imágenes con fondo blanco sólido se revisan para que no se vean
+    rotos en fondo oscuro.
 
 ### Épica 2 — Publicar oferta ("Tengo")
 - [✅] **US-2.1**: Como usuario con espacio disponible, completo un formulario corto
@@ -193,6 +209,25 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 - [✅] **US-4.2**: Como usuario, puedo filtrar además por barrio (texto libre) y por
   rango de precio (incluyendo "gratis").
 - [⬜] **US-4.3 (fase 2)**: Vista de mapa con pines por barrio.
+- [⬜] **US-4.4**: Como usuario, filtro por zona/barrio desde una lista
+  estructurada por ciudad (no texto libre), al estilo de portales como
+  Fincaraíz/Metrocuadrado, para evitar variantes de escritura del mismo
+  barrio y acelerar el filtrado.
+  - *Origen*: discusión 2026-08-17 con el colega de infraestructura/backend —
+    "introducir al modelo de datos zonas de las ciudades para ayudar a
+    filtrar de la misma manera en que la gente filtra en sitios como
+    Fincaraíz".
+  - *Criterios*: el modelo de datos gana un catálogo `zonas` por `ciudad`
+    (barrio pasa de texto libre a selección de una lista, o texto libre con
+    autocompletado sobre el catálogo); el catálogo se genera/asiste con IA
+    por ciudad (el colega confirmó que puede generarlo para cualquier ciudad
+    que se le indique) y se **valida manualmente** antes de publicarse — no
+    se confía en la lista generada sin revisión humana; el feed y los
+    formularios de publicación se actualizan para consumir el catálogo vía
+    la API en vez de aceptar cualquier texto en `barrio`.
+  - *Coordinación pendiente*: confirmar con el equipo de infraestructura el
+    endpoint/contrato para exponer el catálogo de zonas (ver `openapi.yaml`)
+    y quién es dueño de mantenerlo actualizado por ciudad.
 
 ### Épica 5 — Contacto
 - [✅] **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un
@@ -210,6 +245,32 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   propio autor la retire del feed activo.
 - [⬜] **US-6.4**: Como administrador, recibo un resumen diario por SES con el
   número de publicaciones activas, resueltas y reportadas por ciudad.
+- [⬜] **US-6.5**: Como usuario, mi número de WhatsApp no queda expuesto de forma
+  reutilizable a terceros que solo navegan el feed masivamente para recolectar
+  números — más allá de la mitigación ya existente en US-4.1 (no aparece en
+  HTML crudo salvo dentro del enlace `wa.me`).
+  - *Origen*: discusión 2026-08-17 con el colega de infraestructura/backend —
+    en Cali ya se han visto casos de personas tomando números publicados en
+    posts de ayuda para llamar a extorsionar. Se evaluó (y se descartó para
+    el MVP, ver `US-8.2` como precedente de decisión de no sumar fricción)
+    agregar login para mitigar esto, porque "entorpece el proceso"; el
+    consenso fue que sí hace falta **alguna** capa de seguridad, pero sin
+    fricción de cuenta.
+  - *Opciones evaluadas en la conversación* (documentar, no implementar aún
+    sin decisión formal): (a) intermediar el contacto con un bot de
+    WhatsApp que reciba el mensaje y lo reenvíe sin exponer el número
+    directamente (alineado con la idea de "bot de WhatsApp" ya listada como
+    fase 2 en la sección 10 de este documento); (b) mantener `wa.me` directo
+    pero con límites de scraping (rate-limit por IP en el endpoint de
+    listados, ofuscación adicional del número en el DOM); (c) fricción
+    ligera sin cuenta (p. ej. OTP de un solo uso antes de revelar el
+    contacto, similar a `US-7.3`/OTP ya anotado en fase 2).
+  - *Criterios*: cualquier opción elegida debe mantenerse fricción-cero para
+    publicar (no login) y solo puede agregar un paso liviano al momento de
+    **contactar**; requiere decisión explícita del arquitecto/colega de
+    infraestructura antes de implementarse, dado que el post original de la
+    conversación quedó en "tengo que pensarlo bien para todos los use
+    cases".
 
 ### Épica 7 — Política de datos y cumplimiento (Habeas Data)
 - [✅] **US-7.1**: Como usuario, puedo leer una política de datos clara (modal

@@ -39,6 +39,7 @@ const MOCK_LISTINGS: Listing[] = [
     id: 'mock-1',
     tipo: 'ofrezco',
     ciudad: 'Pereira',
+    zona: 'Oriente',
     barrio: 'Circunvalar',
     personas: 4,
     fechaDesde: '2026-08-11',
@@ -58,6 +59,7 @@ const MOCK_LISTINGS: Listing[] = [
     id: 'mock-2',
     tipo: 'necesito',
     ciudad: 'Pereira',
+    zona: 'Sur',
     barrio: 'Cuba',
     personas: 3,
     fechaDesde: '2026-08-12',
@@ -75,6 +77,7 @@ const MOCK_LISTINGS: Listing[] = [
     id: 'mock-3',
     tipo: 'ofrezco',
     ciudad: 'Cali',
+    zona: 'Centro',
     barrio: 'San Antonio',
     personas: 2,
     fechaDesde: '2026-08-10',
@@ -94,6 +97,7 @@ const MOCK_LISTINGS: Listing[] = [
     id: 'mock-4',
     tipo: 'ofrezco',
     ciudad: 'Quibdó',
+    zona: 'Anillo Central (Comuna 3)',
     barrio: 'César Conto',
     personas: 6,
     fechaDesde: '2026-08-11',
@@ -119,6 +123,7 @@ export const fetchListings = async (filters?: Partial<FilterState>): Promise<Lis
     const params = new URLSearchParams();
     if (filters?.ciudad) params.append('ciudad', filters.ciudad);
     if (filters?.tipo) params.append('tipo', filters.tipo);
+    if (filters?.zona) params.append('zona', filters.zona);
     if (filters?.barrio) params.append('barrio', filters.barrio);
     if (filters?.maxPrecio) params.append('maxPrecio', filters.maxPrecio);
 
@@ -141,6 +146,9 @@ export const fetchListings = async (filters?: Partial<FilterState>): Promise<Lis
     }
     if (filters?.tipo && filters.tipo !== 'todos') {
       items = items.filter((i) => i.tipo === filters.tipo);
+    }
+    if (filters?.zona) {
+      items = items.filter((i) => i.zona.toLowerCase() === filters.zona?.toLowerCase());
     }
     if (filters?.barrio) {
       items = items.filter((i) => i.barrio.toLowerCase().includes(filters.barrio!.toLowerCase()));
@@ -170,6 +178,7 @@ export const createListing = async (input: CreateListingInput): Promise<{ succes
       id: `local-${Date.now()}`,
       tipo: input.tipo,
       ciudad: input.ciudad,
+      zona: input.zona,
       barrio: input.barrio,
       personas: Number(input.personas) || 1,
       fechaDesde: input.fechaDesde,

@@ -224,7 +224,7 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 - [✅] **US-4.2**: Como usuario, puedo filtrar además por barrio (texto libre) y por
   rango de precio (incluyendo "gratis").
 - [⬜] **US-4.3 (fase 2)**: Vista de mapa con pines por barrio.
-- [⬜] **US-4.4**: Como usuario, filtro por zona/barrio desde una lista
+- [🟡] **US-4.4**: Como usuario, filtro por zona/barrio desde una lista
   estructurada por ciudad (no texto libre), al estilo de portales como
   Fincaraíz/Metrocuadrado, para evitar variantes de escritura del mismo
   barrio y acelerar el filtrado.
@@ -240,9 +240,72 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     se confía en la lista generada sin revisión humana; el feed y los
     formularios de publicación se actualizan para consumir el catálogo vía
     la API en vez de aceptar cualquier texto en `barrio`.
+  - *Corrección de granularidad (2026-08-17, misma sesión)*: la primera
+    versión de esta historia cargó `lib/zones.ts` con barrios individuales
+    (~20 por ciudad); el mantenedor aclaró que eso sigue escalando a
+    cientos/miles de opciones y no es lo que pidió — la intención real es
+    **macro-zonas** (Norte/Centro/Sur/Oriente al estilo Fincaraíz), no
+    barrios. Además, no todas las ciudades usan el mismo esquema de
+    zonificación, así que se investigó por ciudad cuál es el esquema real
+    en uso en vez de forzar Norte/Sur/Centro/Oriente/Occidente en todas:
+    Cali tiene 6 zonas geográficas oficiales de Planeación/IDESC (Norte,
+    Oriente, Sur, Centro, Ladera, Oeste); Manizales (11) y Armenia (10) no
+    tienen agrupación cardinal informal de uso común — su división real son
+    comunas con nombre propio, así que esos nombres se usan tal cual;
+    Quibdó tiene 6 comunas ya nombradas con etiqueta cardinal/descriptiva
+    (p. ej. Comuna 1 = "Zona Norte"); Pereira no tiene un mapa oficial de
+    zonas cardinales (se documentó como agrupación informal, no
+    gubernamental); Condoto e Istmina son municipios pequeños sin
+    zonificación interna real, así que solo tienen un "Centro / Casco
+    urbano". Ver las fuentes y el detalle completo en los comentarios de
+    `lib/zones.ts`.
+  - *Solución temporal entregada (2026-08-17)*: mientras se confirma el
+    contrato con infra, `lib/zones.ts` trae un catálogo **frontend-only**
+    (`ZONES_BY_CITY_SLUG`) de macro-zonas por ciudad (5-11 opciones según la
+    ciudad, no barrios), investigado vía búsqueda web contra fuentes
+    públicas (sitio de Planeación de Cali/IDESC, Datos Abiertos Colombia,
+    Wikipedia, alcaldías municipales) y **sin validar manualmente por
+    alguien de cada ciudad todavía** — ver advertencia en el propio
+    archivo. `components/PublishModal.tsx` (campo "Zona", antes "Barrio /
+    Sector") y `components/SearchFilters.tsx` (mismo cambio de label) usan
+    un `<select>` real sobre `getZonesForCityName()` — al ser una lista
+    corta y curada por ciudad, un dropdown cerrado tiene más sentido que
+    autocompletado sobre texto libre; el campo sigue siendo `barrio` en
+    `lib/types.ts`/`lib/api.ts` (cero cambios de contrato), ahora con
+    valores de zona en vez de barrio específico. `MOCK_LISTINGS` en
+    `lib/api.ts` se actualizó a los nuevos valores de zona para que el
+    filtro siga funcionando en modo offline/demo. Queda 🟡 (no ✅) porque
+    falta: (a) validación humana del
+    catálogo, y (b) migrar de este archivo local al catálogo real de la API
+    una vez el colega de infra confirme el contrato.
+  - *Corrección de modelo de datos (2026-08-17, misma sesión)*: el mantenedor
+    aclaró que **`barrio` (texto libre) debe seguir existiendo** como campo
+    de búsqueda independiente — "Zonas son simplemente una forma de llegar
+    más rápido a las tarjetas de contenido que buscas", no un reemplazo del
+    barrio específico. `lib/types.ts` ahora separa ambos campos en
+    `Listing`/`FilterState`/`CreateListingInput`: `zona` (obligatorio,
+    selección de `lib/zones.ts`, filtra por igualdad exacta) y `barrio`
+    (opcional, texto libre, filtra por substring — el comportamiento
+    original de US-4.2). `PublishModal` vuelve a tener ambos campos (Zona
+    *, Barrio/Sector opcional); `SearchFilters` vuelve a tener ambos
+    filtros lado a lado. `ListingCard`/`ShareModal`/`app/admin/page.tsx`
+    muestran `zona · barrio` cuando hay barrio, o solo `zona` si no.
+    `MOCK_LISTINGS` recuperó sus barrios específicos originales
+    (Circunvalar, Cuba, San Antonio, César Conto) junto a la zona
+    correspondiente.
   - *Coordinación pendiente*: confirmar con el equipo de infraestructura el
     endpoint/contrato para exponer el catálogo de zonas (ver `openapi.yaml`)
-    y quién es dueño de mantenerlo actualizado por ciudad.
+    y quién es dueño de mantenerlo actualizado por ciudad; cuando exista,
+    reemplazar `lib/zones.ts` por una llamada a la API (mismo shape:
+    `Record<citySlug, string[]>` o equivalente) sin tocar los componentes
+    que ya consumen `getZonesForCityName()`.
+  - *Contrato propuesto (2026-08-17)*: `openapi.yaml` ya documenta la
+    propuesta completa para alinear con el colega de infra — `GET /zones`
+    (nuevo endpoint, `ZonesResponse` con `zonas: Record<ciudad, string[]>`)
+    y el campo `zona` (obligatorio) agregado a `Listing`/`CreateListingInput`
+    junto a `barrio` (ahora opcional). Ver el mensaje resumen entregado al
+    mantenedor en el chat de esta sesión para compartir con el colega tal
+    cual.
 
 ### Épica 5 — Contacto
 - [✅] **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un

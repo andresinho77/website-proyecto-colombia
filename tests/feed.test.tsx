@@ -6,14 +6,19 @@ import { ListingGrid } from '../components/ListingGrid';
 import { listingsFixture, listingOfrezco, listingNecesito } from './fixtures/listings';
 
 describe('ListingGrid (feed)', () => {
-  it('renderiza una tarjeta por publicación con ciudad, barrio y tipo', () => {
+  it('renderiza una tarjeta por publicación con ciudad, zona/barrio y tipo', () => {
     render(<ListingGrid listings={listingsFixture} />);
 
     expect(screen.getByText(/OFREZCO ALOJAMIENTO/i)).toBeInTheDocument();
     expect(screen.getByText(/NECESITO ALOJAMIENTO/i)).toBeInTheDocument();
 
-    expect(screen.getByText(listingOfrezco.barrio)).toBeInTheDocument();
-    expect(screen.getByText(listingNecesito.barrio)).toBeInTheDocument();
+    // La tarjeta combina zona + barrio como "Zona · Barrio" cuando hay barrio (US-4.4).
+    expect(
+      screen.getByText(`${listingOfrezco.zona} · ${listingOfrezco.barrio}`)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(`${listingNecesito.zona} · ${listingNecesito.barrio}`)
+    ).toBeInTheDocument();
     // `exact: false`: la tarjeta envuelve la descripción en comillas tipográficas.
     expect(screen.getByText(listingOfrezco.descripcion, { exact: false })).toBeInTheDocument();
   });

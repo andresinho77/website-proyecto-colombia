@@ -7,6 +7,7 @@ import { createListing } from '../lib/api';
 import { saveMyListing } from '../lib/localStorage';
 import { ImageUploader } from './ImageUploader';
 import { CITIES } from '../lib/cities';
+import { getZonesForCityName } from '../lib/zones';
 
 interface PublishModalProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
 }) => {
   const [tipo, setTipo] = useState<ListingType>(defaultTipo);
   const [ciudad, setCiudad] = useState(defaultCiudad || CITIES[0].name);
+  const [zona, setZona] = useState('');
   const [barrio, setBarrio] = useState('');
   const [personas, setPersonas] = useState(2);
   const [fechaDesde, setFechaDesde] = useState(new Date().toISOString().split('T')[0]);
@@ -52,6 +54,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     if (!isOpen) return;
     setTipo(defaultTipo);
     setCiudad(defaultCiudad || CITIES[0].name);
+    setZona('');
     setBarrio('');
     setPersonas(2);
     setFechaDesde(new Date().toISOString().split('T')[0]);
@@ -66,6 +69,14 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     setHoneypot('');
     setFormError(null);
   }, [isOpen, defaultTipo, defaultCiudad]);
+
+  // The zone list is per-city (US-4.4) — a zone picked for one city (e.g.
+  // "Ladera", Cali-only) isn't valid once the user switches to another, so
+  // clear the selection whenever the city changes mid-session. `barrio` is
+  // free text and stays untouched — it's not tied to the zone catalog.
+  useEffect(() => {
+    setZona('');
+  }, [ciudad]);
 
   // Dismiss on Escape while open.
   useEffect(() => {
@@ -94,8 +105,8 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     setFormError(null);
 
     // Validation
-    if (!barrio.trim()) {
-      setFormError('Indique el barrio o sector.');
+    if (!zona.trim()) {
+      setFormError('Indique la zona.');
       return;
     }
     if (!descripcion.trim()) {
@@ -120,6 +131,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     const res = await createListing({
       tipo,
       ciudad,
+      zona,
       barrio: barrio.trim(),
       personas: Number(personas) || 1,
       fechaDesde,
@@ -223,7 +235,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
             </button>
           </div>
 
-          {/* Ciudad & Barrio */}
+          {/* Ciudad, Zona & Barrio */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
@@ -244,17 +256,37 @@ export const PublishModal: React.FC<PublishModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Barrio / Sector *
+                Zona *
               </label>
-              <input
-                type="text"
+              <select
                 required
-                placeholder="Ej: Circunvalar, Cuba..."
-                value={barrio}
-                onChange={(e) => setBarrio(e.target.value)}
+                value={zona}
+                onChange={(e) => setZona(e.target.value)}
                 className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
-              />
+              >
+                <option value="" disabled>
+                  Seleccione una zona
+                </option>
+                {getZonesForCityName(ciudad).map((z) => (
+                  <option key={z} value={z}>
+                    {z}
+                  </option>
+                ))}
+              </select>
             </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Barrio / Sector (opcional)
+            </label>
+            <input
+              type="text"
+              placeholder="Ej: Circunvalar, Cuba... (ayuda a que te encuentren con más precisión)"
+              value={barrio}
+              onChange={(e) => setBarrio(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none placeholder-slate-500"
+            />
           </div>
 
           {/* Personas & Price */}

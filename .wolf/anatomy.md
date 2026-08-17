@@ -13,7 +13,7 @@
 - `GEMINI.md` — OpenWolf (~68 tok)
 - `next-env.d.ts` — / <reference types="next" /> (~66 tok)
 - `next.config.mjs` — Next.js configuration (~54 tok)
-- `openapi.yaml` — API contract snapshot for frontend/backend integration (~452 tok)
+- `openapi.yaml` — API contract snapshot for frontend/backend integration; now includes proposed `GET /zones` (`ZonesResponse`) and `zona`/`barrio` split on `Listing`/`CreateListingInput` (US-4.4, drafted 2026-08-17 to align with infra colleague, not yet backend-confirmed) (~520 tok)
 - `package-lock.json` — npm lock file (~82487 tok)
 - `package.json` — Node.js package manifest (~398 tok)
 - `postcss.config.mjs` — Declares config (~42 tok)
@@ -92,6 +92,7 @@
   - fn `resolveApiBaseUrl` L18-251 (~2217 tok)
 - `localStorage.ts` — Exports SavedAuthorListing, getMyListings, saveMyListing, removeMyListing (~343 tok)
 - `types.ts` — Exports ListingType, ListingStatus, Listing, FilterState, CreateListingInput (~262 tok)
+- `zones.ts` — Temporary frontend-only US-4.4 macro-zone catalog (`ZONES_BY_CITY_SLUG`, Norte/Sur/Centro-style areas per city, each using that city's real classification scheme researched via WebSearch — not individual barrios) + `getZonesForCityName(cityName)`; stand-in until infra exposes the real catalog via API. (~750 tok)
 
 ## scripts/
 

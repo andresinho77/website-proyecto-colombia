@@ -23,10 +23,11 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
   const [isLoading, setIsLoading] = useState(true);
 
   // City is fixed by the route (see Navbar's city switcher), not a
-  // user-editable filter (US-4.1, US-4.2 cover only tipo/barrio/precio now).
+  // user-editable filter (US-4.1/US-4.2/US-4.4 cover tipo/zona/barrio/precio).
   const [filters, setFilters] = useState<FilterState>({
     ciudad: cityName,
     tipo: 'todos',
+    zona: '',
     barrio: '',
     maxPrecio: '',
   });
@@ -73,6 +74,7 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
     setFilters({
       ciudad: cityName,
       tipo: 'todos',
+      zona: '',
       barrio: '',
       maxPrecio: '',
     });

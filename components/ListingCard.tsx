@@ -52,6 +52,9 @@ export const ListingCard: React.FC<ListingCardProps> = ({
 
   const isOfrezco = listing.tipo === 'ofrezco';
   const hasImages = listing.imagenes && listing.imagenes.length > 0;
+  // Zona (US-4.4) is the required, filterable location; barrio is optional
+  // free text the author can add for extra precision — shown alongside when present.
+  const location = listing.barrio ? `${listing.zona} · ${listing.barrio}` : listing.zona;
 
   // Check if current user is the author via localStorage
   const myListings = getMyListings();
@@ -64,7 +67,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
     const text = encodeURIComponent(
       `Hola, vi tu publicación en Alojamiento Solidario Colombia (${
         isOfrezco ? 'Ofrezco' : 'Necesito'
-      } en ${listing.ciudad}, ${listing.barrio}) [Ref: ${listing.id.substring(
+      } en ${listing.ciudad}, ${location}) [Ref: ${listing.id.substring(
         0,
         6
       )}]. ¿Podemos hablar?`
@@ -132,7 +135,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           <h3 className="font-display text-lg font-semibold text-slate-100 mb-1 flex items-center gap-1.5">
             <MapPin className="w-4 h-4 text-emerald-700 flex-shrink-0" />
             {listing.ciudad},{' '}
-            <span className="font-semibold text-slate-300">{listing.barrio}</span>
+            <span className="font-semibold text-slate-300">{location}</span>
           </h3>
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 mt-2 font-medium">
@@ -154,7 +157,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={listing.imagenes![currentImgIndex]}
-              alt={`Foto de espacio en ${listing.barrio}`}
+              alt={`Foto de espacio en ${location}`}
               className="w-full h-full object-cover"
             />
 

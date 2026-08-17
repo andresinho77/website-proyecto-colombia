@@ -42,6 +42,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
     expect(fetchListings).toHaveBeenCalledWith({
       ciudad: 'Pereira',
       tipo: 'todos',
+      zona: '',
       barrio: '',
       maxPrecio: '',
     });

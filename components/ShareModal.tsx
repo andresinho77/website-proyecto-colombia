@@ -23,10 +23,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({ listing, onClose }) => {
 
   if (!listing) return null;
 
+  const location = listing.barrio ? `${listing.zona} · ${listing.barrio}` : listing.zona;
   const shareText = encodeURIComponent(
     `¡Hola! He publicado un ${
       listing.tipo === 'ofrezco' ? 'oferta de alojamiento' : 'solicitud de refugio'
-    } en ${listing.ciudad} (${listing.barrio}) en Alojamiento Solidario Colombia: "${
+    } en ${listing.ciudad} (${location}) en Alojamiento Solidario Colombia: "${
       listing.descripcion
     }"`
   );

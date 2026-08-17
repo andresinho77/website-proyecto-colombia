@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, CheckCircle2, MessageSquare, Key, Copy, Share2 } from 'lucide-react';
 import { Listing } from '../lib/types';
 
@@ -10,10 +10,21 @@ interface ShareModalProps {
 }
 
 export const ShareModal: React.FC<ShareModalProps> = ({ listing, onClose }) => {
+  // Dismiss on Escape while open. Runs unconditionally (before the
+  // `!listing` early return) so hook order stays stable across renders.
+  useEffect(() => {
+    if (!listing) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [listing, onClose]);
+
   if (!listing) return null;
 
   const shareText = encodeURIComponent(
-    `🇨🇴 ¡Hola! He publicado un ${
+    `¡Hola! He publicado un ${
       listing.tipo === 'ofrezco' ? 'oferta de alojamiento' : 'solicitud de refugio'
     } en ${listing.ciudad} (${listing.barrio}) en Alojamiento Solidario Colombia: "${
       listing.descripcion
@@ -29,20 +40,25 @@ export const ShareModal: React.FC<ShareModalProps> = ({ listing, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="glass-card max-w-md w-full p-6 rounded-3xl border border-solidarity-500/40 shadow-2xl text-center relative">
+    <div
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md grid place-items-center p-4 py-8 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="glass-card max-w-md w-full p-6 rounded-3xl shadow-lg text-center relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center"
+          className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-slate-100 flex items-center justify-center"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className="w-16 h-16 rounded-full bg-solidarity-500/20 text-emerald-400 border border-solidarity-500/40 flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 rounded-full bg-solidarity-500/20 text-emerald-700 border border-solidarity-500/40 flex items-center justify-center mx-auto mb-4">
           <CheckCircle2 className="w-10 h-10" />
         </div>
 
-        <h2 className="text-2xl font-bold text-white mb-2">¡Publicación Exitosa! 🎉</h2>
+        <h2 className="font-display text-2xl font-semibold text-slate-100 mb-2">Publicación exitosa</h2>
         <p className="text-xs text-slate-300 mb-6">
           Tu publicación ya está activa y visible en el feed público para ayuda inmediata.
         </p>
@@ -56,7 +72,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ listing, onClose }) => {
               </span>
               <button
                 onClick={copyPinToClipboard}
-                className="text-[11px] text-emerald-400 hover:underline flex items-center gap-1 font-mono"
+                className="text-[11px] text-emerald-700 hover:underline flex items-center gap-1 font-mono"
               >
                 <Copy className="w-3 h-3" /> Copiar
               </button>
@@ -83,7 +99,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ listing, onClose }) => {
 
         <button
           onClick={onClose}
-          className="text-xs text-slate-400 hover:text-white font-medium py-2"
+          className="text-xs text-slate-400 hover:text-slate-100 font-medium py-2"
         >
           Ir al Feed Principal
         </button>

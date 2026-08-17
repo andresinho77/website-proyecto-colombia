@@ -6,24 +6,28 @@ import { ListingType, Listing } from '../lib/types';
 import { createListing } from '../lib/api';
 import { saveMyListing } from '../lib/localStorage';
 import { ImageUploader } from './ImageUploader';
+import { CITIES } from '../lib/cities';
 
 interface PublishModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultTipo?: ListingType;
+  /** City the modal was opened from (route-scoped). Preselected but still
+   * editable, since a listing's city doesn't have to match the page it was
+   * published from. */
+  defaultCiudad?: string;
   onSuccessPublished: (listing: Listing) => void;
 }
-
-const CITIES = ['Pereira', 'Cali', 'Quibdó', 'Manizales', 'Armenia', 'Condoto', 'Istmina'];
 
 export const PublishModal: React.FC<PublishModalProps> = ({
   isOpen,
   onClose,
   defaultTipo = 'ofrezco',
+  defaultCiudad,
   onSuccessPublished,
 }) => {
   const [tipo, setTipo] = useState<ListingType>(defaultTipo);
-  const [ciudad, setCiudad] = useState(CITIES[0]);
+  const [ciudad, setCiudad] = useState(defaultCiudad || CITIES[0].name);
   const [barrio, setBarrio] = useState('');
   const [personas, setPersonas] = useState(2);
   const [fechaDesde, setFechaDesde] = useState(new Date().toISOString().split('T')[0]);
@@ -47,7 +51,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
     setTipo(defaultTipo);
-    setCiudad(CITIES[0]);
+    setCiudad(defaultCiudad || CITIES[0].name);
     setBarrio('');
     setPersonas(2);
     setFechaDesde(new Date().toISOString().split('T')[0]);
@@ -61,7 +65,17 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     setHabeasData(true);
     setHoneypot('');
     setFormError(null);
-  }, [isOpen, defaultTipo]);
+  }, [isOpen, defaultTipo, defaultCiudad]);
+
+  // Dismiss on Escape while open.
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -138,24 +152,26 @@ export const PublishModal: React.FC<PublishModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <div className="glass-card max-w-lg w-full p-6 rounded-3xl border border-slate-700 shadow-2xl relative my-8">
-        
+    <div
+      className="fixed inset-0 z-50 bg-black/50 backdrop-blur-md grid place-items-center p-4 py-8 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="glass-card max-w-lg w-full p-6 rounded-3xl shadow-lg relative">
+
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+          className="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-slate-100 flex items-center justify-center transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
 
         {/* Modal Header */}
         <div className="mb-6">
-          <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block mb-1">
-            Publicación Express en &lt;60s
-          </span>
-          <h2 className="text-2xl font-bold text-white">
-            {tipo === 'ofrezco' ? 'Ofrecer Alojamiento 🏡' : 'Solicitar Alojamiento 🆘'}
+          <h2 className="font-display text-2xl font-semibold text-slate-100">
+            {tipo === 'ofrezco' ? 'Ofrecer alojamiento' : 'Solicitar alojamiento'}
           </h2>
         </div>
 
@@ -188,7 +204,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
               className={`py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                 tipo === 'ofrezco'
                   ? 'bg-solidarity-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-slate-100'
               }`}
             >
               <Home className="w-4 h-4" /> Ofrezco Espacio
@@ -200,7 +216,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
               className={`py-2 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${
                 tipo === 'necesito'
                   ? 'bg-rose-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-slate-400 hover:text-slate-100'
               }`}
             >
               <Heart className="w-4 h-4" /> Necesito Techo
@@ -216,11 +232,11 @@ export const PublishModal: React.FC<PublishModalProps> = ({
               <select
                 value={ciudad}
                 onChange={(e) => setCiudad(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
               >
                 {CITIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                  <option key={c.slug} value={c.name}>
+                    {c.name}
                   </option>
                 ))}
               </select>
@@ -236,7 +252,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
                 placeholder="Ej: Circunvalar, Cuba..."
                 value={barrio}
                 onChange={(e) => setBarrio(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
               />
             </div>
           </div>
@@ -253,7 +269,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
                 max={20}
                 value={personas}
                 onChange={(e) => setPersonas(Number(e.target.value))}
-                className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
               />
             </div>
 
@@ -262,7 +278,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
                 Modalidad de Precio
               </label>
               <div className="flex items-center gap-2 pt-1">
-                <label className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold cursor-pointer">
+                <label className="flex items-center gap-1.5 text-xs text-emerald-700 font-semibold cursor-pointer">
                   <input
                     type="checkbox"
                     checked={isGratis}
@@ -281,7 +297,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
                     placeholder="Valor COP"
                     value={precio}
                     onChange={(e) => setPrecio(Number(e.target.value))}
-                    className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-2 py-1 text-xs focus:border-emerald-500 focus:outline-none"
+                    className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-2 py-1 text-xs focus:border-emerald-500 focus:outline-none"
                   />
                 )}
               </div>
@@ -309,7 +325,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
               placeholder="Describa brevemente el espacio, servicios (baño, luz, WiFi) o necesidad urgente..."
               value={descripcion}
               onChange={(e) => setDescripcion(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl p-3 text-sm focus:border-emerald-500 focus:outline-none placeholder-slate-500"
+              className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl p-3 text-sm focus:border-emerald-500 focus:outline-none placeholder-slate-500"
             />
           </div>
 
@@ -325,7 +341,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
                 placeholder="+573105550123"
                 value={whatsapp}
                 onChange={(e) => handlePhoneChange(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-sm font-mono focus:border-emerald-500 focus:outline-none"
+                className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm font-mono focus:border-emerald-500 focus:outline-none"
               />
             </div>
             <p className="text-[11px] text-slate-400 mt-1">
@@ -348,7 +364,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
               />
               <span className="text-[11px] text-slate-300 leading-snug">
                 Autorizo el tratamiento de mis datos de contacto para la finalidad de alojamiento temporal de emergencia, conforme a la{' '}
-                <strong className="text-white">Ley 1581 de 2012 de Colombia</strong>.
+                <strong className="text-slate-100">Ley 1581 de 2012 de Colombia</strong>.
               </span>
             </label>
           </div>
@@ -364,7 +380,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="touch-target w-full py-3 rounded-xl bg-gradient-to-r from-solidarity-600 to-emerald-500 hover:from-solidarity-500 hover:to-emerald-400 text-white font-bold text-base shadow-lg shadow-solidarity-950/50 flex items-center justify-center gap-2 transition-all mt-4"
+            className="touch-target w-full py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-base shadow-sm flex items-center justify-center gap-2 transition-colors mt-4"
           >
             <Send className="w-4 h-4" />
             {isSubmitting ? 'Publicando en &lt;60s...' : 'Publicar Ahora'}

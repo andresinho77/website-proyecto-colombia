@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MapPin,
   Users,
@@ -39,6 +39,16 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   const [inputPin, setInputPin] = useState('');
   const [resolveError, setResolveError] = useState<string | null>(null);
   const [isResolving, setIsResolving] = useState(false);
+
+  // Dismiss the resolve modal on Escape while open.
+  useEffect(() => {
+    if (!showResolveModal) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setShowResolveModal(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showResolveModal]);
 
   const isOfrezco = listing.tipo === 'ofrezco';
   const hasImages = listing.imagenes && listing.imagenes.length > 0;
@@ -93,7 +103,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   };
 
   return (
-    <div className="glass-card glass-card-hover rounded-2xl overflow-hidden border border-slate-800 shadow-xl flex flex-col justify-between">
+    <div className="glass-card glass-card-hover rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between">
       <div>
         {/* Header & Badges */}
         <div className="p-5 pb-3">
@@ -101,7 +111,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             <span
               className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
                 isOfrezco
-                  ? 'bg-solidarity-950 border border-solidarity-500/40 text-emerald-400'
+                  ? 'bg-solidarity-950 border border-solidarity-500/40 text-emerald-300'
                   : 'bg-rose-950 border border-rose-500/40 text-rose-300'
               }`}
             >
@@ -111,7 +121,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
 
             <span className="text-xs font-bold text-slate-300 bg-slate-900/90 border border-slate-700/60 px-2.5 py-1 rounded-lg">
               {listing.precio === 0 ? (
-                <span className="text-emerald-400">Gratis ($0)</span>
+                <span className="text-emerald-700">Gratis ($0)</span>
               ) : (
                 `$${listing.precio.toLocaleString('es-CO')} COP`
               )}
@@ -119,8 +129,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({
           </div>
 
           {/* Location & Barrio */}
-          <h3 className="text-lg font-bold text-white mb-1 flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <h3 className="font-display text-lg font-semibold text-slate-100 mb-1 flex items-center gap-1.5">
+            <MapPin className="w-4 h-4 text-emerald-700 flex-shrink-0" />
             {listing.ciudad},{' '}
             <span className="font-semibold text-slate-300">{listing.barrio}</span>
           </h3>
@@ -156,7 +166,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                       prev === 0 ? listing.imagenes!.length - 1 : prev - 1
                     )
                   }
-                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-950/80 text-white flex items-center justify-center hover:bg-slate-900"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -166,11 +176,11 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                       prev === listing.imagenes!.length - 1 ? 0 : prev + 1
                     )
                   }
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-slate-950/80 text-white flex items-center justify-center hover:bg-slate-900"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-slate-950/80 text-[10px] text-slate-300">
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-black/60 text-[10px] text-white">
                   {currentImgIndex + 1} / {listing.imagenes!.length}
                 </div>
               </>
@@ -211,7 +221,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
               onClick={() => onShareWhatsApp(listing)}
               className="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1 transition-colors py-1"
             >
-              <Share2 className="w-3.5 h-3.5 text-emerald-400" />
+              <Share2 className="w-3.5 h-3.5 text-emerald-700" />
               Compartir
             </button>
           )}
@@ -245,11 +255,16 @@ export const ListingCard: React.FC<ListingCardProps> = ({
 
       {/* Resolve PIN Modal */}
       {showResolveModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-card max-w-sm w-full p-6 rounded-2xl border border-slate-700 shadow-2xl">
+        <div
+          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm grid place-items-center p-4 py-8 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setShowResolveModal(false);
+          }}
+        >
+          <div className="glass-card max-w-sm w-full p-6 rounded-2xl shadow-lg">
             <div className="flex items-center gap-2 text-amber-400 mb-3">
               <Lock className="w-5 h-5" />
-              <h3 className="font-bold text-white text-base">Marcar como Resuelta</h3>
+              <h3 className="font-display font-semibold text-slate-100 text-base">Marcar como resuelta</h3>
             </div>
 
             <p className="text-xs text-slate-300 mb-4">
@@ -267,10 +282,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                   placeholder={myListingLocal?.pin || 'Ej: 1234'}
                   value={inputPin}
                   onChange={(e) => setInputPin(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-3 py-2 text-center text-lg tracking-widest font-mono focus:border-amber-400 focus:outline-none"
+                  className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-center text-lg tracking-widest font-mono focus:border-amber-400 focus:outline-none"
                 />
                 {myListingLocal && (
-                  <p className="text-[11px] text-emerald-400 mt-1">
+                  <p className="text-[11px] text-emerald-700 mt-1">
                     ✓ PIN detectado automáticamente en este dispositivo.
                   </p>
                 )}
@@ -284,7 +299,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowResolveModal(false)}
-                  className="px-3 py-2 text-xs text-slate-400 hover:text-white"
+                  className="px-3 py-2 text-xs text-slate-400 hover:text-slate-100"
                 >
                   Cancelar
                 </button>

@@ -2,49 +2,61 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Home, PlusCircle, Search, ShieldAlert, HeartHandshake } from 'lucide-react';
+import { PlusCircle, Search, ShieldAlert, HeartHandshake } from 'lucide-react';
+import { CitySwitcher } from './CitySwitcher';
 
 interface NavbarProps {
+  currentCitySlug: string;
   onOpenPublish?: (defaultTipo?: 'ofrezco' | 'necesito') => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenPublish }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentCitySlug, onOpenPublish }) => {
   return (
     <header className="sticky top-0 z-40 glass-nav w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          
-          {/* Logo & Title */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-solidarity-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-solidarity-900/30 group-hover:scale-105 transition-transform">
-              <HeartHandshake className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <span className="font-bold text-lg sm:text-xl tracking-tight text-white flex items-center gap-2">
-                Alojamiento Solidario
-                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-medium">
-                  🇨🇴 Emergencia
-                </span>
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-2 h-16 sm:h-20">
+
+          {/* Logo, Title & City Switcher */}
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 sm:flex-none">
+            <Link href={`/${currentCitySlug}/`} className="flex items-center flex-shrink-0 group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-700 flex items-center justify-center">
+                <HeartHandshake className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+              </div>
+            </Link>
+
+            {/* Mobile/tablet: the city itself is the primary identity — kept
+                through md: since sm:-only widths (e.g. ~712px) don't have
+                room for the full title + chip alongside nav labels */}
+            <CitySwitcher currentSlug={currentCitySlug} variant="title" className="md:hidden min-w-0" />
+
+            {/* Desktop: full app name + a city chip alongside it */}
+            <div className="hidden md:block min-w-0">
+              <span className="flex items-center gap-2">
+                <Link
+                  href={`/${currentCitySlug}/`}
+                  className="font-display font-semibold text-xl tracking-tight text-slate-100 truncate"
+                >
+                  Alojamiento Solidario
+                </Link>
+                <CitySwitcher currentSlug={currentCitySlug} variant="chip" />
               </span>
-              <span className="text-xs text-slate-400 block hidden sm:block">
-                Respuesta Terremoto 10 de Agosto de 2026
-              </span>
             </div>
-          </Link>
+          </div>
 
           {/* Persistent Header Navigation (US-1.2) */}
-          <nav className="flex items-center gap-2 sm:gap-4">
+          <nav className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">
             <Link
-              href="/#feed"
-              className="touch-target px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 flex items-center gap-1.5 transition-colors"
+              href={`/${currentCitySlug}/#feed`}
+              className="touch-target px-2.5 sm:px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-slate-100 hover:bg-slate-800/60 flex items-center justify-center gap-1.5 transition-colors"
             >
-              <Search className="w-4 h-4 text-emerald-400" />
-              <span className="hidden xs:inline">Feed de</span> Alojamientos
+              <Search className="w-4 h-4 text-emerald-700" />
+              <span className="md:hidden">Buscar</span>
+              <span className="hidden md:inline">Feed de Alojamientos</span>
             </Link>
 
             <Link
               href="/terminos-y-privacidad"
-              className="touch-target px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-400 hover:text-slate-200 hidden md:flex items-center gap-1 transition-colors"
+              className="touch-target px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-400 hover:text-slate-200 hidden lg:flex items-center gap-1 transition-colors"
             >
               <ShieldAlert className="w-4 h-4 text-slate-400" />
               Habeas Data
@@ -53,10 +65,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenPublish }) => {
             {onOpenPublish && (
               <button
                 onClick={() => onOpenPublish('ofrezco')}
-                className="touch-target px-4 py-2 rounded-xl bg-solidarity-600 hover:bg-solidarity-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-solidarity-900/40 flex items-center gap-2 transition-all hover:shadow-solidarity-600/30"
+                className="touch-target px-2.5 sm:px-4 py-2 rounded-xl bg-solidarity-600 hover:bg-solidarity-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-solidarity-900/40 flex items-center justify-center gap-2 transition-all hover:shadow-solidarity-600/30"
               >
                 <PlusCircle className="w-4 h-4" />
-                <span>Publicar Espacio</span>
+                <span className="md:hidden">Publicar</span>
+                <span className="hidden md:inline">Publicar Espacio</span>
               </button>
             )}
           </nav>

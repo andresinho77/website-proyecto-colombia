@@ -4,33 +4,42 @@
 
 @layer base {
   body {
-    @apply bg-slate-950 text-slate-100 antialiased selection:bg-solidarity-500 selection:text-white min-h-screen;
+    @apply bg-slate-950 text-slate-100 antialiased selection:bg-emerald-600 selection:text-white min-h-screen font-sans;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   }
 }
 
+/* Frosted glass surface over a soft warm-gray page background (Airbnb/Funda
+   direction: light, airy, photo-forward — not the dark glass this app used
+   to have). Kept as a class so the whole app's card surface can be retuned
+   from one place. */
 .glass-card {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(20, 20, 26, 0.06);
+  box-shadow: 0 1px 2px rgba(20, 20, 26, 0.04), 0 8px 24px rgba(20, 20, 26, 0.06);
 }
 
 .glass-card-hover {
-  transition: all 0.2s ease-in-out;
+  transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
 .glass-card-hover:hover {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(34, 197, 94, 0.3);
+  border-color: rgba(230, 73, 43, 0.25);
+  box-shadow: 0 4px 8px rgba(20, 20, 26, 0.06), 0 16px 32px rgba(20, 20, 26, 0.1);
   transform: translateY(-2px);
 }
 
 .glass-nav {
-  background: rgba(2, 6, 23, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border-bottom: 1px solid rgba(20, 20, 26, 0.06);
 }
 
 /* Touch target minimum size utility (≥44px) */

@@ -181,9 +181,13 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 
 ### Épica 4 — Feed y búsqueda
 - [✅] **US-4.1**: Como usuario, veo un listado de publicaciones activas, más
-  recientes primero, filtrable por ciudad y tipo (ofrezco/necesito).
-  - *Criterios*: filtro por ciudad con Pereira y Cali destacados por defecto;
-    cada tarjeta muestra barrio, personas, fechas, precio y botón de WhatsApp;
+  recientes primero, de la ciudad que estoy visitando y filtrable por tipo
+  (ofrezco/necesito).
+  - *Criterios*: la ciudad es un nivel de navegación, no un filtro dentro del
+    feed — cada ciudad vive en su propia ruta (`/pereira/`, `/cali/`,
+    `/quibdo/`, ...) elegida al principio vía el selector de ciudad del
+    navbar (persistido en `localStorage` para la próxima visita a `/`); cada
+    tarjeta muestra barrio, personas, fechas, precio y botón de WhatsApp;
     el número de WhatsApp completo no se expone en el HTML crudo salvo dentro
     del enlace `wa.me` (evitar scraping trivial de teléfonos).
 - [✅] **US-4.2**: Como usuario, puedo filtrar además por barrio (texto libre) y por

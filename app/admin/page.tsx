@@ -116,9 +116,9 @@ export default function AdminPage() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-4">
-        <div className="glass-card max-w-sm w-full p-8 rounded-3xl border border-slate-800 shadow-2xl text-center">
-          <div className="w-14 h-14 rounded-2xl bg-solidarity-600/30 border border-solidarity-500/40 flex items-center justify-center text-emerald-400 mx-auto mb-4">
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
+        <div className="glass-card max-w-sm w-full p-8 rounded-3xl shadow-lg text-center">
+          <div className="w-14 h-14 rounded-2xl bg-solidarity-600/30 border border-solidarity-500/40 flex items-center justify-center text-emerald-700 mx-auto mb-4">
             <Lock className="w-7 h-7" />
           </div>
           <h1 className="text-xl font-bold mb-2">Panel de Moderación (US-6.2)</h1>
@@ -132,7 +132,7 @@ export default function AdminPage() {
               placeholder="Clave de Administrador"
               value={adminKey}
               onChange={(e) => setAdminKey(e.target.value)}
-              className="w-full bg-slate-900 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-sm text-center focus:border-emerald-500 focus:outline-none"
+              className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-4 py-2.5 text-sm text-center focus:border-emerald-500 focus:outline-none"
             />
 
             {loginError && (
@@ -153,11 +153,11 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6 max-w-6xl mx-auto">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-6 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ShieldCheck className="w-6 h-6 text-emerald-400" />
+            <ShieldCheck className="w-6 h-6 text-emerald-700" />
             Panel de Moderación de Publicaciones
           </h1>
           <p className="text-xs text-slate-400">
@@ -213,7 +213,7 @@ export default function AdminPage() {
             className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
               statusFilter === f.value
                 ? 'bg-solidarity-600 border-solidarity-500 text-white'
-                : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white'
+                : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-slate-100'
             }`}
           >
             {f.label} ({statusCounts[f.value] || 0})
@@ -230,14 +230,14 @@ export default function AdminPage() {
           visibleListings.map((item) => (
             <div
               key={item.id}
-              className="glass-card p-4 rounded-xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+              className="glass-card p-4 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
             >
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-xs font-bold uppercase px-2.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300">
                     {item.tipo}
                   </span>
-                  <span className="text-xs font-bold text-emerald-400">
+                  <span className="text-xs font-bold text-emerald-700">
                     {item.ciudad} ({item.barrio})
                   </span>
                   <span

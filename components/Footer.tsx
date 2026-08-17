@@ -18,15 +18,15 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
   return (
     <footer className="border-t border-slate-800 bg-slate-950 py-10 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row items-end justify-between gap-6">
 
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-solidarity-600/20 border border-solidarity-500/30 flex items-center justify-center text-emerald-400">
+            <div className="w-8 h-8 rounded-lg bg-emerald-900/50 border border-emerald-700/40 flex items-center justify-center text-emerald-700">
               <HeartHandshake className="w-5 h-5" />
             </div>
             <div>
-              <span className="font-bold text-white text-sm block">
-                Alojamiento Solidario Colombia 🇨🇴
+              <span className="font-display font-semibold text-slate-100 text-sm block">
+                Alojamiento Solidario Colombia
               </span>
               <span className="text-slate-500 text-[11px]">
                 Iniciativa ciudadana de ayuda humanitaria para la emergencia telúrica de 2026.
@@ -35,19 +35,19 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-slate-300 font-medium">
-            <Link href="/#feed" className="hover:text-emerald-400 transition-colors">
+            <Link href="/#feed" className="hover:text-emerald-700 transition-colors">
               Ver Feed Publicaciones
             </Link>
 
-            <Link href="/terminos-y-privacidad" className="hover:text-emerald-400 transition-colors flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <Link href="/terminos-y-privacidad" className="hover:text-emerald-700 transition-colors flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
               Ley 1581 Habeas Data
             </Link>
 
             {onOpenPrivacy && (
               <button
                 onClick={onOpenPrivacy}
-                className="hover:text-emerald-400 transition-colors underline"
+                className="hover:text-emerald-700 transition-colors underline"
               >
                 Política de Privacidad
               </button>
@@ -67,7 +67,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`${channel.label} (sitio externo, se abre en una pestaña nueva)`}
-                className="hover:text-emerald-400 transition-colors flex items-center gap-1"
+                className="hover:text-emerald-700 transition-colors flex items-center gap-1"
               >
                 {channel.label}
                 <ExternalLink className="w-3 h-3 text-slate-500" />

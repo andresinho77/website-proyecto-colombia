@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import Home from '../app/page';
+import CityFeedPage from '../components/CityFeedPage';
 import { listingsFixture, listingOfrezco } from './fixtures/listings';
 
 // La landing es la única superficie que llama a la API en el primer render.
@@ -14,16 +14,16 @@ vi.mock('../lib/api', async (importOriginal) => {
   return { ...actual, fetchListings };
 });
 
-describe('Landing (app/page.tsx)', () => {
+describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   beforeEach(() => {
     fetchListings.mockResolvedValue(listingsFixture);
   });
 
   it('renderiza la estructura principal: banner, hero, feed y footer', async () => {
-    render(<Home />);
+    render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     expect(
-      screen.getByRole('heading', { name: /Feed de Alojamientos Solidarios/i })
+      screen.getByRole('heading', { name: /Alojamientos solidarios en Pereira/i })
     ).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Filtros de Búsqueda/i })).toBeInTheDocument();
     expect(document.querySelector('main#feed')).not.toBeNull();
@@ -31,8 +31,8 @@ describe('Landing (app/page.tsx)', () => {
     await waitFor(() => expect(fetchListings).toHaveBeenCalled());
   });
 
-  it('pide las publicaciones con los filtros por defecto y las pinta en el feed', async () => {
-    render(<Home />);
+  it('pide las publicaciones de la ciudad de la ruta con los filtros por defecto y las pinta en el feed', async () => {
+    render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     // `exact: false`: la tarjeta envuelve la descripción en comillas tipográficas.
     expect(
@@ -40,7 +40,7 @@ describe('Landing (app/page.tsx)', () => {
     ).toBeInTheDocument();
 
     expect(fetchListings).toHaveBeenCalledWith({
-      ciudad: '',
+      ciudad: 'Pereira',
       tipo: 'todos',
       barrio: '',
       maxPrecio: '',
@@ -50,14 +50,14 @@ describe('Landing (app/page.tsx)', () => {
 
   it('muestra el estado vacío del feed cuando la API no devuelve publicaciones', async () => {
     fetchListings.mockResolvedValue([]);
-    render(<Home />);
+    render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     expect(await screen.findByText('No se encontraron publicaciones')).toBeInTheDocument();
     expect(screen.getByText('0 publicaciones')).toBeInTheDocument();
   });
 
   it('mantiene los modales cerrados en el render inicial', async () => {
-    render(<Home />);
+    render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
     await waitFor(() => expect(fetchListings).toHaveBeenCalled());
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

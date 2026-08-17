@@ -105,7 +105,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       {images.length < 3 && (
         <label className="touch-target border-2 border-dashed border-slate-700 hover:border-emerald-500/50 bg-slate-900/60 hover:bg-slate-900 rounded-xl p-4 flex items-center justify-center gap-2 cursor-pointer transition-all">
           {isUploading ? (
-            <Loader2 className="w-5 h-5 text-emerald-400 animate-spin" />
+            <Loader2 className="w-5 h-5 text-emerald-700 animate-spin" />
           ) : (
             <Camera className="w-5 h-5 text-slate-400" />
           )}

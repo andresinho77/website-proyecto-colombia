@@ -19,6 +19,25 @@ class IntersectionObserverStub {
 
 vi.stubGlobal('IntersectionObserver', IntersectionObserverStub);
 
+// CitySwitcher (Navbar) and the `/` redirect use `useRouter` from
+// `next/navigation`, which requires an app-router context jsdom doesn't
+// provide. Stub it globally so any component tree can render.
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
+  notFound: () => {
+    throw new Error('notFound() called in test');
+  },
+}));
+
 afterEach(() => {
   cleanup();
 });

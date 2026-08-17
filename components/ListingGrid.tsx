@@ -40,9 +40,9 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
 
   if (listings.length === 0) {
     return (
-      <div className="glass-card p-12 rounded-2xl text-center border border-slate-800 max-w-xl mx-auto my-8">
+      <div className="glass-card p-12 rounded-2xl text-center max-w-xl mx-auto my-8">
         <AlertCircle className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">No se encontraron publicaciones</h3>
+        <h3 className="font-display text-xl font-semibold text-slate-100 mb-2">No se encontraron publicaciones</h3>
         <p className="text-slate-400 text-sm mb-6">
           No hay alojamientos registrados que coincidan con los filtros seleccionados.
         </p>
@@ -51,15 +51,15 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={() => onOpenPublish('necesito')}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-600 text-white font-semibold text-xs"
             >
-              Publicar Necesidad 🆘
+              Publicar necesidad
             </button>
             <button
               onClick={() => onOpenPublish('ofrezco')}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-solidarity-600 hover:bg-solidarity-500 text-white font-bold text-xs"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-xs"
             >
-              Ofrecer Espacio 🏡
+              Ofrecer espacio
             </button>
           </div>
         )}

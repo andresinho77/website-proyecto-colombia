@@ -18,7 +18,12 @@ paths:
       tags:
         - Listings
       summary: List active emergency listings
-      description: Retrieve public active disaster-relief shelter offerings and requests, sorted newest first. Supports in-memory filtering.
+      description: >-
+        Retrieve public active disaster-relief shelter offerings and
+        requests, sorted newest first. Supports in-memory filtering.
+        PROPOSED (US-6.5): items in this public, unauthenticated response
+        should not include `whatsapp` — see that field's description on the
+        `Listing` schema and the new `POST /listings/{id}/contact` endpoint.
       operationId: getListings
       parameters:
         - in: query
@@ -175,6 +180,73 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
         "500":
           description: Server error generating pre-signed URL.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /listings/{id}/contact:
+    post:
+      tags:
+        - Listings
+      summary: Reveal a listing's WhatsApp contact (US-6.5, proposed — not yet implemented)
+      description: >-
+        Resolves the real `wa.me`-ready WhatsApp number for one listing, on
+        demand, per click — this is the proposed replacement for including
+        `whatsapp` directly in `GET /listings` responses. Public feed reads
+        should NOT expose the raw number to anyone scripting a request
+        against the API; this endpoint is the single choke point where the
+        backend can apply per-IP/per-listing rate limiting and validate the
+        `turnstileToken` (same Cloudflare Turnstile site key already used
+        for `CreateListingInput.turnstileToken` on publish) before handing
+        out a number. Motivation: reports from Cali of scraped listing
+        numbers being used for extortion (see ROADMAP.md US-6.5). Frontend
+        already calls this shape (`getContactLink` in `lib/api.ts`,
+        `website-proyecto-colombia` repo) with a graceful offline fallback,
+        so shipping this endpoint is a drop-in — no frontend changes needed
+        beyond removing that fallback.
+      operationId: getListingContact
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "7e96c311-9309-42fe-b44a-6c6d76c5cab1"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactListingRequest"
+      responses:
+        "200":
+          description: Contact resolved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactListingResponse"
+        "404":
+          description: Listing not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          description: Rate limit exceeded (too many reveal requests from this IP/listing in a short window).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Turnstile token missing, invalid, or already consumed.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error.
           content:
             application/json:
               schema:
@@ -390,7 +462,15 @@ components:
         whatsapp:
           type: string
           pattern: "^\\+573[0-9]{9}$"
-          description: Colombian mobile number in E.164 international format (+57...)
+          description: >-
+            Colombian mobile number in E.164 international format (+57...).
+            PROPOSED (US-6.5, not yet enforced): `GET /listings` should NOT
+            populate this field in its response items — omit or null it out
+            server-side there. It's still needed as-is in
+            `CreateListingResponse` (the author confirming their own
+            submission) and in admin/moderation responses (trusted, keyed
+            context). Public reveal happens only via
+            `POST /listings/{id}/contact`.
           example: "+573105550123"
         imagenes:
           type: array
@@ -582,6 +662,38 @@ components:
           format: uri
           description: Public CDN URL through which the uploaded image will be delivered
           example: "https://api.alojamientosolidario.co/listings/7e96c311_1786905783255.jpg"
+
+    ContactListingRequest:
+      type: object
+      properties:
+        turnstileToken:
+          type: string
+          nullable: true
+          description: >-
+            Cloudflare Turnstile response token from the invisible widget
+            rendered once per feed session (see components/Turnstile.tsx).
+            May be null/absent if the widget failed to load client-side
+            (blocked CDN, ad blocker) — the backend should decide whether to
+            still allow the reveal in that case (e.g. fall back to rate
+            limit only) rather than stranding someone trying to reach help.
+          example: "0.AAAABB...token"
+
+    ContactListingResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: true
+        whatsapp:
+          type: string
+          pattern: "^\\+573[0-9]{9}$"
+          description: The listing author's WhatsApp number, only returned on success.
+          example: "+573105550123"
+        error:
+          type: string
+          example: "Demasiadas solicitudes, intenta de nuevo en unos minutos."
 
     ReportListingRequest:
       type: object

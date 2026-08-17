@@ -11,6 +11,9 @@ interface ListingGridProps {
   onShareWhatsApp?: (listing: Listing) => void;
   onRefresh?: () => void;
   onOpenPublish?: (defaultTipo?: 'ofrezco' | 'necesito') => void;
+  /** US-6.5 — see ListingCard's prop of the same name. */
+  turnstileToken?: string | null;
+  onTurnstileConsumed?: () => void;
 }
 
 export const ListingGrid: React.FC<ListingGridProps> = ({
@@ -19,6 +22,8 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
   onShareWhatsApp,
   onRefresh,
   onOpenPublish,
+  turnstileToken,
+  onTurnstileConsumed,
 }) => {
   if (isLoading) {
     return (
@@ -75,6 +80,8 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
           listing={listing}
           onShareWhatsApp={onShareWhatsApp}
           onRefresh={onRefresh}
+          turnstileToken={turnstileToken}
+          onTurnstileConsumed={onTurnstileConsumed}
         />
       ))}
     </div>

@@ -226,6 +226,36 @@ export const uploadFileToS3 = async (file: File, uploadUrl: string): Promise<boo
   }
 };
 
+// US-6.5: the public feed (fetchListings) should not hand out raw WhatsApp
+// numbers to anyone scripting a request against the API directly — the
+// reveal happens on demand, per click, through this call instead, so the
+// backend can rate-limit/Turnstile-gate it independently of just serving the
+// feed. The real POST /listings/{id}/contact endpoint doesn't exist yet
+// (proposed in openapi.yaml); until infra ships it, the offline fallback
+// below resolves the number from MOCK_LISTINGS with the same response
+// shape, so ListingCard's call site won't need to change when it does.
+export const getContactLink = async (
+  id: string,
+  turnstileToken?: string | null
+): Promise<{ success: boolean; whatsapp?: string; error?: string }> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/${id}/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ turnstileToken }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      return { success: false, error: data.error || 'No se pudo obtener el contacto.' };
+    }
+    return { success: true, whatsapp: data.whatsapp };
+  } catch (err) {
+    const item = MOCK_LISTINGS.find((i) => i.id === id);
+    if (!item) return { success: false, error: 'Publicación no encontrada.' };
+    return { success: true, whatsapp: item.whatsapp };
+  }
+};
+
 export const reportListing = async (id: string): Promise<{ success: boolean; message?: string; error?: string }> => {
   try {
     const res = await fetch(`${API_BASE_URL}/report`, {

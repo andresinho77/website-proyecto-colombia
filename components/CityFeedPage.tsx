@@ -10,6 +10,7 @@ import { PublishModal } from './PublishModal';
 import { ShareModal } from './ShareModal';
 import { PrivacyPolicyModal } from './PrivacyPolicyModal';
 import { Footer } from './Footer';
+import { useInvisibleTurnstile, TurnstileContainer } from './Turnstile';
 import { Listing, FilterState, ListingType } from '../lib/types';
 import { fetchListings } from '../lib/api';
 
@@ -20,6 +21,10 @@ interface CityFeedPageProps {
 
 export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) {
   const [listings, setListings] = useState<Listing[]>([]);
+  // US-6.5: one invisible Turnstile challenge for the whole feed, reused
+  // across "Contactar por WhatsApp" clicks and refreshed after each one.
+  const { token: turnstileToken, containerRef: turnstileRef, refresh: refreshTurnstile } =
+    useInvisibleTurnstile();
   const [isLoading, setIsLoading] = useState(true);
 
   // City is fixed by the route (see Navbar's city switcher), not a
@@ -125,9 +130,14 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
             onShareWhatsApp={(item) => setNewlyCreatedListing(item)}
             onRefresh={loadListings}
             onOpenPublish={handleOpenPublish}
+            turnstileToken={turnstileToken}
+            onTurnstileConsumed={refreshTurnstile}
           />
         </main>
       </div>
+
+      {/* US-6.5: invisible, renders nothing visible — see components/Turnstile.tsx */}
+      <TurnstileContainer containerRef={turnstileRef} />
 
       {/* Footer */}
       <Footer onOpenPrivacy={() => setIsPrivacyOpen(true)} />

@@ -13,7 +13,7 @@
 - `GEMINI.md` — OpenWolf (~68 tok)
 - `next-env.d.ts` — / <reference types="next" /> (~66 tok)
 - `next.config.mjs` — Next.js configuration (~54 tok)
-- `openapi.yaml` — API contract snapshot for frontend/backend integration; now includes proposed `GET /zones` (`ZonesResponse`) and `zona`/`barrio` split on `Listing`/`CreateListingInput` (US-4.4, drafted 2026-08-17 to align with infra colleague, not yet backend-confirmed) (~520 tok)
+- `openapi.yaml` — API contract snapshot for frontend/backend integration; now includes proposed `GET /zones` (`ZonesResponse`) and `zona`/`barrio` split on `Listing`/`CreateListingInput` (US-4.4), plus proposed `POST /listings/{id}/contact` (`ContactListingRequest`/`Response`) + a note that `GET /listings` shouldn't return raw `whatsapp` (US-6.5) — both drafted 2026-08-17/18 to align with infra colleague, not yet backend-confirmed (~610 tok)
 - `package-lock.json` — npm lock file (~82487 tok)
 - `package.json` — Node.js package manifest (~398 tok)
 - `postcss.config.mjs` — Declares config (~42 tok)
@@ -66,9 +66,9 @@
   - section `HeroButtonsProps` L6-71 (~1068 tok)
 - `ImageUploader.tsx` — ImageUploader — uses useState (~1238 tok)
   - section `ImageUploaderProps` L7-131 (~1184 tok)
-- `ListingCard.tsx` — ListingCard — renders form, map — uses useState; one-line anti-fraud reinforcement under the WhatsApp button (~3420 tok)
+- `ListingCard.tsx` — ListingCard — renders form, map — uses useState; one-line anti-fraud reinforcement under the WhatsApp button; "Contactar" is now a button calling `getContactLink` (US-6.5 reveal-on-click, Turnstile-token-optional) instead of a static `wa.me` href; opens a blank tab synchronously (no noopener/noreferrer — needs the reference) then redirects it once the number resolves, to survive popup blockers (bug-013) (~3470 tok)
   - section `ListingCardProps` L21-305 (~3250 tok)
-- `ListingGrid.tsx` — ListingGrid (~762 tok)
+- `ListingGrid.tsx` — ListingGrid; threads `turnstileToken`/`onTurnstileConsumed` down to each `ListingCard` (US-6.5) (~762 tok)
   - section `ListingGridProps` L8-83 (~713 tok)
 - `Navbar.tsx` — Navbar (~854 tok)
   - section `NavbarProps` L7-68 (~809 tok)
@@ -80,6 +80,7 @@
   - section `SearchFiltersProps` L7-145 (~1595 tok)
 - `ShareModal.tsx` — ShareModal (~1057 tok)
   - section `ShareModalProps` L7-94 (~1010 tok)
+- `Turnstile.tsx` — US-6.5: `useInvisibleTurnstile()` hook (loads Cloudflare script once, renders one invisible widget, exposes `{ token, containerRef, refresh }`) + `TurnstileContainer`; degrades to `token: null` gracefully if unset/blocked — callers must never block on it (~900 tok)
 
 ## docs/
 
@@ -88,7 +89,7 @@
 
 ## lib/
 
-- `api.ts` — Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"); `fetchListings` aplica `toPublicFeed` (solo `estado=activo`, orden `creadoEn` desc) a la respuesta de API y al fallback mock; `resolveListing` valida PIN contra el mock en el fallback offline; `fetchAdminListings`/`setAdminListingStatus` centralizan el loader y las acciones de `/admin` (mismo contrato de wire, con fallback offline a `MOCK_LISTINGS` para las 2 claves demo). (~3050 tok)
+- `api.ts` — Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"); `fetchListings` aplica `toPublicFeed` (solo `estado=activo`, orden `creadoEn` desc) a la respuesta de API y al fallback mock; `resolveListing` valida PIN contra el mock en el fallback offline; `fetchAdminListings`/`setAdminListingStatus` centralizan el loader y las acciones de `/admin` (mismo contrato de wire, con fallback offline a `MOCK_LISTINGS` para las 2 claves demo); `getContactLink` (US-6.5) — KNOWN GAP (bug-014, no corregido aún): solo cae al fallback offline ante fallo de red, no ante una respuesta HTTP de error. (~3150 tok)
   - fn `resolveApiBaseUrl` L18-251 (~2217 tok)
 - `localStorage.ts` — Exports SavedAuthorListing, getMyListings, saveMyListing, removeMyListing (~343 tok)
 - `types.ts` — Exports ListingType, ListingStatus, Listing, FilterState, CreateListingInput (~262 tok)
@@ -100,7 +101,8 @@
 
 ## tests/
 
-- `feed.test.tsx` — onOpenPublish (~639 tok)
+- `api-contact.test.ts` — getContactLink (US-6.5): API success, offline fallback on network failure, error on unknown id (~350 tok)
+- `feed.test.tsx` — onOpenPublish; plus a "ListingCard contact reveal" suite (US-6.5): synchronous window.open + redirect to wa.me, error + pending-tab close on failure (~950 tok)
 - `landing.test.tsx` — La landing es la única superficie que llama a la API en el primer render. (~700 tok)
 - `setup.ts` — `next/link` (Navbar, Footer) observa el viewport para prefetch. jsdom no (~194 tok)
 

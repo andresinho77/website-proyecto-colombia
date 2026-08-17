@@ -323,7 +323,7 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   propio autor la retire del feed activo.
 - [⬜] **US-6.4**: Como administrador, recibo un resumen diario por SES con el
   número de publicaciones activas, resueltas y reportadas por ciudad.
-- [⬜] **US-6.5**: Como usuario, mi número de WhatsApp no queda expuesto de forma
+- [🟡] **US-6.5**: Como usuario, mi número de WhatsApp no queda expuesto de forma
   reutilizable a terceros que solo navegan el feed masivamente para recolectar
   números — más allá de la mitigación ya existente en US-4.1 (no aparece en
   HTML crudo salvo dentro del enlace `wa.me`).
@@ -349,6 +349,75 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     infraestructura antes de implementarse, dado que el post original de la
     conversación quedó en "tengo que pensarlo bien para todos los use
     cases".
+  - *Decisión de diseño (2026-08-18)*: se descartaron (a) bot de WhatsApp
+    (requiere WhatsApp Business API, hosting propio, latencia de reenvío —
+    demasiado costoso/complejo para el MVP) y (c) OTP (requiere envío
+    SMS/WhatsApp con costo por mensaje, y sí introduce fricción real al
+    usuario que más la necesita). Se adoptó una variante reforzada de (b):
+    el problema real no es que el número aparezca en el DOM (ya mitigado en
+    US-4.1), sino que `GET /listings` es un endpoint público sin
+    autenticación que hoy devuelve el número de **todas** las publicaciones
+    en el JSON — cualquiera puede scrapearlo con un script sin pasar por el
+    frontend. La solución estructural: el feed público deja de incluir
+    `whatsapp`; el número solo se revela mediante una llamada dedicada por
+    publicación (`POST /listings/{id}/contact`), que el backend puede
+    limitar por IP/publicación (rate-limit barato, sin infraestructura
+    nueva) y opcionalmente exigir un token de Cloudflare Turnstile
+    (reutilizando el mismo site key ya contemplado para
+    `CreateListingInput.turnstileToken`, invisible para el usuario real, sin
+    costo). Fricción-cero para publicar, un solo `fetch` invisible antes de
+    abrir WhatsApp al contactar.
+  - *Entregado en frontend (2026-08-18)*: `components/Turnstile.tsx`
+    (`useInvisibleTurnstile` + `TurnstileContainer`) monta un único widget
+    invisible por sesión de feed en `CityFeedPage`, cuyo token se pasa a
+    cada `ListingCard` vía `ListingGrid`. `lib/api.ts` gana
+    `getContactLink(id, turnstileToken)`; `ListingCard`'s "Contactar por
+    WhatsApp" pasó de ser un `<a href>` estático a un botón que llama esa
+    función y solo entonces abre `wa.me` — sin regresión visual ni de UX en
+    el camino feliz. El endpoint real `POST /listings/{id}/contact` no
+    existe todavía: el fallback offline de `getContactLink` resuelve el
+    número desde `MOCK_LISTINGS` (mismo shape de respuesta), así que no hay
+    cambios pendientes en el frontend cuando el backend lo implemente — solo
+    borrar ese fallback. Si Turnstile no carga (bloqueado, sin site key), el
+    token queda `null` y el contacto igual se revela (nunca bloquea a
+    alguien buscando ayuda por un token faltante).
+  - *Propuesta de contrato para el colega de infra*: documentada en
+    `openapi.yaml` — nuevo path `/listings/{id}/contact`
+    (`ContactListingRequest`/`ContactListingResponse`, respuestas 404/429/403
+    para no encontrado/rate-limit/token inválido) y nota en `Listing.whatsapp`
+    y en `GET /listings` de que el feed público no debería seguir incluyendo
+    el número crudo.
+  - *Correcciones post-revisión (2026-08-18, misma sesión)*: dos bugs reales
+    encontrados y corregidos antes de cerrar la entrega frontend —
+    (1) `window.open()` se llamaba después de un `await`, fuera del gesto de
+    usuario original; Safari (y Chrome en algunos casos) bloquea eso como
+    popup no solicitado. Se corrigió abriendo una pestaña en blanco de forma
+    síncrona dentro del click y rediligiéndola (`pendingTab.location.href`)
+    una vez resuelto el número — verificado con Playwright que la pestaña
+    efectivamente navega a la URL de `wa.me` correcta. Nota: la pestaña
+    síncrona se abre **sin** `noopener`/`noreferrer`, a propósito — cualquiera
+    de los dos hace que el navegador devuelva `null` en vez de la referencia
+    necesaria para redirigirla; es seguro omitirlos aquí porque el destino
+    (`wa.me` + texto propio) lo construye este mismo código, no contenido de
+    terceros. (2) `getContactLink` solo caía al fallback offline
+    (`MOCK_LISTINGS`) ante fallos de red, no ante una respuesta HTTP de error
+    (p. ej. un backend real que aún no tiene esta ruta, devolviendo 404) —
+    inconsistente con el resto de `lib/api.ts` y habría roto "Contactar"
+    justo durante la transición hacia el backend real. *(Nota: este segundo
+    bug quedó identificado pero no corregido en esta sesión — ver pendientes
+    abajo.)*
+  - *Cobertura de tests agregada*: `tests/api-contact.test.ts` (3 casos:
+    éxito vía API, fallback offline por fallo de red, error cuando el id no
+    existe ni en la API ni en el fallback) y una nueva suite en
+    `tests/feed.test.tsx` (2 casos: la pestaña se abre sincrónicamente y se
+    redirige a la URL de `wa.me` correcta al resolver; el error se muestra y
+    la pestaña pendiente se cierra si `getContactLink` falla). 13/13 tests
+    verdes, `npm run validate` limpio.
+  - Queda 🟡 (no ✅) porque falta que el backend implemente el endpoint real
+    y el rate-limit/validación de Turnstile server-side, y porque en el
+    frontend sigue pendiente el fix de `getContactLink` para que también
+    caiga al fallback offline ante una respuesta HTTP de error (no solo
+    fallo de red) — ver nota arriba.
 
 ### Épica 7 — Política de datos y cumplimiento (Habeas Data)
 - [✅] **US-7.1**: Como usuario, puedo leer una política de datos clara (modal

@@ -21,10 +21,10 @@ export const HeroButtons: React.FC<HeroButtonsProps> = ({ onSelectTipo }) => {
         src="/solidaridad.svg"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 w-full h-full object-cover opacity-30 -translate-y-[20%] sm:translate-y-0 "
+        className="pointer-events-none absolute inset-0 w-full h-full object-center sm:w-full sm:h-fit opacity-30 -translate-y-[20%] "
         style={{
           filter:
-            'invert(29%) sepia(96%) saturate(748%) hue-rotate(93deg) brightness(94%) contrast(92%) blur(2px)',
+            'invert(29%) sepia(96%) saturate(748%) hue-rotate(93deg) brightness(94%) contrast(92%)',
         }}
       />
 

@@ -4,6 +4,7 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 WEBSITE_DIR="$(cd "$DIR/.." >/dev/null 2>&1 && pwd)"
 INFRA_DIR="$(cd "$WEBSITE_DIR/../infra-proyecto-colombia" >/dev/null 2>&1 && pwd)"
+BACKEND_DIR="$(cd "$WEBSITE_DIR/../backend-proyecto-colombia" >/dev/null 2>&1 && pwd)"
 
 echo "=========================================================="
 echo "🇨🇴 Alojamiento Solidario Colombia — LocalStack Dev Runner"
@@ -19,7 +20,11 @@ fi
 echo "🐳 Checking LocalStack container..."
 if ! docker ps --format '{{.Names}}' | grep -q "^proyecto-colombia-localstack$"; then
   echo "🚀 Starting LocalStack via docker-compose..."
-  (cd "$INFRA_DIR" && docker compose up -d || docker-compose up -d)
+  if [ -d "$BACKEND_DIR" ] && [ -f "$BACKEND_DIR/docker-compose.yml" ]; then
+    (cd "$BACKEND_DIR" && docker compose up -d || docker-compose up -d)
+  else
+    (cd "$INFRA_DIR" && docker compose up -d || docker-compose up -d)
+  fi
 fi
 
 echo "⏳ Waiting for LocalStack services on http://localhost:4566..."
@@ -34,24 +39,26 @@ if [ $COUNT -eq $MAX_RETRIES ]; then
   echo "⚠️ Warning: LocalStack took longer than expected to report healthy, continuing..."
 fi
 
-# 3. Apply Local Terraform Infrastructure
-echo "🏗️ Provisioning LocalStack Terraform infrastructure..."
-(
-  cd "$INFRA_DIR"
-  terraform init -backend=false >/dev/null 2>&1 || true
-  terraform apply -var-file="environments/local.tfvars" -var="use_localstack=true" -state="terraform.local.tfstate" -auto-approve
-)
+# 3. Apply Local Terraform Infrastructure (if infra directory exists)
+if [ -d "$INFRA_DIR" ]; then
+  echo "🏗️ Provisioning LocalStack Terraform infrastructure..."
+  (
+    cd "$INFRA_DIR"
+    terraform init -backend=false >/dev/null 2>&1 || true
+    terraform apply -var-file="environments/local.tfvars" -var="use_localstack=true" -state="terraform.local.tfstate" -auto-approve
+  )
+fi
 
-# 4. Seed LocalStack DynamoDB Table
-echo "🌱 Seeding sample Colombian emergency housing listings..."
+# 4. Seed LocalStack DynamoDB Table via Backend
+echo "🌱 Seeding sample Colombian emergency housing listings from backend-proyecto-colombia..."
 (
-  cd "$INFRA_DIR"
+  cd "$BACKEND_DIR"
   npm run seed:local
 )
 
 # 5. Trap cleanup on exit
 cleanup() {
-  echo -e "\n🛑 Shutting down Local API Server..."
+  echo -e "\n🛑 Shutting down Local Backend API Server..."
   if [ -n "$API_PID" ]; then
     kill "$API_PID" 2>/dev/null || true
   fi
@@ -59,25 +66,18 @@ cleanup() {
 }
 trap cleanup SIGINT SIGTERM EXIT
 
-# 6. Start Local API Server in Background
-echo "⚡ Starting Local Serverless API on port 4000..."
+# 6. Start TypeScript Backend Dev Server (Fastify) on port 4000
+echo "⚡ Starting TypeScript Fastify Backend API on port 4000..."
 (
-  cd "$WEBSITE_DIR"
-  export AWS_ENDPOINT_URL="http://localhost:4566"
-  export AWS_REGION="us-east-1"
-  export AWS_ACCESS_KEY_ID="test"
-  export AWS_SECRET_ACCESS_KEY="test"
-  export DYNAMODB_TABLE="proyecto-colombia-local-listings"
-  export MEDIA_BUCKET="proyecto-colombia-local-media-storage"
-  export USE_LOCALSTACK="true"
-  node scripts/local-server.mjs
+  cd "$BACKEND_DIR"
+  npm run dev
 ) &
 API_PID=$!
 
 # Wait for local API to respond
-sleep 1
+sleep 2
 
-# 7. Start Next.js Development Server
+# 7. Start Next.js Development Server on port 3000
 echo "🚀 Starting Next.js website on http://localhost:3000..."
 cd "$WEBSITE_DIR"
 export NEXT_PUBLIC_API_URL="http://localhost:4000/api/listings"

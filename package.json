@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "dev:api": "node scripts/local-server.mjs",
+    "dev:api": "cd ../backend-proyecto-colombia && npm run dev",
     "dev:local": "bash scripts/start-local-dev.sh",
     "build": "next build",
     "build:local": "NEXT_PUBLIC_API_URL=\"${NEXT_PUBLIC_API_URL:-http://localhost:4000/api/listings}\" next build",

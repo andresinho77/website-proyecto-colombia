@@ -50,9 +50,8 @@ Network is never hit: the landing suite mocks `fetchListings`, and the feed suit
 
 ---
 
-## 📜 OpenAPI 3.0.3 API Contract (`openapi.yaml`)
-
-The complete API contract expected and implemented by this frontend client is defined in [`openapi.yaml`](openapi.yaml). It details request schemas, query parameters, phone format validations, error envelopes, and administrator moderation endpoints.
+## 📜 OpenAPI 3.0.3 API Contract
+The canonical API contract expected and implemented by this frontend client is defined and maintained in [`backend-proyecto-colombia/openapi.yaml`](../backend-proyecto-colombia/openapi.yaml) (interactive docs available at `http://localhost:4000/docs`).
 
 ---
 
@@ -63,7 +62,7 @@ The frontend talks to the backend **only** through this variable (resolved once 
 | Context | Behavior |
 |---|---|
 | Variable set | Used as-is (trailing slashes trimmed). |
-| `npm run dev` without it | Deliberate local-safe fallback to `http://localhost:4000/api/listings` (the `npm run dev:api` mock server). It never falls back to production, so a local run cannot write real data by accident. |
+| `npm run dev` without it | Deliberate local-safe fallback to `http://localhost:4000/api/listings` (the `backend-proyecto-colombia` Fastify server). It never falls back to production, so a local run cannot write real data by accident. |
 | `npm run build` without it | **Build fails** with explicit instructions. The value is inlined into the static bundle, so a deployable artifact must never point at a guessed endpoint. |
 | `npm run validate` / `build:local` | Injects the local endpoint unless a value is already exported in the shell. |
 | CI | Uses the `NEXT_PUBLIC_API_URL` repository variable. If it is unset, CI logs a warning and falls back to the production endpoint so the artifact stays deployable. |
@@ -74,39 +73,31 @@ The frontend talks to the backend **only** through this variable (resolved once 
 
 ### 1. LOCAL Environment (LocalStack & Full Serverless Stack)
 
-#### Option A: 1-Command LocalStack Full-Stack Dev (Recommended 🚀)
+#### Option A: 1-Command Full-Stack Dev (Recommended 🚀)
 Runs the entire local stack in a single automated step:
 1. Verifies that **Docker** is active and ensures the **LocalStack** container (`proyecto-colombia-localstack`) is running on port `4566`.
 2. Applies the **Terraform** local infrastructure (`environments/local.tfvars`, `use_localstack=true`).
-3. Seeds realistic sample disaster-relief listings into LocalStack DynamoDB (`proyecto-colombia-local-listings`).
-4. Launches the local Serverless API server on port `4000` with LocalStack environment variables.
+3. Seeds realistic sample disaster-relief listings into LocalStack DynamoDB via `backend-proyecto-colombia`.
+4. Launches the Fastify TypeScript API server on port `4000`.
 5. Launches the **Next.js** dev server on **`http://localhost:3000`** with hot-reload.
 
 ```bash
 npm run dev:local
 ```
-Open **`http://localhost:3000`** in your browser. All listings, publications, reports, and PIN resolution will interact directly with your local LocalStack DynamoDB table!
+Open **`http://localhost:3000`** in your browser. All listings, publications, reports, and PIN resolution will interact directly with your local DynamoDB table!
 
 ---
 
-#### Option B: Manual Multi-Terminal Workflow
-If you prefer running services independently across dedicated terminal sessions:
+#### Option B: Dedicated Backend Dev Runner
+Run the backend and database independently in one terminal, and Next.js in another:
 
-**Terminal 1 (Infrastructure & LocalStack Seed):**
+**Terminal 1 (Backend API & LocalStack):**
 ```bash
-cd ../infra-proyecto-colombia
-docker compose up -d
-terraform apply -var-file=environments/local.tfvars -var="use_localstack=true" -state=terraform.local.tfstate -auto-approve
-npm run seed:local
+cd ../backend-proyecto-colombia
+npm run dev:all
 ```
 
-**Terminal 2 (Local Serverless API Handler):**
-```bash
-cd website-proyecto-colombia
-npm run dev:api
-```
-
-**Terminal 3 (Next.js Frontend):**
+**Terminal 2 (Next.js Frontend):**
 ```bash
 cd website-proyecto-colombia
 npm run dev

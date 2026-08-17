@@ -170,7 +170,7 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   página vía un enlace persistente en el header.
 - [✅] **US-1.3**: Como usuario, veo un enlace visible a la política de datos
   (`privacidad.html`) desde el footer de cualquier página.
-- [⬜] **US-1.4**: Como usuario, el sitio respeta mi preferencia de tema
+- [✅] **US-1.4**: Como usuario, el sitio respeta mi preferencia de tema
   (claro/oscuro) del sistema operativo/navegador (`prefers-color-scheme`,
   incluyendo Night Shift/modo nocturno automático de macOS/iOS), sin requerir
   un toggle manual para el MVP.
@@ -179,6 +179,21 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     (`color-scheme` en `<html>` + CSS variables o soporte `dark:` de Tailwind);
     el logo/imágenes con fondo blanco sólido se revisan para que no se vean
     rotos en fondo oscuro.
+  - *Entregado (2026-08-17)*: implementado 100% vía CSS variables + media
+    query, sin JS ni toggle. `tailwind.config.ts` resuelve cada shade de
+    `slate/rose/emerald/amber/accent` a `rgb(var(--color-x) / <alpha-value>)`;
+    `app/globals.css` define los valores claros en `:root` y los re-declara
+    bajo `@media (prefers-color-scheme: dark)` — cero cambios en componentes.
+    Solo la escala neutra `slate` se invierte entre temas (era ya un hack de
+    inversión para el modo claro, ver commit "extreme makeover"); los colores
+    de marca (`rose`, `emerald`, `amber`) se mantienen fijos en ambos temas
+    porque ya estaban diseñados como superficies autocontenidas (botones,
+    píldoras) con buen contraste sobre cualquier fondo — invertirlos también
+    rompía el contraste de esas superficies (verificado visualmente y
+    corregido antes de cerrar la historia). `.glass-card`/`.glass-nav` migran
+    de `rgba()` fijos a las mismas variables. Verificado con capturas
+    Playwright en `light`/`dark` `colorScheme` sobre landing, feed y footer;
+    `npm run validate` verde.
 
 ### Épica 2 — Publicar oferta ("Tengo")
 - [✅] **US-2.1**: Como usuario con espacio disponible, completo un formulario corto

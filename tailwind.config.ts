@@ -1,6 +1,18 @@
 import type { Config } from "tailwindcss";
 
+// Every shade below resolves through a CSS variable (defined in
+// app/globals.css) instead of a literal hex, so the SAME class name
+// (bg-slate-950, text-rose-500, ...) renders a different value in light vs.
+// dark mode without touching a single component. Light values live on
+// :root; dark values are re-declared under `@media (prefers-color-scheme:
+// dark)`. The <alpha-value> placeholder keeps Tailwind's opacity modifiers
+// (bg-slate-950/80) working with CSS variables.
+function themed(name: string) {
+  return `rgb(var(--color-${name}) / <alpha-value>)`;
+}
+
 const config: Config = {
+  darkMode: 'media',
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -13,86 +25,85 @@ const config: Config = {
         sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // Light-first warm-neutral scale (Airbnb/Funda direction): the SAME
-        // "slate" name every component already uses, but inverted so 950 is
-        // near-white (page/card bg) and 50 is near-black (primary text) —
-        // this flips every existing bg-slate-950/text-slate-100/etc. from
-        // the old dark theme to a light one with zero per-component edits.
+        // Warm-neutral scale, themed via CSS variables: light mode keeps the
+        // Airbnb/Funda direction (950 near-white page/card bg, 50 near-black
+        // text); dark mode re-declares the same steps the "right way round"
+        // (950 near-black, 50 near-white) in globals.css.
         slate: {
-          50: '#14141a',
-          100: '#242430',
-          200: '#3d3d4a',
-          300: '#56566a',
-          400: '#71717f',
-          500: '#8a8a96',
-          600: '#a7a7b0',
-          700: '#c6c6cc',
-          800: '#e4e4e8',
-          900: '#f0f0f3',
-          950: '#f7f7fa',
+          50: themed('slate-50'),
+          100: themed('slate-100'),
+          200: themed('slate-200'),
+          300: themed('slate-300'),
+          400: themed('slate-400'),
+          500: themed('slate-500'),
+          600: themed('slate-600'),
+          700: themed('slate-700'),
+          800: themed('slate-800'),
+          900: themed('slate-900'),
+          950: themed('slate-950'),
         },
         // Watermelon — "necesito alojamiento". Juicy warm pink-red, not a
         // dusty earth tone and not an alarm/"hot" red.
         rose: {
-          50: '#fff1f3',
-          100: '#ffe1e6',
-          200: '#ffc3cd',
-          300: '#ff96a8',
-          400: '#fb6c82',
-          500: '#f2465f',
-          600: '#d92e49',
-          700: '#b02339',
-          800: '#861c2d',
-          900: '#611624',
-          950: '#3d0f18',
+          50: themed('rose-50'),
+          100: themed('rose-100'),
+          200: themed('rose-200'),
+          300: themed('rose-300'),
+          400: themed('rose-400'),
+          500: themed('rose-500'),
+          600: themed('rose-600'),
+          700: themed('rose-700'),
+          800: themed('rose-800'),
+          900: themed('rose-900'),
+          950: themed('rose-950'),
         },
         // Fresh green — "tengo espacio disponible" / trust & availability
         emerald: {
-          50: '#eefaf3',
-          100: '#d3f2e1',
-          200: '#a3e4c1',
-          300: '#6ecf9d',
-          400: '#3fb87d',
-          500: '#219d63',
-          600: '#177d4f',
-          700: '#136341',
-          800: '#114f35',
-          900: '#0e3f2b',
-          950: '#082419',
+          50: themed('emerald-50'),
+          100: themed('emerald-100'),
+          200: themed('emerald-200'),
+          300: themed('emerald-300'),
+          400: themed('emerald-400'),
+          500: themed('emerald-500'),
+          600: themed('emerald-600'),
+          700: themed('emerald-700'),
+          800: themed('emerald-800'),
+          900: themed('emerald-900'),
+          950: themed('emerald-950'),
         },
         // Gold, for cautionary accents (PIN, warnings)
         amber: {
-          50: '#fff8ea',
-          100: '#ffedc2',
-          200: '#ffd982',
-          300: '#ffc247',
-          400: '#f7a721',
-          500: '#e08a12',
-          600: '#b96b0d',
-          700: '#93520f',
-          800: '#734111',
-          900: '#4a2a0c',
+          50: themed('amber-50'),
+          100: themed('amber-100'),
+          200: themed('amber-200'),
+          300: themed('amber-300'),
+          400: themed('amber-400'),
+          500: themed('amber-500'),
+          600: themed('amber-600'),
+          700: themed('amber-700'),
+          800: themed('amber-800'),
+          900: themed('amber-900'),
         },
         solidarity: {
-          50: '#eefaf3',
-          100: '#d3f2e1',
-          500: '#219d63',
-          600: '#177d4f',
-          700: '#136341',
-          800: '#114f35',
-          900: '#0e3f2b',
-          950: '#082419',
+          50: themed('emerald-50'),
+          100: themed('emerald-100'),
+          500: themed('emerald-500'),
+          600: themed('emerald-600'),
+          700: themed('emerald-700'),
+          800: themed('emerald-800'),
+          900: themed('emerald-900'),
+          950: themed('emerald-950'),
         },
         emergency: {
-          50: '#fff1f3',
-          100: '#ffe1e6',
-          500: '#f2465f',
-          600: '#d92e49',
-          700: '#b02339',
+          50: themed('rose-50'),
+          100: themed('rose-100'),
+          500: themed('rose-500'),
+          600: themed('rose-600'),
+          700: themed('rose-700'),
         },
         accent: {
-          amber: '#f7a721',
-          blue: '#0074e4',
+          amber: themed('accent-amber'),
+          blue: themed('accent-blue'),
         }
       },
     },

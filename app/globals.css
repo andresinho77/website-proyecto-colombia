@@ -2,6 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens as CSS variables (r g b triples, consumed by Tailwind via
+   rgb(var(--color-x) / <alpha-value>) in tailwind.config.ts) so every
+   existing bg-slate-950/text-slate-100/etc. class renders correctly in both
+   themes with zero per-component changes. Light values on :root; dark
+   values re-declared under prefers-color-scheme so the browser (and macOS
+   Night Shift / OS-level dark mode, which both resolve to this same media
+   feature) switches automatically — no JS, no flash of wrong theme. */
+:root {
+  color-scheme: light dark;
+
+  /* Warm-neutral scale — light: 950 near-white (page/card bg), 50 near-black (text) */
+  --color-slate-50: 20 20 26;
+  --color-slate-100: 36 36 48;
+  --color-slate-200: 61 61 74;
+  --color-slate-300: 86 86 106;
+  --color-slate-400: 113 113 127;
+  --color-slate-500: 138 138 150;
+  --color-slate-600: 167 167 176;
+  --color-slate-700: 198 198 204;
+  --color-slate-800: 228 228 232;
+  --color-slate-900: 240 240 243;
+  --color-slate-950: 247 247 250;
+
+  --color-rose-50: 255 241 243;
+  --color-rose-100: 255 225 230;
+  --color-rose-200: 255 195 205;
+  --color-rose-300: 255 150 168;
+  --color-rose-400: 251 108 130;
+  --color-rose-500: 242 70 95;
+  --color-rose-600: 217 46 73;
+  --color-rose-700: 176 35 57;
+  --color-rose-800: 134 28 45;
+  --color-rose-900: 97 22 36;
+  --color-rose-950: 61 15 24;
+
+  --color-emerald-50: 238 250 243;
+  --color-emerald-100: 211 242 225;
+  --color-emerald-200: 163 228 193;
+  --color-emerald-300: 110 207 157;
+  --color-emerald-400: 63 184 125;
+  --color-emerald-500: 33 157 99;
+  --color-emerald-600: 23 125 79;
+  --color-emerald-700: 19 99 65;
+  --color-emerald-800: 17 79 53;
+  --color-emerald-900: 14 63 43;
+  --color-emerald-950: 8 36 25;
+
+  --color-amber-50: 255 248 234;
+  --color-amber-100: 255 237 194;
+  --color-amber-200: 255 217 130;
+  --color-amber-300: 255 194 71;
+  --color-amber-400: 247 167 33;
+  --color-amber-500: 224 138 18;
+  --color-amber-600: 185 107 13;
+  --color-amber-700: 147 82 15;
+  --color-amber-800: 115 65 17;
+  --color-amber-900: 74 42 12;
+
+  --color-accent-amber: 247 167 33;
+  --color-accent-blue: 0 116 228;
+
+  --glass-card-bg: 255 255 255 / 0.72;
+  --glass-nav-bg: 255 255 255 / 0.8;
+  --glass-border: 20 20 26 / 0.06;
+  --glass-border-hover: 230 73 43 / 0.25;
+  --glass-shadow-1: 0 1px 2px rgba(20, 20, 26, 0.04), 0 8px 24px rgba(20, 20, 26, 0.06);
+  --glass-shadow-1-hover: 0 4px 8px rgba(20, 20, 26, 0.06), 0 16px 32px rgba(20, 20, 26, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Same warm-neutral scale, un-inverted: 950 near-black (page/card bg), 50 near-white (text) */
+    --color-slate-50: 247 247 250;
+    --color-slate-100: 228 228 232;
+    --color-slate-200: 198 198 204;
+    --color-slate-300: 167 167 176;
+    --color-slate-400: 138 138 150;
+    --color-slate-500: 113 113 127;
+    --color-slate-600: 86 86 106;
+    --color-slate-700: 61 61 74;
+    --color-slate-800: 42 42 54;
+    --color-slate-900: 27 27 36;
+    --color-slate-950: 17 17 23;
+
+    /* rose/emerald/amber/accent are fixed brand accents (badges, buttons)
+       already tuned to sit on any surface — e.g. bg-rose-700 + text-white,
+       bg-emerald-950 + text-emerald-300 as a self-contained dark pill — so,
+       unlike the neutral slate scale, they intentionally stay unchanged
+       between light and dark mode. */
+
+    --color-accent-blue: 92 168 255;
+
+    --glass-card-bg: 27 27 36 / 0.72;
+    --glass-nav-bg: 20 20 26 / 0.82;
+    --glass-border: 247 247 250 / 0.08;
+    --glass-border-hover: 251 108 130 / 0.3;
+    --glass-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --glass-shadow-1-hover: 0 4px 8px rgba(0, 0, 0, 0.35), 0 16px 32px rgba(0, 0, 0, 0.45);
+  }
+}
+
 @layer base {
   body {
     @apply bg-slate-950 text-slate-100 antialiased selection:bg-emerald-600 selection:text-white min-h-screen font-sans;
@@ -14,15 +115,15 @@
 }
 
 /* Frosted glass surface over a soft warm-gray page background (Airbnb/Funda
-   direction: light, airy, photo-forward — not the dark glass this app used
-   to have). Kept as a class so the whole app's card surface can be retuned
-   from one place. */
+   direction: light, airy, photo-forward). Values come from the tokens above,
+   so dark mode gets a dark frosted surface instead of white-on-black. Kept
+   as a class so the whole app's card surface can be retuned from one place. */
 .glass-card {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgb(var(--glass-card-bg));
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(20, 20, 26, 0.06);
-  box-shadow: 0 1px 2px rgba(20, 20, 26, 0.04), 0 8px 24px rgba(20, 20, 26, 0.06);
+  border: 1px solid rgb(var(--glass-border));
+  box-shadow: var(--glass-shadow-1);
 }
 
 .glass-card-hover {
@@ -30,16 +131,16 @@
 }
 
 .glass-card-hover:hover {
-  border-color: rgba(230, 73, 43, 0.25);
-  box-shadow: 0 4px 8px rgba(20, 20, 26, 0.06), 0 16px 32px rgba(20, 20, 26, 0.1);
+  border-color: rgb(var(--glass-border-hover));
+  box-shadow: var(--glass-shadow-1-hover);
   transform: translateY(-2px);
 }
 
 .glass-nav {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(var(--glass-nav-bg));
   backdrop-filter: blur(16px) saturate(160%);
   -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border-bottom: 1px solid rgba(20, 20, 26, 0.06);
+  border-bottom: 1px solid rgb(var(--glass-border));
 }
 
 /* Touch target minimum size utility (≥44px) */

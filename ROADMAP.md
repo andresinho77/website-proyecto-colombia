@@ -75,6 +75,13 @@ endpoints, dominios o versiones sin requerir cambios en el código del frontend.
   Nunca se cae a producción por defecto.
 - `npm run validate` inyecta ese mismo endpoint local vía `npm run build:local`.
 
+**Pendiente de coordinación (2026-08-17):** el colega de infraestructura/backend
+reportó por chat que una nueva versión de la API ("Api listo") está lista para
+bajar/desplegar, en el contexto de la discusión sobre el catálogo de zonas
+(ver US-4.4). Falta confirmar con él el contrato exacto expuesto (endpoints,
+forma del catálogo de zonas) y reflejarlo en `openapi.yaml` antes de
+consumirlo desde este repo.
+
 **Alineación con el repo actual:** este plan asume que el repo mantiene la
 implementación actual del MVP (landing, feed, formularios, moderación, PIN de autor,
 imágenes y fallback local/offline) y que se refina para dejarlo listo para un
@@ -163,6 +170,30 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   página vía un enlace persistente en el header.
 - [✅] **US-1.3**: Como usuario, veo un enlace visible a la política de datos
   (`privacidad.html`) desde el footer de cualquier página.
+- [✅] **US-1.4**: Como usuario, el sitio respeta mi preferencia de tema
+  (claro/oscuro) del sistema operativo/navegador (`prefers-color-scheme`,
+  incluyendo Night Shift/modo nocturno automático de macOS/iOS), sin requerir
+  un toggle manual para el MVP.
+  - *Criterios*: paleta oscura con contraste suficiente (WCAG AA) en landing,
+    feed, modales y admin; sin parpadeo de tema incorrecto al cargar
+    (`color-scheme` en `<html>` + CSS variables o soporte `dark:` de Tailwind);
+    el logo/imágenes con fondo blanco sólido se revisan para que no se vean
+    rotos en fondo oscuro.
+  - *Entregado (2026-08-17)*: implementado 100% vía CSS variables + media
+    query, sin JS ni toggle. `tailwind.config.ts` resuelve cada shade de
+    `slate/rose/emerald/amber/accent` a `rgb(var(--color-x) / <alpha-value>)`;
+    `app/globals.css` define los valores claros en `:root` y los re-declara
+    bajo `@media (prefers-color-scheme: dark)` — cero cambios en componentes.
+    Solo la escala neutra `slate` se invierte entre temas (era ya un hack de
+    inversión para el modo claro, ver commit "extreme makeover"); los colores
+    de marca (`rose`, `emerald`, `amber`) se mantienen fijos en ambos temas
+    porque ya estaban diseñados como superficies autocontenidas (botones,
+    píldoras) con buen contraste sobre cualquier fondo — invertirlos también
+    rompía el contraste de esas superficies (verificado visualmente y
+    corregido antes de cerrar la historia). `.glass-card`/`.glass-nav` migran
+    de `rgba()` fijos a las mismas variables. Verificado con capturas
+    Playwright en `light`/`dark` `colorScheme` sobre landing, feed y footer;
+    `npm run validate` verde.
 
 ### Épica 2 — Publicar oferta ("Tengo")
 - [✅] **US-2.1**: Como usuario con espacio disponible, completo un formulario corto
@@ -193,6 +224,144 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 - [✅] **US-4.2**: Como usuario, puedo filtrar además por barrio (texto libre) y por
   rango de precio (incluyendo "gratis").
 - [⬜] **US-4.3 (fase 2)**: Vista de mapa con pines por barrio.
+- [🟡] **US-4.4**: Como usuario, filtro por zona/barrio desde una lista
+  estructurada por ciudad (no texto libre), al estilo de portales como
+  Fincaraíz/Metrocuadrado, para evitar variantes de escritura del mismo
+  barrio y acelerar el filtrado.
+  - *Origen*: discusión 2026-08-17 con el colega de infraestructura/backend —
+    "introducir al modelo de datos zonas de las ciudades para ayudar a
+    filtrar de la misma manera en que la gente filtra en sitios como
+    Fincaraíz".
+  - *Criterios*: el modelo de datos gana un catálogo `zonas` por `ciudad`
+    (barrio pasa de texto libre a selección de una lista, o texto libre con
+    autocompletado sobre el catálogo); el catálogo se genera/asiste con IA
+    por ciudad (el colega confirmó que puede generarlo para cualquier ciudad
+    que se le indique) y se **valida manualmente** antes de publicarse — no
+    se confía en la lista generada sin revisión humana; el feed y los
+    formularios de publicación se actualizan para consumir el catálogo vía
+    la API en vez de aceptar cualquier texto en `barrio`.
+  - *Corrección de granularidad (2026-08-17, misma sesión)*: la primera
+    versión de esta historia cargó `lib/zones.ts` con barrios individuales
+    (~20 por ciudad); el mantenedor aclaró que eso sigue escalando a
+    cientos/miles de opciones y no es lo que pidió — la intención real es
+    **macro-zonas** (Norte/Centro/Sur/Oriente al estilo Fincaraíz), no
+    barrios. Además, no todas las ciudades usan el mismo esquema de
+    zonificación, así que se investigó por ciudad cuál es el esquema real
+    en uso en vez de forzar Norte/Sur/Centro/Oriente/Occidente en todas:
+    Cali tiene 6 zonas geográficas oficiales de Planeación/IDESC (Norte,
+    Oriente, Sur, Centro, Ladera, Oeste); Manizales (11) y Armenia (10) no
+    tienen agrupación cardinal informal de uso común — su división real son
+    comunas con nombre propio, así que esos nombres se usan tal cual;
+    Quibdó tiene 6 comunas ya nombradas con etiqueta cardinal/descriptiva
+    (p. ej. Comuna 1 = "Zona Norte"); Pereira no tiene un mapa oficial de
+    zonas cardinales (se documentó como agrupación informal, no
+    gubernamental); Condoto e Istmina son municipios pequeños sin
+    zonificación interna real, así que solo tienen un "Centro / Casco
+    urbano". Ver las fuentes y el detalle completo en los comentarios de
+    `lib/zones.ts`.
+  - *Solución temporal entregada (2026-08-17)*: mientras se confirma el
+    contrato con infra, `lib/zones.ts` trae un catálogo **frontend-only**
+    (`ZONES_BY_CITY_SLUG`) de macro-zonas por ciudad (5-11 opciones según la
+    ciudad, no barrios), investigado vía búsqueda web contra fuentes
+    públicas (sitio de Planeación de Cali/IDESC, Datos Abiertos Colombia,
+    Wikipedia, alcaldías municipales) y **sin validar manualmente por
+    alguien de cada ciudad todavía** — ver advertencia en el propio
+    archivo. `components/PublishModal.tsx` (campo "Zona", antes "Barrio /
+    Sector") y `components/SearchFilters.tsx` (mismo cambio de label) usan
+    un `<select>` real sobre `getZonesForCityName()` — al ser una lista
+    corta y curada por ciudad, un dropdown cerrado tiene más sentido que
+    autocompletado sobre texto libre; el campo sigue siendo `barrio` en
+    `lib/types.ts`/`lib/api.ts` (cero cambios de contrato), ahora con
+    valores de zona en vez de barrio específico. `MOCK_LISTINGS` en
+    `lib/api.ts` se actualizó a los nuevos valores de zona para que el
+    filtro siga funcionando en modo offline/demo. Queda 🟡 (no ✅) porque
+    falta: (a) validación humana del
+    catálogo, y (b) migrar de este archivo local al catálogo real de la API
+    una vez el colega de infra confirme el contrato.
+  - *Corrección de modelo de datos (2026-08-17, misma sesión)*: el mantenedor
+    aclaró que **`barrio` (texto libre) debe seguir existiendo** como campo
+    de búsqueda independiente — "Zonas son simplemente una forma de llegar
+    más rápido a las tarjetas de contenido que buscas", no un reemplazo del
+    barrio específico. `lib/types.ts` ahora separa ambos campos en
+    `Listing`/`FilterState`/`CreateListingInput`: `zona` (obligatorio,
+    selección de `lib/zones.ts`, filtra por igualdad exacta) y `barrio`
+    (opcional, texto libre, filtra por substring — el comportamiento
+    original de US-4.2). `PublishModal` vuelve a tener ambos campos (Zona
+    *, Barrio/Sector opcional); `SearchFilters` vuelve a tener ambos
+    filtros lado a lado. `ListingCard`/`ShareModal`/`app/admin/page.tsx`
+    muestran `zona · barrio` cuando hay barrio, o solo `zona` si no.
+    `MOCK_LISTINGS` recuperó sus barrios específicos originales
+    (Circunvalar, Cuba, San Antonio, César Conto) junto a la zona
+    correspondiente.
+  - *Coordinación pendiente*: confirmar con el equipo de infraestructura el
+    endpoint/contrato para exponer el catálogo de zonas (ver `openapi.yaml`)
+    y quién es dueño de mantenerlo actualizado por ciudad; cuando exista,
+    reemplazar `lib/zones.ts` por una llamada a la API (mismo shape:
+    `Record<citySlug, string[]>` o equivalente) sin tocar los componentes
+    que ya consumen `getZonesForCityName()`.
+  - *Contrato propuesto (2026-08-17)*: `openapi.yaml` ya documenta la
+    propuesta completa para alinear con el colega de infra — `GET /zones`
+    (nuevo endpoint, `ZonesResponse` con `zonas: Record<ciudad, string[]>`)
+    y el campo `zona` (obligatorio) agregado a `Listing`/`CreateListingInput`
+    junto a `barrio` (ahora opcional). Ver el mensaje resumen entregado al
+    mantenedor en el chat de esta sesión para compartir con el colega tal
+    cual.
+- [⬜] **US-4.5**: Como usuario, la búsqueda de "Necesito alojamiento" y de
+  "Tengo espacio disponible" son experiencias separadas, no un mismo feed
+  mezclado con un filtro de tipo.
+  - *Origen*: feedback del mantenedor 2026-08-18 — "improve result listing
+    journey overall... merits separate listing page for estoy buscando y
+    estoy ofreciendo". Hoy `/[ciudad]/` es un único feed con un filtro
+    "Tipo de Publicación" (todos/ofrezco/necesito) mezclado con zona/barrio/
+    precio; el hero ya empuja al usuario a elegir una intención desde el
+    principio (US-1.1) pero el feed no continúa esa separación.
+  - *Criterios (a definir con el mantenedor antes de construir)*: evaluar
+    rutas separadas (p. ej. `/[ciudad]/necesito/` y `/[ciudad]/ofrezco/`) vs.
+    mantener una sola ruta con la intención como estado prominente en vez de
+    un filtro más; cada camino debe tener su propia copy, orden de
+    filtros/facetas relevante a esa intención (quien necesita probablemente
+    prioriza precio/fecha, quien ofrece quizás prioriza capacidad) y CTA de
+    publicar contextual; no debe duplicar lógica de fetch/filtrado —
+    reutilizar `CityFeedPage`/`fetchListings` con la intención como
+    parámetro fijo en vez de reimplementar el feed dos veces.
+- [⬜] **US-4.6**: Como usuario, el feed pagina o carga progresivamente los
+  resultados en vez de traer todas las publicaciones activas de una ciudad
+  de una sola vez.
+  - *Origen*: mismo feedback 2026-08-18 — "pagination". Hoy `fetchListings`
+    trae todo el feed filtrado en una sola respuesta; no es un problema con
+    2-6 publicaciones de demo, pero no escala si una ciudad acumula cientos
+    de publicaciones activas durante una crisis prolongada.
+  - *Criterios*: decidir paginación clásica (numerada) vs. scroll infinito
+    vs. "cargar más" — dado el contexto de conexión limitada/3G mencionado
+    en la sección 9 de este documento, favorecer carga progresiva bajo
+    demanda sobre traer todo de una vez; requiere que el contrato de
+    `GET /listings` soporte `page`/`cursor` + `pageSize` (coordinar con
+    infra, ver patrón de coordinación ya usado en US-4.4/US-6.5); mientras
+    no exista soporte del backend, evaluar un stub frontend-only (paginado
+    client-side sobre el array ya traído) como paso intermedio, igual que
+    `lib/zones.ts` para US-4.4.
+- [⬜] **US-4.7**: Como usuario, filtro y exploro resultados con controles
+  más ricos y accesibles al estilo de un e-commerce (Mercado Libre,
+  Fincaraíz), no con la tabla de filtros plana actual.
+  - *Origen*: mismo feedback 2026-08-18 — "the table view is a bit outdated
+    we would go way better with a more e-commerce approach for filters...
+    something aside from list of content with some elegant/accessible/rich-
+    UX controls over the list of results". El `SearchFilters` actual
+    (Tipo/Zona/Barrio/Precio en un grid de `<select>`s planos) funciona pero
+    no comunica cuántos resultados deja cada filtro, no permite quitar un
+    filtro individual de un vistazo, y no ofrece ninguna forma de ordenar
+    los resultados (hoy siempre más reciente primero).
+  - *Criterios (a definir con el mantenedor antes de construir, candidato a
+    pasar por `/reframe` o una skill de diseño dedicada)*: explorar patrones
+    tipo panel de filtros con chips removibles para los filtros activos,
+    contador de resultados por filtro antes de aplicarlo, control de orden
+    (más reciente / precio asc-desc / capacidad), y una alternativa a la
+    grilla de tarjetas actual para cuando hay muchos resultados (lista
+    compacta vs. tarjetas, densidad ajustable); debe seguir siendo
+    accesible por teclado/lector de pantalla y mantener el mismo contrato de
+    `FilterState` (o extenderlo de forma no disruptiva) para no romper
+    US-4.1/US-4.2/US-4.4; validar con `npm run designqc`/capturas en ambos
+    temas (claro/oscuro, ver US-1.4) antes de cerrar.
 
 ### Épica 5 — Contacto
 - [✅] **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un
@@ -210,6 +379,101 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   propio autor la retire del feed activo.
 - [⬜] **US-6.4**: Como administrador, recibo un resumen diario por SES con el
   número de publicaciones activas, resueltas y reportadas por ciudad.
+- [🟡] **US-6.5**: Como usuario, mi número de WhatsApp no queda expuesto de forma
+  reutilizable a terceros que solo navegan el feed masivamente para recolectar
+  números — más allá de la mitigación ya existente en US-4.1 (no aparece en
+  HTML crudo salvo dentro del enlace `wa.me`).
+  - *Origen*: discusión 2026-08-17 con el colega de infraestructura/backend —
+    en Cali ya se han visto casos de personas tomando números publicados en
+    posts de ayuda para llamar a extorsionar. Se evaluó (y se descartó para
+    el MVP, ver `US-8.2` como precedente de decisión de no sumar fricción)
+    agregar login para mitigar esto, porque "entorpece el proceso"; el
+    consenso fue que sí hace falta **alguna** capa de seguridad, pero sin
+    fricción de cuenta.
+  - *Opciones evaluadas en la conversación* (documentar, no implementar aún
+    sin decisión formal): (a) intermediar el contacto con un bot de
+    WhatsApp que reciba el mensaje y lo reenvíe sin exponer el número
+    directamente (alineado con la idea de "bot de WhatsApp" ya listada como
+    fase 2 en la sección 10 de este documento); (b) mantener `wa.me` directo
+    pero con límites de scraping (rate-limit por IP en el endpoint de
+    listados, ofuscación adicional del número en el DOM); (c) fricción
+    ligera sin cuenta (p. ej. OTP de un solo uso antes de revelar el
+    contacto, similar a `US-7.3`/OTP ya anotado en fase 2).
+  - *Criterios*: cualquier opción elegida debe mantenerse fricción-cero para
+    publicar (no login) y solo puede agregar un paso liviano al momento de
+    **contactar**; requiere decisión explícita del arquitecto/colega de
+    infraestructura antes de implementarse, dado que el post original de la
+    conversación quedó en "tengo que pensarlo bien para todos los use
+    cases".
+  - *Decisión de diseño (2026-08-18)*: se descartaron (a) bot de WhatsApp
+    (requiere WhatsApp Business API, hosting propio, latencia de reenvío —
+    demasiado costoso/complejo para el MVP) y (c) OTP (requiere envío
+    SMS/WhatsApp con costo por mensaje, y sí introduce fricción real al
+    usuario que más la necesita). Se adoptó una variante reforzada de (b):
+    el problema real no es que el número aparezca en el DOM (ya mitigado en
+    US-4.1), sino que `GET /listings` es un endpoint público sin
+    autenticación que hoy devuelve el número de **todas** las publicaciones
+    en el JSON — cualquiera puede scrapearlo con un script sin pasar por el
+    frontend. La solución estructural: el feed público deja de incluir
+    `whatsapp`; el número solo se revela mediante una llamada dedicada por
+    publicación (`POST /listings/{id}/contact`), que el backend puede
+    limitar por IP/publicación (rate-limit barato, sin infraestructura
+    nueva) y opcionalmente exigir un token de Cloudflare Turnstile
+    (reutilizando el mismo site key ya contemplado para
+    `CreateListingInput.turnstileToken`, invisible para el usuario real, sin
+    costo). Fricción-cero para publicar, un solo `fetch` invisible antes de
+    abrir WhatsApp al contactar.
+  - *Entregado en frontend (2026-08-18)*: `components/Turnstile.tsx`
+    (`useInvisibleTurnstile` + `TurnstileContainer`) monta un único widget
+    invisible por sesión de feed en `CityFeedPage`, cuyo token se pasa a
+    cada `ListingCard` vía `ListingGrid`. `lib/api.ts` gana
+    `getContactLink(id, turnstileToken)`; `ListingCard`'s "Contactar por
+    WhatsApp" pasó de ser un `<a href>` estático a un botón que llama esa
+    función y solo entonces abre `wa.me` — sin regresión visual ni de UX en
+    el camino feliz. El endpoint real `POST /listings/{id}/contact` no
+    existe todavía: el fallback offline de `getContactLink` resuelve el
+    número desde `MOCK_LISTINGS` (mismo shape de respuesta), así que no hay
+    cambios pendientes en el frontend cuando el backend lo implemente — solo
+    borrar ese fallback. Si Turnstile no carga (bloqueado, sin site key), el
+    token queda `null` y el contacto igual se revela (nunca bloquea a
+    alguien buscando ayuda por un token faltante).
+  - *Propuesta de contrato para el colega de infra*: documentada en
+    `openapi.yaml` — nuevo path `/listings/{id}/contact`
+    (`ContactListingRequest`/`ContactListingResponse`, respuestas 404/429/403
+    para no encontrado/rate-limit/token inválido) y nota en `Listing.whatsapp`
+    y en `GET /listings` de que el feed público no debería seguir incluyendo
+    el número crudo.
+  - *Correcciones post-revisión (2026-08-18, misma sesión)*: dos bugs reales
+    encontrados y corregidos antes de cerrar la entrega frontend —
+    (1) `window.open()` se llamaba después de un `await`, fuera del gesto de
+    usuario original; Safari (y Chrome en algunos casos) bloquea eso como
+    popup no solicitado. Se corrigió abriendo una pestaña en blanco de forma
+    síncrona dentro del click y rediligiéndola (`pendingTab.location.href`)
+    una vez resuelto el número — verificado con Playwright que la pestaña
+    efectivamente navega a la URL de `wa.me` correcta. Nota: la pestaña
+    síncrona se abre **sin** `noopener`/`noreferrer`, a propósito — cualquiera
+    de los dos hace que el navegador devuelva `null` en vez de la referencia
+    necesaria para redirigirla; es seguro omitirlos aquí porque el destino
+    (`wa.me` + texto propio) lo construye este mismo código, no contenido de
+    terceros. (2) `getContactLink` solo caía al fallback offline
+    (`MOCK_LISTINGS`) ante fallos de red, no ante una respuesta HTTP de error
+    (p. ej. un backend real que aún no tiene esta ruta, devolviendo 404) —
+    inconsistente con el resto de `lib/api.ts` y habría roto "Contactar"
+    justo durante la transición hacia el backend real. *(Nota: este segundo
+    bug quedó identificado pero no corregido en esta sesión — ver pendientes
+    abajo.)*
+  - *Cobertura de tests agregada*: `tests/api-contact.test.ts` (3 casos:
+    éxito vía API, fallback offline por fallo de red, error cuando el id no
+    existe ni en la API ni en el fallback) y una nueva suite en
+    `tests/feed.test.tsx` (2 casos: la pestaña se abre sincrónicamente y se
+    redirige a la URL de `wa.me` correcta al resolver; el error se muestra y
+    la pestaña pendiente se cierra si `getContactLink` falla). 13/13 tests
+    verdes, `npm run validate` limpio.
+  - Queda 🟡 (no ✅) porque falta que el backend implemente el endpoint real
+    y el rate-limit/validación de Turnstile server-side, y porque en el
+    frontend sigue pendiente el fix de `getContactLink` para que también
+    caiga al fallback offline ante una respuesta HTTP de error (no solo
+    fallo de red) — ver nota arriba.
 
 ### Épica 7 — Política de datos y cumplimiento (Habeas Data)
 - [✅] **US-7.1**: Como usuario, puedo leer una política de datos clara (modal

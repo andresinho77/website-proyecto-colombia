@@ -10,25 +10,49 @@ import { PublishModal } from './PublishModal';
 import { ShareModal } from './ShareModal';
 import { PrivacyPolicyModal } from './PrivacyPolicyModal';
 import { Footer } from './Footer';
+import { useInvisibleTurnstile, TurnstileContainer } from './Turnstile';
 import { Listing, FilterState, ListingType } from '../lib/types';
 import { fetchListings } from '../lib/api';
 
 interface CityFeedPageProps {
-  cityName: string;
-  citySlug: string;
+  cityName?: string;
+  citySlug?: string;
+  departmentName?: string;
+  departmentSlug?: string;
+  isDepartmentFeed?: boolean;
+  isNationalFeed?: boolean;
 }
 
-export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) {
+export default function CityFeedPage({
+  cityName = '',
+  citySlug = '',
+  departmentName,
+  departmentSlug,
+  isDepartmentFeed = false,
+  isNationalFeed = false,
+}: CityFeedPageProps) {
   const [listings, setListings] = useState<Listing[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [totalCount, setTotalCount] = useState<number | undefined>(undefined);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  // US-6.5: one invisible Turnstile challenge for the whole feed, reused
+  // across "Contactar por WhatsApp" clicks and refreshed after each one.
+  const { token: turnstileToken, containerRef: turnstileRef, refresh: refreshTurnstile } =
+    useInvisibleTurnstile();
   const [isLoading, setIsLoading] = useState(true);
 
-  // City is fixed by the route (see Navbar's city switcher), not a
-  // user-editable filter (US-4.1, US-4.2 cover only tipo/barrio/precio now).
+  // City and department filters
   const [filters, setFilters] = useState<FilterState>({
-    ciudad: cityName,
+    ciudad: isDepartmentFeed || isNationalFeed ? '' : cityName,
+    ciudadSlug: isDepartmentFeed || isNationalFeed ? '' : citySlug,
+    departamento: isNationalFeed ? '' : (departmentName || ''),
+    departamentoSlug: isNationalFeed ? '' : (departmentSlug || ''),
     tipo: 'todos',
+    zona: '',
     barrio: '',
     maxPrecio: '',
+    limit: 24,
   });
 
   // Modal States
@@ -40,7 +64,9 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
   const loadListings = useCallback(async () => {
     setIsLoading(true);
     const data = await fetchListings(filters);
-    setListings(data);
+    setListings(data.items);
+    setNextCursor(data.nextCursor);
+    setTotalCount(data.totalCount ?? data.items.length);
     setIsLoading(false);
   }, [filters]);
 
@@ -48,11 +74,30 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
     loadListings();
   }, [loadListings]);
 
-  // Re-scope the feed when the city switcher navigates to a different slug
-  // (the component instance is reused across client-side navigations).
+  // Re-scope the feed when navigating to a different slug
   useEffect(() => {
-    setFilters((prev) => ({ ...prev, ciudad: cityName }));
-  }, [cityName]);
+    setFilters((prev) => ({
+      ...prev,
+      ciudad: isDepartmentFeed || isNationalFeed ? '' : cityName,
+      ciudadSlug: isDepartmentFeed || isNationalFeed ? '' : citySlug,
+      departamento: isNationalFeed ? '' : (departmentName || ''),
+      departamentoSlug: isNationalFeed ? '' : (departmentSlug || ''),
+    }));
+  }, [cityName, citySlug, departmentName, departmentSlug, isDepartmentFeed, isNationalFeed]);
+
+  const handleLoadMore = async () => {
+    if (!nextCursor || isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const data = await fetchListings(filters, nextCursor);
+      setListings((prev) => [...prev, ...data.items]);
+      setNextCursor(data.nextCursor);
+    } catch (err) {
+      console.error('Error loading more listings:', err);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const handleOpenPublish = (defaultTipo: ListingType = 'ofrezco') => {
     setPublishDefaultTipo(defaultTipo);
@@ -60,7 +105,6 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
   };
 
   const handleSelectHeroTipo = (tipo: ListingType) => {
-    // Also filter the feed to match selected choice or open publish modal
     setFilters((prev) => ({ ...prev, tipo }));
     handleOpenPublish(tipo);
   };
@@ -71,10 +115,15 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
 
   const handleResetFilters = () => {
     setFilters({
-      ciudad: cityName,
+      ciudad: isDepartmentFeed || isNationalFeed ? '' : cityName,
+      ciudadSlug: isDepartmentFeed || isNationalFeed ? '' : citySlug,
+      departamento: isNationalFeed ? '' : (departmentName || ''),
+      departamentoSlug: isNationalFeed ? '' : (departmentSlug || ''),
       tipo: 'todos',
+      zona: '',
       barrio: '',
       maxPrecio: '',
+      limit: 24,
     });
   };
 
@@ -83,6 +132,18 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
     loadListings();
   };
 
+  const titleText = isNationalFeed
+    ? 'Alojamientos solidarios en Colombia'
+    : isDepartmentFeed
+    ? `Alojamientos solidarios en ${departmentName}`
+    : `Alojamientos solidarios en ${cityName}${departmentName ? ` (${departmentName})` : ''}`;
+
+  const subtitleText = isNationalFeed
+    ? 'Publicaciones activas en todo el territorio nacional. Contacta directamente por WhatsApp en 1-clic.'
+    : isDepartmentFeed
+    ? `Publicaciones activas en todos los municipios de ${departmentName}. Contacta directamente por WhatsApp en 1-clic.`
+    : 'Publicaciones activas más recientes. Contacta directamente por WhatsApp en 1-clic.';
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-solidarity-500 selection:text-white">
       <div>
@@ -90,7 +151,13 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
         <EmergencyBanner />
 
         {/* Header / Navbar (US-1.2) */}
-        <Navbar currentCitySlug={citySlug} onOpenPublish={handleOpenPublish} />
+        <Navbar
+          currentCitySlug={citySlug || 'pereira'}
+          currentDeptSlug={departmentSlug}
+          isDepartmentFeed={isDepartmentFeed}
+          isNationalFeed={isNationalFeed}
+          onOpenPublish={handleOpenPublish}
+        />
 
         {/* Main Hero Section (US-1.1: 2 large buttons <2s load) */}
         <HeroButtons onSelectTipo={handleSelectHeroTipo} />
@@ -100,10 +167,10 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
           <div className="mb-6 flex items-center justify-between">
             <div>
               <h2 className="font-display text-2xl sm:text-3xl font-semibold text-slate-100 tracking-tight">
-                Alojamientos solidarios en {cityName}
+                {titleText}
               </h2>
               <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                Publicaciones activas más recientes. Contacta directamente por WhatsApp en 1-clic.
+                {subtitleText}
               </p>
             </div>
           </div>
@@ -113,19 +180,27 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
             filters={filters}
             onChangeFilter={handleFilterChange}
             onReset={handleResetFilters}
-            totalResults={listings.length}
+            totalResults={totalCount ?? listings.length}
           />
 
           {/* Listing Grid */}
           <ListingGrid
             listings={listings}
             isLoading={isLoading}
+            hasMore={!!nextCursor}
+            isLoadingMore={isLoadingMore}
+            onLoadMore={handleLoadMore}
             onShareWhatsApp={(item) => setNewlyCreatedListing(item)}
             onRefresh={loadListings}
             onOpenPublish={handleOpenPublish}
+            turnstileToken={turnstileToken}
+            onTurnstileConsumed={refreshTurnstile}
           />
         </main>
       </div>
+
+      {/* US-6.5: invisible, renders nothing visible — see components/Turnstile.tsx */}
+      <TurnstileContainer containerRef={turnstileRef} />
 
       {/* Footer */}
       <Footer onOpenPrivacy={() => setIsPrivacyOpen(true)} />
@@ -135,7 +210,7 @@ export default function CityFeedPage({ cityName, citySlug }: CityFeedPageProps) 
         isOpen={isPublishOpen}
         onClose={() => setIsPublishOpen(false)}
         defaultTipo={publishDefaultTipo}
-        defaultCiudad={cityName}
+        defaultCiudad={cityName || (departmentName ? undefined : 'Pereira')}
         onSuccessPublished={handleSuccessPublished}
       />
 

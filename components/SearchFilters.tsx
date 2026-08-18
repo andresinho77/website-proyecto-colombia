@@ -3,6 +3,7 @@
 import React from 'react';
 import { MapPin, Filter, RefreshCw } from 'lucide-react';
 import { FilterState } from '../lib/types';
+import { getZonesForCityName } from '../lib/zones';
 
 interface SearchFiltersProps {
   filters: FilterState;
@@ -17,6 +18,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
   onReset,
   totalResults,
 }) => {
+  const zones = getZonesForCityName(filters.ciudad);
   return (
     <div className="glass-card p-5 rounded-2xl mb-8">
       <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-800">
@@ -29,7 +31,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
 
       {/* Filter Inputs Grid — city is fixed by the page (see Navbar's city
           switcher), not filterable here */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
 
         {/* Tipo Filter */}
         <div>
@@ -47,10 +49,31 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
           </select>
         </div>
 
-        {/* Barrio Free Text Search (US-4.2) */}
+        {/* Zone Filter (US-4.4) — a short, curated per-city list (Norte/
+            Sur/Centro/...) to jump quickly to the right area of the feed. */}
         <div>
           <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-            Barrio / Sector (Texto libre)
+            Zona
+          </label>
+          <select
+            value={filters.zona}
+            onChange={(e) => onChangeFilter({ zona: e.target.value })}
+            className="touch-target w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500"
+          >
+            <option value="">Todas las zonas</option>
+            {zones.map((zona) => (
+              <option key={zona} value={zona}>
+                {zona}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Barrio Free Text Search (US-4.2) — narrower than Zona, for
+            someone searching a specific neighborhood by name. */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+            Barrio (Texto libre)
           </label>
           <div className="relative">
             <input
@@ -83,7 +106,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
       </div>
 
       {/* Reset Filters CTA */}
-      {(filters.barrio || filters.tipo !== 'todos' || filters.maxPrecio) && (
+      {(filters.zona || filters.barrio || filters.tipo !== 'todos' || filters.maxPrecio) && (
         <div className="mt-4 pt-3 border-t border-slate-800 flex justify-end">
           <button
             onClick={onReset}

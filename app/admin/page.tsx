@@ -238,7 +238,7 @@ export default function AdminPage() {
                     {item.tipo}
                   </span>
                   <span className="text-xs font-bold text-emerald-700">
-                    {item.ciudad} ({item.barrio})
+                    {item.ciudad} ({item.barrio ? `${item.zona} · ${item.barrio}` : item.zona})
                   </span>
                   <span
                     className={`text-xs px-2 py-0.5 rounded font-mono ${

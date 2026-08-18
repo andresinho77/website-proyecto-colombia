@@ -1,0 +1,109 @@
+name: "Frontend Deploy to AWS"
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+# id-token es obligatorio para pedir el token OIDC de GitHub que AWS canjea
+# por credenciales temporales. No hay claves estaticas en este repo.
+permissions:
+  id-token: write
+  contents: read
+
+# Un solo deploy a la vez; no cancelamos el que ya esta corriendo para no
+# dejar el bucket a medias entre el sync y la invalidacion.
+concurrency:
+  group: "deploy-prod"
+  cancel-in-progress: false
+
+env:
+  AWS_REGION: "us-east-1"
+  S3_BUCKET: "proyecto-colombia-prod-web-hosting"
+  CLOUDFRONT_DISTRIBUTION_ID: "E3LIQPKLMQ5LGY"
+
+jobs:
+  deploy:
+    name: "Build Static Export & Publish to S3 + CloudFront"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Resolve API base URL
+        id: api
+        env:
+          REPO_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+        run: |
+          # Si la repository variable no esta configurada no inyectamos nada:
+          # Next.js toma entonces el valor de .env.production, que ya apunta al
+          # API Gateway de produccion.
+          if [ -n "$REPO_API_URL" ]; then
+            echo "url=$REPO_API_URL" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning title=NEXT_PUBLIC_API_URL::Repository variable not set; falling back to .env.production."
+            echo "url=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Next.js Static Export
+        env:
+          NEXT_PUBLIC_API_URL: ${{ steps.api.outputs.url }}
+        run: npm run build
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          aws-region: ${{ env.AWS_REGION }}
+          audience: sts.amazonaws.com
+
+      # Dos pasadas de sync para separar politicas de cache. Los assets de
+      # _next/static llevan hash en el nombre, asi que son inmutables; el HTML
+      # debe revalidarse en cada visita o CloudFront serviria paginas viejas
+      # hasta una hora (default_ttl = 3600).
+      - name: Sync Hashed Assets (immutable, long-lived)
+        run: |
+          aws s3 sync out/ "s3://${S3_BUCKET}/" \
+            --delete \
+            --exclude "*.html" \
+            --cache-control "public,max-age=31536000,immutable" \
+            --no-progress
+
+      - name: Sync HTML (always revalidate)
+        run: |
+          aws s3 sync out/ "s3://${S3_BUCKET}/" \
+            --exclude "*" \
+            --include "*.html" \
+            --cache-control "no-cache,must-revalidate" \
+            --no-progress
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          INVALIDATION_ID="$(aws cloudfront create-invalidation \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --paths "/*" \
+            --query 'Invalidation.Id' --output text)"
+          echo "Invalidation created: $INVALIDATION_ID"
+          aws cloudfront wait invalidation-completed \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --id "$INVALIDATION_ID"
+
+      - name: Deployment Summary
+        run: |
+          {
+            echo "### Frontend desplegado"
+            echo ""
+            echo "- Bucket: \`${S3_BUCKET}\`"
+            echo "- Distribution: \`${CLOUDFRONT_DISTRIBUTION_ID}\`"
+            echo "- URL: https://dfngszk43c2ig.cloudfront.net/"
+          } >> "$GITHUB_STEP_SUMMARY"

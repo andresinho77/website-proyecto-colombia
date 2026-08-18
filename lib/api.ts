@@ -1,4 +1,4 @@
-import { Listing, ListingStatus, CreateListingInput, FilterState } from './types';
+import { Listing, ListingStatus, CreateListingInput, FilterState, PaginatedListings } from './types';
 
 /**
  * Contrato de `NEXT_PUBLIC_API_URL` (ver README → "Validación local"):
@@ -39,6 +39,10 @@ const MOCK_LISTINGS: Listing[] = [
     id: 'mock-1',
     tipo: 'ofrezco',
     ciudad: 'Pereira',
+    ciudadSlug: 'pereira',
+    departamento: 'Risaralda',
+    departamentoSlug: 'risaralda',
+    zona: 'Oriente',
     barrio: 'Circunvalar',
     personas: 4,
     fechaDesde: '2026-08-11',
@@ -58,6 +62,10 @@ const MOCK_LISTINGS: Listing[] = [
     id: 'mock-2',
     tipo: 'necesito',
     ciudad: 'Pereira',
+    ciudadSlug: 'pereira',
+    departamento: 'Risaralda',
+    departamentoSlug: 'risaralda',
+    zona: 'Sur',
     barrio: 'Cuba',
     personas: 3,
     fechaDesde: '2026-08-12',
@@ -75,6 +83,10 @@ const MOCK_LISTINGS: Listing[] = [
     id: 'mock-3',
     tipo: 'ofrezco',
     ciudad: 'Cali',
+    ciudadSlug: 'cali',
+    departamento: 'Valle del Cauca',
+    departamentoSlug: 'valle-del-cauca',
+    zona: 'Centro',
     barrio: 'San Antonio',
     personas: 2,
     fechaDesde: '2026-08-10',
@@ -94,6 +106,10 @@ const MOCK_LISTINGS: Listing[] = [
     id: 'mock-4',
     tipo: 'ofrezco',
     ciudad: 'Quibdó',
+    ciudadSlug: 'quibdo',
+    departamento: 'Chocó',
+    departamentoSlug: 'choco',
+    zona: 'Anillo Central (Comuna 3)',
     barrio: 'César Conto',
     personas: 6,
     fechaDesde: '2026-08-11',
@@ -114,13 +130,22 @@ const MOCK_LISTINGS: Listing[] = [
 const toPublicFeed = (items: Listing[]): Listing[] =>
   items.filter((i) => i.estado === 'activo').sort((a, b) => b.creadoEn - a.creadoEn);
 
-export const fetchListings = async (filters?: Partial<FilterState>): Promise<Listing[]> => {
+export const fetchListings = async (
+  filters?: Partial<FilterState>,
+  cursor?: string
+): Promise<PaginatedListings> => {
   try {
     const params = new URLSearchParams();
     if (filters?.ciudad) params.append('ciudad', filters.ciudad);
+    if (filters?.ciudadSlug) params.append('ciudadSlug', filters.ciudadSlug);
+    if (filters?.departamento) params.append('departamento', filters.departamento);
+    if (filters?.departamentoSlug) params.append('departamentoSlug', filters.departamentoSlug);
     if (filters?.tipo) params.append('tipo', filters.tipo);
+    if (filters?.zona) params.append('zona', filters.zona);
     if (filters?.barrio) params.append('barrio', filters.barrio);
-    if (filters?.maxPrecio) params.append('maxPrecio', filters.maxPrecio);
+    if (filters?.maxPrecio) params.append('maxPrecio', String(filters.maxPrecio));
+    if (filters?.limit) params.append('limit', String(filters.limit));
+    if (cursor || filters?.cursor) params.append('cursor', (cursor || filters?.cursor)!);
 
     const url = `${API_BASE_URL}?${params.toString()}`;
     const res = await fetch(url, { cache: 'no-store' });
@@ -129,23 +154,50 @@ export const fetchListings = async (filters?: Partial<FilterState>): Promise<Lis
 
     const data = await res.json();
     if (data.items && Array.isArray(data.items)) {
-      return toPublicFeed(data.items);
+      return {
+        items: toPublicFeed(data.items),
+        nextCursor: data.nextCursor,
+        totalCount: data.total,
+      };
     }
-    return toPublicFeed(MOCK_LISTINGS);
+    if (Array.isArray(data)) {
+      return {
+        items: toPublicFeed(data),
+      };
+    }
+    return {
+      items: toPublicFeed(MOCK_LISTINGS),
+    };
   } catch (err) {
     console.warn('API connection unavailable, serving emergency local mock listings:', err);
     let items = [...MOCK_LISTINGS];
 
-    if (filters?.ciudad) {
-      items = items.filter((i) => i.ciudad.toLowerCase() === filters.ciudad?.toLowerCase());
+    if (filters?.departamento || filters?.departamentoSlug) {
+      const targetDept = (filters.departamentoSlug || filters.departamento || '').toLowerCase();
+      items = items.filter((i) =>
+        (i.departamentoSlug && i.departamentoSlug.toLowerCase() === targetDept) ||
+        (i.departamento && i.departamento.toLowerCase() === targetDept)
+      );
+    }
+    if (filters?.ciudad || filters?.ciudadSlug) {
+      const targetCity = (filters.ciudadSlug || filters.ciudad || '').toLowerCase();
+      items = items.filter((i) =>
+        (i.ciudadSlug && i.ciudadSlug.toLowerCase() === targetCity) ||
+        (i.ciudad && i.ciudad.toLowerCase() === targetCity)
+      );
     }
     if (filters?.tipo && filters.tipo !== 'todos') {
       items = items.filter((i) => i.tipo === filters.tipo);
     }
+    if (filters?.zona) {
+      items = items.filter((i) => i.zona.toLowerCase() === filters.zona?.toLowerCase());
+    }
     if (filters?.barrio) {
       items = items.filter((i) => i.barrio.toLowerCase().includes(filters.barrio!.toLowerCase()));
     }
-    return toPublicFeed(items);
+    return {
+      items: toPublicFeed(items),
+    };
   }
 };
 
@@ -170,6 +222,10 @@ export const createListing = async (input: CreateListingInput): Promise<{ succes
       id: `local-${Date.now()}`,
       tipo: input.tipo,
       ciudad: input.ciudad,
+      ciudadSlug: input.ciudadSlug,
+      departamento: input.departamento,
+      departamentoSlug: input.departamentoSlug,
+      zona: input.zona,
       barrio: input.barrio,
       personas: Number(input.personas) || 1,
       fechaDesde: input.fechaDesde,
@@ -214,6 +270,36 @@ export const uploadFileToS3 = async (file: File, uploadUrl: string): Promise<boo
   } catch (err) {
     console.error('Error uploading file to S3:', err);
     return false;
+  }
+};
+
+// US-6.5: the public feed (fetchListings) should not hand out raw WhatsApp
+// numbers to anyone scripting a request against the API directly — the
+// reveal happens on demand, per click, through this call instead, so the
+// backend can rate-limit/Turnstile-gate it independently of just serving the
+// feed. The real POST /listings/{id}/contact endpoint doesn't exist yet
+// (proposed in openapi.yaml); until infra ships it, the offline fallback
+// below resolves the number from MOCK_LISTINGS with the same response
+// shape, so ListingCard's call site won't need to change when it does.
+export const getContactLink = async (
+  id: string,
+  turnstileToken?: string | null
+): Promise<{ success: boolean; whatsapp?: string; error?: string }> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/${id}/contact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ turnstileToken }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      return { success: false, error: data.error || 'No se pudo obtener el contacto.' };
+    }
+    return { success: true, whatsapp: data.whatsapp };
+  } catch (err) {
+    const item = MOCK_LISTINGS.find((i) => i.id === id);
+    if (!item) return { success: false, error: 'Publicación no encontrada.' };
+    return { success: true, whatsapp: item.whatsapp };
   }
 };
 

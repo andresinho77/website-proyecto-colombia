@@ -126,3 +126,18 @@
 - Before making an env var required/fail-loud in the backend, CHECK that the infra actually supplies
   it. `lambda.tf` did not set `ADMIN_SECRET_KEY` at all — shipping the fail-loud change alone would
   have broken the deploy on the next apply.
+
+## Key Learnings — backend serialization boundary (2026-08-18)
+- The backend has NO serializer layer: controllers return `Listing` rows straight from DynamoDB.
+  `src/utils/redact.ts` is the first such boundary — reuse and extend it rather than adding ad-hoc
+  field deletions at call sites.
+- The author `pin` is generated server-side at creation and returned in the CREATE response only
+  (`PublishModal.tsx` persists it to localStorage). `ListingCard` reads it back from localStorage,
+  never from the feed — so the feed does not need `pin`.
+- Admin frontend (`website .../app/admin/page.tsx`) renders `item.whatsapp` from `list_all`; the
+  redacted item deliberately keeps the SAME key holding a masked value so the page keeps working.
+
+## User Preferences
+- Fix exactly the finding that was asked for, one at a time. When adjacent issues surface, report them
+  with evidence and let the user schedule them — do not fold them into the current change.
+- Do not commit unless explicitly asked.

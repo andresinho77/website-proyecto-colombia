@@ -110,3 +110,19 @@
 ## Pending — repo hygiene
 - `.nvmrc` pins Node 24 (used by frontend-ci.yml and deploy.yml via `node-version-file`), but local
   Node is v22.22.3. Not the cause of bug-002, but a real local/CI parity gap worth closing.
+
+## Decision Log — 2026-08-18 (Security Finding 1)
+- Secrets get NO default anywhere in the deployed path. `admin_secret_key` is declared in Terraform
+  without a default so a missing value fails `plan`, and the backend throws at cold start rather than
+  degrading to a known key. Chosen over a "safe default" because the review proved prod had been
+  running on the published fallback for real.
+- A single local-only constant (`LOCAL_DEV_ADMIN_KEY`) is kept for dev ergonomics, but the backend
+  explicitly REJECTS it when `isLocal === false`, so it can never become a production credential.
+- Secrets reach prod via `TF_VAR_admin_secret_key` from GitHub Secrets, never via committed
+  `*.tfvars`. `environments/prod.tfvars` must stay free of secret values; local/dev tfvars are
+  LocalStack-only (`use_localstack = true`) so their values are not credentials.
+
+## Do-Not-Repeat — 2026-08-18 (cont.)
+- Before making an env var required/fail-loud in the backend, CHECK that the infra actually supplies
+  it. `lambda.tf` did not set `ADMIN_SECRET_KEY` at all — shipping the fail-loud change alone would
+  have broken the deploy on the next apply.

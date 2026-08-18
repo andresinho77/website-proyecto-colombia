@@ -95,3 +95,18 @@
   This is a safety net (dummy `test` creds never reach prod) but produces confusing errors.
 - Terraform aborts an `apply` at state-lock acquisition, before reading state, refreshing, or
   planning — a lock failure therefore cannot have mutated remote state or real resources.
+
+## Key Learnings — npm / CI (2026-08-18)
+- `npm ci` "Missing: X from lock file" is usually a hoisted **peer dependency** that npm auto-installs
+  but that was never materialized at the lockfile root. Nested copies of the same package under another
+  dependency do NOT satisfy it. Repair with `npm install --package-lock-only` and check the diff is
+  additive only.
+- Before blaming an npm/Node version mismatch for a CI-only failure, reproduce locally with the CI's
+  npm (`npx npm@<major> ci --dry-run`). Here both npm 10 and 11 failed identically — the lockfile was
+  simply stale, and the version theory would have been wrong.
+- `npm ci --dry-run` validates lockfile sync without touching node_modules — the safe way to test a
+  lockfile fix.
+
+## Pending — repo hygiene
+- `.nvmrc` pins Node 24 (used by frontend-ci.yml and deploy.yml via `node-version-file`), but local
+  Node is v22.22.3. Not the cause of bug-002, but a real local/CI parity gap worth closing.

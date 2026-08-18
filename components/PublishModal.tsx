@@ -6,8 +6,9 @@ import { ListingType, Listing } from '../lib/types';
 import { createListing } from '../lib/api';
 import { saveMyListing } from '../lib/localStorage';
 import { ImageUploader } from './ImageUploader';
-import { CITIES } from '../lib/cities';
+import { LocationCombobox } from './LocationCombobox';
 import { getZonesForCityName } from '../lib/zones';
+import { findLocationByLegacyCity, LocationCity } from '../lib/locations';
 
 interface PublishModalProps {
   isOpen: boolean;
@@ -27,8 +28,12 @@ export const PublishModal: React.FC<PublishModalProps> = ({
   defaultCiudad,
   onSuccessPublished,
 }) => {
+  const initialLoc = findLocationByLegacyCity(defaultCiudad || 'pereira');
   const [tipo, setTipo] = useState<ListingType>(defaultTipo);
-  const [ciudad, setCiudad] = useState(defaultCiudad || CITIES[0].name);
+  const [ciudad, setCiudad] = useState(initialLoc?.name || 'Pereira');
+  const [ciudadSlug, setCiudadSlug] = useState(initialLoc?.slug || 'pereira');
+  const [departamento, setDepartamento] = useState(initialLoc?.departmentName || 'Risaralda');
+  const [departamentoSlug, setDepartamentoSlug] = useState(initialLoc?.departmentSlug || 'risaralda');
   const [zona, setZona] = useState('');
   const [barrio, setBarrio] = useState('');
   const [personas, setPersonas] = useState(2);
@@ -52,8 +57,12 @@ export const PublishModal: React.FC<PublishModalProps> = ({
   // draft must not leak into the next publish flow.
   useEffect(() => {
     if (!isOpen) return;
+    const loc = findLocationByLegacyCity(defaultCiudad || 'pereira');
     setTipo(defaultTipo);
-    setCiudad(defaultCiudad || CITIES[0].name);
+    setCiudad(loc?.name || 'Pereira');
+    setCiudadSlug(loc?.slug || 'pereira');
+    setDepartamento(loc?.departmentName || 'Risaralda');
+    setDepartamentoSlug(loc?.departmentSlug || 'risaralda');
     setZona('');
     setBarrio('');
     setPersonas(2);
@@ -131,6 +140,9 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     const res = await createListing({
       tipo,
       ciudad,
+      ciudadSlug,
+      departamento,
+      departamentoSlug,
       zona,
       barrio: barrio.trim(),
       personas: Number(personas) || 1,
@@ -235,25 +247,24 @@ export const PublishModal: React.FC<PublishModalProps> = ({
             </button>
           </div>
 
-          {/* Ciudad, Zona & Barrio */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Ciudad *
-              </label>
-              <select
-                value={ciudad}
-                onChange={(e) => setCiudad(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
-              >
-                {CITIES.map((c) => (
-                  <option key={c.slug} value={c.name}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Ciudad / Ubicación */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Ciudad / Municipio (Colombia) *
+            </label>
+            <LocationCombobox
+              value={ciudad}
+              onChange={(loc) => {
+                setCiudad(loc.name);
+                setCiudadSlug(loc.slug);
+                setDepartamento(loc.departmentName);
+                setDepartamentoSlug(loc.departmentSlug);
+              }}
+            />
+          </div>
 
+          {/* Zona & Barrio */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
                 Zona *
@@ -273,6 +284,19 @@ export const PublishModal: React.FC<PublishModalProps> = ({
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Barrio / Sector (opcional)
+              </label>
+              <input
+                type="text"
+                placeholder="Ej: Circunvalar, Cuba..."
+                value={barrio}
+                onChange={(e) => setBarrio(e.target.value)}
+                className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none placeholder-slate-500"
+              />
             </div>
           </div>
 

@@ -6,11 +6,26 @@ import { PlusCircle, Search, ShieldAlert, HeartHandshake } from 'lucide-react';
 import { CitySwitcher } from './CitySwitcher';
 
 interface NavbarProps {
-  currentCitySlug: string;
+  currentCitySlug?: string;
+  currentDeptSlug?: string;
+  isDepartmentFeed?: boolean;
+  isNationalFeed?: boolean;
   onOpenPublish?: (defaultTipo?: 'ofrezco' | 'necesito') => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentCitySlug, onOpenPublish }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  currentCitySlug = 'pereira',
+  currentDeptSlug,
+  isDepartmentFeed = false,
+  isNationalFeed = false,
+  onOpenPublish,
+}) => {
+  const homeHref = isNationalFeed
+    ? '/'
+    : isDepartmentFeed && currentDeptSlug
+    ? `/departamento/${currentDeptSlug}/`
+    : `/${currentCitySlug}/`;
+
   return (
     <header className="sticky top-0 z-40 glass-nav w-full">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -18,27 +33,38 @@ export const Navbar: React.FC<NavbarProps> = ({ currentCitySlug, onOpenPublish }
 
           {/* Logo, Title & City Switcher */}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 sm:flex-none">
-            <Link href={`/${currentCitySlug}/`} className="flex items-center flex-shrink-0 group">
+            <Link href={homeHref} className="flex items-center flex-shrink-0 group">
               <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-700 flex items-center justify-center">
                 <HeartHandshake className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
             </Link>
 
-            {/* Mobile/tablet: the city itself is the primary identity — kept
-                through md: since sm:-only widths (e.g. ~712px) don't have
-                room for the full title + chip alongside nav labels */}
-            <CitySwitcher currentSlug={currentCitySlug} variant="title" className="md:hidden min-w-0" />
+            {/* Mobile/tablet: current location is the primary identity */}
+            <CitySwitcher
+              currentSlug={currentCitySlug}
+              currentDeptSlug={currentDeptSlug}
+              isDepartmentMode={isDepartmentFeed}
+              isNationalMode={isNationalFeed}
+              variant="title"
+              className="md:hidden min-w-0"
+            />
 
-            {/* Desktop: full app name + a city chip alongside it */}
+            {/* Desktop: full app name + a city/dept chip alongside it */}
             <div className="hidden md:block min-w-0">
               <span className="flex items-center gap-2">
                 <Link
-                  href={`/${currentCitySlug}/`}
+                  href={homeHref}
                   className="font-display font-semibold text-xl tracking-tight text-slate-100 truncate"
                 >
                   Alojamiento Solidario
                 </Link>
-                <CitySwitcher currentSlug={currentCitySlug} variant="chip" />
+                <CitySwitcher
+                  currentSlug={currentCitySlug}
+                  currentDeptSlug={currentDeptSlug}
+                  isDepartmentMode={isDepartmentFeed}
+                  isNationalMode={isNationalFeed}
+                  variant="chip"
+                />
               </span>
             </div>
           </div>
@@ -46,7 +72,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentCitySlug, onOpenPublish }
           {/* Persistent Header Navigation (US-1.2) */}
           <nav className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">
             <Link
-              href={`/${currentCitySlug}/#feed`}
+              href={`${homeHref}#feed`}
               className="touch-target px-2.5 sm:px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-slate-100 hover:bg-slate-800/60 flex items-center justify-center gap-1.5 transition-colors"
             >
               <Search className="w-4 h-4 text-emerald-700" />

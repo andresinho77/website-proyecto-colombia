@@ -1,49 +1,4 @@
-/**
- * Temporary frontend-only macro-zone catalog (US-4.4).
- *
- * This is a stand-in for the real catalog that will eventually come from
- * the backend (see ROADMAP.md US-4.4 — "Api listo" conversation with infra
- * 2026-08-17: the catalog is expected to be exposed via the API once the
- * contract is confirmed). Until then, this file lets the product be
- * developed and demoed against a short, sane list of areas per city
- * instead of free text — deliberately **macro-zones** (Norte/Sur/Centro/...
- * or a handful of named districts), not individual barrios: a real barrio
- * list would run into the hundreds per city (Pereira alone has ~419 across
- * 19 comunas, Cali ~335 across 22) and stop being a usable filter.
- *
- * Colombian cities do NOT share one classification scheme, so each city
- * below uses whatever real system its own planning office/community
- * actually uses instead of forcing a uniform Norte/Sur/Centro grid:
- *
- * - **Cali**: official geographic zones from the Alcaldía's IDESC map
- *   (Planeación Municipal — "Mapa de Zonas Geográficas"), 6 zones: Norte,
- *   Oriente, Sur, Centro, Ladera, Oeste. This grouping is explicitly
- *   informal per the source itself ("no está respaldada por documento
- *   normativo alguno") but is the one the city and its citizens actually
- *   use day to day.
- * - **Manizales** and **Armenia**: no informal cardinal grouping in common
- *   use — their real subdivision is a small number of *named* comunas
- *   (11 and 10 respectively, fixed by municipal acuerdo/decreto), so those
- *   comuna names are used directly as the "zona" options.
- * - **Quibdó**: 6 official comunas, each already named with a cardinal or
- *   descriptive label (Comuna 1 = "Zona Norte", Comuna 5 = "Medrano y Zona
- *   Sur", etc.) — used as-is.
- * - **Pereira**: no single official geographic-zone map was found (its 19
- *   comunas don't carry cardinal names); Norte/Sur/Centro/Oriente/Occidente
- *   here reflect the informal grouping real-estate sites and residents use
- *   in practice (Cuba/Kennedy → sur, Pinares/Circunvalar → oriente,
- *   Cerritos/vía a Cartago → occidente, Boston/Centro → centro), not a
- *   government-published map.
- * - **Condoto** and **Istmina**: small towns without meaningful sub-city
- *   zoning at all — a single "Centro / Casco urbano" option.
- *
- * IMPORTANT: like any AI-assisted catalog, this needs a manual pass by
- * someone from each city before it's treated as authoritative — see
- * US-4.4's acceptance criteria in ROADMAP.md. Pereira's and Cali's "Ladera"
- * groupings in particular are approximate.
- */
-
-import { CITIES } from './cities';
+import { normalizeSlug } from './locations';
 
 export const ZONES_BY_CITY_SLUG: Record<string, string[]> = {
   pereira: ['Centro', 'Norte', 'Sur', 'Oriente', 'Occidente'],
@@ -81,13 +36,63 @@ export const ZONES_BY_CITY_SLUG: Record<string, string[]> = {
     'Los Fundadores',
     'Quimbaya',
   ],
-  condoto: ['Centro / Casco urbano'],
-  istmina: ['Centro / Casco urbano'],
+  bogota: [
+    'Usaquén',
+    'Chapinero',
+    'Santa Fe',
+    'San Cristóbal',
+    'Usme',
+    'Tunjuelito',
+    'Bosa',
+    'Kennedy',
+    'Fontibón',
+    'Engativá',
+    'Suba',
+    'Barrios Unidos',
+    'Teusaquillo',
+    'Los Mártires',
+    'Antonio Nariño',
+    'Puente Aranda',
+    'La Candelaria',
+    'Rafael Uribe Uribe',
+    'Ciudad Bolívar',
+    'Sumapaz',
+  ],
+  medellin: [
+    'Popular',
+    'Santa Cruz',
+    'Manrique',
+    'Aranjuez',
+    'Castilla',
+    'Doce de Octubre',
+    'Robledo',
+    'Villa Hermosa',
+    'Buenos Aires',
+    'La Candelaria (Centro)',
+    'Laureles-Estadio',
+    'La América',
+    'San Javier',
+    'El Poblado',
+    'Guayabal',
+    'Belén',
+  ],
+  condoto: ['Centro / Casco urbano', 'Zona Rural / Veredal'],
+  istmina: ['Centro / Casco urbano', 'Zona Rural / Veredal'],
 };
 
-/** Zones for a city, looked up by its display name (matches `Listing.ciudad`/`FilterState.ciudad`). */
+export const DEFAULT_FALLBACK_ZONES = [
+  'Centro / Casco urbano',
+  'Zona Norte',
+  'Zona Sur',
+  'Zona Oriente',
+  'Zona Occidente',
+  'Zona Rural / Vereda',
+];
+
+/** Zones for a city, looked up by its display name or slug */
 export function getZonesForCityName(cityName: string): string[] {
-  const city = CITIES.find((c) => c.name === cityName);
-  if (!city) return [];
-  return ZONES_BY_CITY_SLUG[city.slug] ?? [];
+  const norm = normalizeSlug(cityName || '');
+  const tailored = ZONES_BY_CITY_SLUG[norm];
+  if (tailored && tailored.length > 0) return tailored;
+  return DEFAULT_FALLBACK_ZONES;
 }

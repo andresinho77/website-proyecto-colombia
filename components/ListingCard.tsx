@@ -214,6 +214,8 @@ export const ListingCard: React.FC<ListingCardProps> = ({
             <img
               src={listing.imagenes![currentImgIndex]}
               alt={`Foto de espacio en ${location}`}
+              loading="lazy"
+              decoding="async"
               className="w-full h-full object-cover"
             />
 

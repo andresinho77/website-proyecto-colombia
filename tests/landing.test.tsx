@@ -16,7 +16,7 @@ vi.mock('../lib/api', async (importOriginal) => {
 
 describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   beforeEach(() => {
-    fetchListings.mockResolvedValue(listingsFixture);
+    fetchListings.mockResolvedValue({ items: listingsFixture, totalCount: 2 });
   });
 
   it('renderiza la estructura principal: banner, hero, feed y footer', async () => {
@@ -39,18 +39,21 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
       await screen.findByText(listingOfrezco.descripcion, { exact: false })
     ).toBeInTheDocument();
 
-    expect(fetchListings).toHaveBeenCalledWith({
-      ciudad: 'Pereira',
-      tipo: 'todos',
-      zona: '',
-      barrio: '',
-      maxPrecio: '',
-    });
+    expect(fetchListings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ciudad: 'Pereira',
+        ciudadSlug: 'pereira',
+        tipo: 'todos',
+        zona: '',
+        barrio: '',
+        maxPrecio: '',
+      })
+    );
     expect(screen.getByText('2 publicaciones')).toBeInTheDocument();
   });
 
   it('muestra el estado vacío del feed cuando la API no devuelve publicaciones', async () => {
-    fetchListings.mockResolvedValue([]);
+    fetchListings.mockResolvedValue({ items: [], totalCount: 0 });
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     expect(await screen.findByText('No se encontraron publicaciones')).toBeInTheDocument();
@@ -63,5 +66,22 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByText(/Marcar como Resuelta/i)).not.toBeInTheDocument();
+  });
+
+  it('pide todas las publicaciones a nivel nacional cuando isNationalFeed es true', async () => {
+    render(<CityFeedPage cityName="Colombia" isNationalFeed={true} />);
+
+    expect(
+      screen.getByRole('heading', { name: /Alojamientos solidarios en Colombia/i })
+    ).toBeInTheDocument();
+
+    expect(fetchListings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ciudad: '',
+        ciudadSlug: '',
+        departamento: '',
+        departamentoSlug: '',
+      })
+    );
   });
 });

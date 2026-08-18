@@ -5,6 +5,9 @@ export interface Listing {
   id: string;
   tipo: ListingType;
   ciudad: string;
+  ciudadSlug?: string;
+  departamento?: string;
+  departamentoSlug?: string;
   /** Macro-zone within the city (US-4.4), e.g. "Norte"/"Ladera"/a named comuna — drives fast filtering. */
   zona: string;
   /** Free-text specific neighborhood/sector, optional — for search, not filtering (see US-4.4 in ROADMAP.md). */
@@ -24,15 +27,29 @@ export interface Listing {
 
 export interface FilterState {
   ciudad: string;
+  ciudadSlug?: string;
+  departamento?: string;
+  departamentoSlug?: string;
   tipo: string;
   zona: string;
   barrio: string;
   maxPrecio: string;
+  limit?: number;
+  cursor?: string;
+}
+
+export interface PaginatedListings {
+  items: Listing[];
+  nextCursor?: string;
+  totalCount?: number;
 }
 
 export interface CreateListingInput {
   tipo: ListingType;
   ciudad: string;
+  ciudadSlug?: string;
+  departamento?: string;
+  departamentoSlug?: string;
   zona: string;
   barrio: string;
   personas: number;

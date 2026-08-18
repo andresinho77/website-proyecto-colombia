@@ -58,6 +58,17 @@ describe('ListingGrid (feed)', () => {
     expect(container.querySelectorAll('.animate-pulse')).toHaveLength(6);
     expect(screen.queryByText(listingOfrezco.descripcion, { exact: false })).not.toBeInTheDocument();
   });
+
+  it('muestra el botón "Cargar más publicaciones" cuando hasMore es true y llama onLoadMore al hacer clic', async () => {
+    const onLoadMore = vi.fn();
+    render(<ListingGrid listings={listingsFixture} hasMore={true} onLoadMore={onLoadMore} />);
+
+    const loadMoreBtn = screen.getByRole('button', { name: /Cargar más publicaciones/i });
+    expect(loadMoreBtn).toBeInTheDocument();
+
+    await userEvent.click(loadMoreBtn);
+    expect(onLoadMore).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('ListingCard contact reveal (US-6.5)', () => {

@@ -76,3 +76,22 @@
 - [2026-08-14] GitHub Pages approach removed entirely (workflow `deploy-pages` job + Pages artifact, ROADMAP references). Supersedes the 2026-08-13 dual-path decision. Entrega única: este repo hace build/type-check y expone el artefacto estático `out/`; el despliegue productivo (S3/CloudFront) lo hace `infra-proyecto-colombia`. `output: 'export'` en `next.config.mjs` se mantiene porque produce ese artefacto.
 - [2026-08-13] ~~Delivery split: this repo publishes a permanent public mock on GitHub Pages~~ — superseded 2026-08-14 (GitHub Pages removed). Production deployment path (S3/CloudFront and infra automation) is owned by `infra-proyecto-colombia`.
 - [2026-08-13] Documentation governance formalized: when docs disagree, `ROADMAP.md` prevails until reconciliation.
+
+## Do-Not-Repeat — 2026-08-18
+- `terraform init -backend=false` does NOT switch a project to local state. It only skips backend
+  initialization for that run; a backend already cached in `.terraform/terraform.tfstate` stays
+  active, and `-state=<file>` is then silently ignored. To genuinely force local state, write a
+  `*_override.tf` file with a `terraform { backend "local" { path = ... } }` block and pair it with
+  a separate `TF_DATA_DIR` so the real backend cache is not clobbered.
+- Never swallow `terraform init` output with `>/dev/null 2>&1 || true` in dev scripts — it hid the
+  backend misconfiguration until apply failed at lock acquisition.
+
+## Key Learnings — infra-proyecto-colombia
+- `provider.tf` hardcodes a prod S3 backend (`proyecto-colombia-prod-tfstate`, lock table
+  `proyecto-colombia-prod-tfstate-locks`); backend blocks cannot take variables, so any local
+  workflow must override it explicitly.
+- `start-local-dev.sh` exports `AWS_ENDPOINT_URL=http://localhost:4566` globally, which the S3
+  backend's AWS SDK honors too — so a remote backend will be redirected into LocalStack, not AWS.
+  This is a safety net (dummy `test` creds never reach prod) but produces confusing errors.
+- Terraform aborts an `apply` at state-lock acquisition, before reading state, refreshing, or
+  planning — a lock failure therefore cannot have mutated remote state or real resources.

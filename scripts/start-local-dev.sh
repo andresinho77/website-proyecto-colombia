@@ -10,6 +10,16 @@ echo "=========================================================="
 echo "🇨🇴 Alojamiento Solidario Colombia — LocalStack Dev Runner"
 echo "=========================================================="
 
+# LocalStack env vars, needed by Terraform, the seed script, and the
+# backend dev server — export before any of those run, not just before Next.js.
+export NEXT_PUBLIC_API_URL="http://localhost:4000/api/listings"
+export NEXT_PUBLIC_TURNSTILE_SITE_KEY="1x00000000000000000000AA"
+export AWS_ENDPOINT_URL="http://localhost:4566"
+export AWS_REGION="us-east-1"
+export AWS_ACCESS_KEY_ID="test"
+export AWS_SECRET_ACCESS_KEY="test"
+export USE_LOCALSTACK="true"
+
 # 1. Check Docker Daemon
 if ! docker info >/dev/null 2>&1; then
   echo "❌ Error: Docker daemon is not running. Please launch Docker Desktop and try again."
@@ -80,11 +90,4 @@ sleep 2
 # 7. Start Next.js Development Server on port 3000
 echo "🚀 Starting Next.js website on http://localhost:3000..."
 cd "$WEBSITE_DIR"
-export NEXT_PUBLIC_API_URL="http://localhost:4000/api/listings"
-export NEXT_PUBLIC_TURNSTILE_SITE_KEY="1x00000000000000000000AA"
-export AWS_ENDPOINT_URL="http://localhost:4566"
-export AWS_REGION="us-east-1"
-export AWS_ACCESS_KEY_ID="test"
-export AWS_SECRET_ACCESS_KEY="test"
-export USE_LOCALSTACK="true"
 npx next dev

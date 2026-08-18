@@ -60,7 +60,8 @@ export function useInvisibleTurnstile() {
         if (cancelled || !window.turnstile || !containerRef.current) return;
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: TURNSTILE_SITE_KEY,
-          size: 'invisible',
+          size: 'normal',
+          appearance: 'interaction-only',
           retry: 'auto',
           callback: (t: string) => setToken(t),
           'expired-callback': () => setToken(null),
@@ -91,4 +92,8 @@ export function useInvisibleTurnstile() {
 
 export const TurnstileContainer: React.FC<{ containerRef: React.RefObject<HTMLDivElement> }> = ({
   containerRef,
-}) => <div ref={containerRef} className="hidden" aria-hidden="true" />;
+}) => (
+  // Cloudflare warns display:none containers can break widget rendering, so
+  // this is positioned off-screen rather than hidden via `hidden`/display:none.
+  <div ref={containerRef} className="absolute -left-[9999px] top-0" aria-hidden="true" />
+);

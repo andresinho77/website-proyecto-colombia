@@ -98,6 +98,7 @@
 ## scripts/
 
 - `local-server.mjs` — Declares PORT (~348 tok)
+- `stop-local-dev.sh` — Kills whatever `start-local-dev.sh` left running: processes on ports 3000/4000 (Next.js, Fastify/tsx backend) and the `proyecto-colombia-localstack` docker container. Run via `npm run dev:stopLocal`. (~250 tok)
 
 ## tests/
 

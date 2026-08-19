@@ -379,7 +379,7 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   propio autor la retire del feed activo.
 - [⬜] **US-6.4**: Como administrador, recibo un resumen diario por SES con el
   número de publicaciones activas, resueltas y reportadas por ciudad.
-- [🟡] **US-6.5**: Como usuario, mi número de WhatsApp no queda expuesto de forma
+- [✅] **US-6.5**: Como usuario, mi número de WhatsApp no queda expuesto de forma
   reutilizable a terceros que solo navegan el feed masivamente para recolectar
   números — más allá de la mitigación ya existente en US-4.1 (no aparece en
   HTML crudo salvo dentro del enlace `wa.me`).
@@ -469,11 +469,29 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     redirige a la URL de `wa.me` correcta al resolver; el error se muestra y
     la pestaña pendiente se cierra si `getContactLink` falla). 13/13 tests
     verdes, `npm run validate` limpio.
-  - Queda 🟡 (no ✅) porque falta que el backend implemente el endpoint real
-    y el rate-limit/validación de Turnstile server-side, y porque en el
-    frontend sigue pendiente el fix de `getContactLink` para que también
-    caiga al fallback offline ante una respuesta HTTP de error (no solo
-    fallo de red) — ver nota arriba.
+  - *Cierre (2026-08-19)*: el endpoint real `POST /listings/{id}/contact`
+    quedó implementado en `backend-proyecto-colombia`
+    (`src/services/listing.service.ts#revealContact`,
+    `src/controllers/listing.controller.ts#revealContact`, ruta en
+    `src/handlers/listings.ts`) — valida el Turnstile token cuando se
+    provee (sin bloquear si falta), devuelve 404 si el aviso no existe o
+    está `eliminado`, y el `GET /listings` público deja de devolver el
+    número crudo: `getPaginatedActiveListings` enmascara `whatsapp` con
+    `maskWhatsapp` (`+57******0123`) antes de responder, reutilizando el
+    mismo helper que ya protegía la vista de moderación (`list_all`/
+    `reveal_contact` del admin, aportado por el colega en
+    `fd3baeb`/`src/utils/redact.ts`). El fix de `getContactLink` (bug-014)
+    también se aplicó: ahora distingue 404 real (definitivo, no cae al
+    fallback) de cualquier otro error HTTP (cae al fallback offline, igual
+    que `fetchListings`). 59/59 tests de backend y 26/26 de frontend
+    verdes; `npm run validate` limpio en ambos repos.
+  - *Pendiente, fuera de alcance de esta sesión*: rate-limit por IP en
+    `POST /listings/{id}/contact` no está implementado en código de
+    aplicación — la ruta recomendada es un usage plan/throttling a nivel
+    de API Gateway en el repo de infraestructura (Terraform), no lógica en
+    el Lambda. Documentado en `openapi.yaml` de `backend-proyecto-colombia`
+    como nota de la operación.
+  - Pasa de 🟡 a ✅.
 
 ### Épica 7 — Política de datos y cumplimiento (Habeas Data)
 - [✅] **US-7.1**: Como usuario, puedo leer una política de datos clara (modal

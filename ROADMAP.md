@@ -166,6 +166,41 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
   - *Criterios de aceptación*: texto en español; accesible desde móvil (responsive,
     botones táctiles ≥44px); los botones comunican claramente si abren el feed o el
     formulario de publicación.
+  - *Rediseño (2026-08-21)*: `components/HeroButtons.tsx` (el hero de ancho
+    completo) se eliminó a favor de `components/IntentNavBar.tsx` — pedido
+    del mantenedor tras cerrar US-4.5: con el tab-nav Todos/Necesito/Ofrezco
+    ya persistente, el hero grande quedaba redundante y no sobrevivía al
+    scroll. Patrón elegido (de 4 opciones evaluadas): un solo bar
+    `sticky top-16/20` justo debajo del Navbar, con el tab-nav a la
+    izquierda (ahora estilo segmented pill, no underline) y un botón "+"
+    contextual a la derecha — idioma de Reminders/Todoist ("una lista, una
+    acción de agregar"), no un botón "+" por pestaña (más simple en touch,
+    evita doble target anidado). El "+" publica directo con el `intentTipo`
+    activo cuando hay uno; en "Todos" abre un popover de 2 opciones
+    (Necesito/Ofrezco) antes de abrir el modal, restituyendo la
+    desambiguación que daba el hero viejo. Cobertura nueva en
+    `tests/intent-nav-bar.test.tsx` (4 casos).
+  - *Limpieza del Navbar (2026-08-21, misma sesión)*: el mantenedor notó que
+    el botón "Publicar Espacio" y el enlace "Feed de Alojamientos" del
+    `Navbar` quedaron redundantes con `IntentNavBar` (su "+" ya cubre
+    publicar, sus tabs ya cubren navegar al feed) — ambos se eliminaron de
+    `components/Navbar.tsx` junto con la prop `onOpenPublish` que ya no se
+    usa.
+  - *Bug encontrado y corregido en el mismo pase*: publicar desde una página
+    de departamento (p. ej. `/departamento/atlantico/necesito/`) preseleccionaba
+    "Pereira (Risaralda)" en el modal — `PublishModal` solo recibía
+    `defaultCiudad` en rutas de ciudad, así que en cualquier feed de
+    departamento/nacional caía siempre al hardcode de Pereira sin importar el
+    departamento real. `components/PublishModal.tsx` gana
+    `defaultDepartmentSlug` + `resolveDefaultLocation()`: usa `defaultCiudad`
+    si resuelve, si no busca una ciudad real de ese departamento (prioriza
+    `isPriority`, vía `getCitiesByDepartment` de `lib/locations.ts`), y solo
+    cae a Pereira cuando no hay ninguna pista de ubicación (nacional puro).
+    Cobertura nueva en `tests/publish-modal.test.tsx` (3 casos).
+  - 35/35 tests verdes (typecheck/lint limpios); `npm run build:local` aún
+    no re-corrido esta sesión — ver nota de proceso en `.wolf/buglog.json`
+    bug-015 sobre no correr build mientras el dev server del usuario está
+    activo.
 - [✅] **US-1.2**: Como usuario, puedo navegar al feed de publicaciones desde cualquier
   página vía un enlace persistente en el header.
 - [✅] **US-1.3**: Como usuario, veo un enlace visible a la política de datos

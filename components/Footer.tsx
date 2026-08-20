@@ -4,17 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { HeartHandshake, ShieldCheck, ExternalLink } from 'lucide-react';
 
-interface FooterProps {
-  onOpenPrivacy?: () => void;
-}
-
 const OFFICIAL_CHANNELS = [
   { label: 'Cruz Roja Colombiana', href: 'https://www.cruzrojacolombiana.org/' },
   { label: 'UNGRD', href: 'https://www.gestiondelriesgo.gov.co/' },
   { label: 'Canales oficiales de alcaldías (gov.co)', href: 'https://www.gov.co/' },
 ];
 
-export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
+export const Footer: React.FC = () => {
   return (
     <footer className="border-t border-slate-800 bg-slate-950 py-10 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -35,23 +31,21 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-slate-300 font-medium">
-            <Link href="/#feed" className="hover:text-emerald-700 transition-colors">
-              Ver Feed Publicaciones
-            </Link>
+            {/* "Ver Feed Publicaciones" removed (2026-08-21): redundant with
+                IntentNavBar, whose tabs already put the feed one click away
+                on every page — same reasoning as dropping it from Navbar. */}
 
+            {/* Single privacy entry point (2026-08-21): this used to sit
+                alongside a "Política de Privacidad" button that opened
+                PrivacyPolicyModal — a near-duplicate of this same page with
+                slightly different wording. The modal is retired; its one
+                unique section (§5, security/no-commercialization) was
+                merged into this page instead of keeping two surfaces to
+                keep aligned. */}
             <Link href="/terminos-y-privacidad" className="hover:text-emerald-700 transition-colors flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-              Ley 1581 Habeas Data
+              Política de Privacidad / Habeas Data
             </Link>
-
-            {onOpenPrivacy && (
-              <button
-                onClick={onOpenPrivacy}
-                className="hover:text-emerald-700 transition-colors underline"
-              >
-                Política de Privacidad
-              </button>
-            )}
           </div>
         </div>
 

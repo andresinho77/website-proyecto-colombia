@@ -1,15 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import Link from 'next/link';
 import { Navbar } from './Navbar';
 import { EmergencyBanner } from './EmergencyBanner';
-import { HeroButtons } from './HeroButtons';
+import { IntentNavBar } from './IntentNavBar';
 import { SearchFilters } from './SearchFilters';
 import { ListingGrid } from './ListingGrid';
 import { PublishModal } from './PublishModal';
 import { ShareModal } from './ShareModal';
-import { PrivacyPolicyModal } from './PrivacyPolicyModal';
 import { Footer } from './Footer';
 import { useInvisibleTurnstile, TurnstileContainer } from './Turnstile';
 import { Listing, FilterState, ListingType } from '../lib/types';
@@ -66,7 +64,6 @@ export default function CityFeedPage({
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [publishDefaultTipo, setPublishDefaultTipo] = useState<ListingType>(intentTipo || 'ofrezco');
   const [newlyCreatedListing, setNewlyCreatedListing] = useState<Listing | null>(null);
-  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   const loadListings = useCallback(async () => {
     setIsLoading(true);
@@ -109,11 +106,6 @@ export default function CityFeedPage({
   const handleOpenPublish = (defaultTipo: ListingType = 'ofrezco') => {
     setPublishDefaultTipo(defaultTipo);
     setIsPublishOpen(true);
-  };
-
-  const handleSelectHeroTipo = (tipo: ListingType) => {
-    setFilters((prev) => ({ ...prev, tipo }));
-    handleOpenPublish(tipo);
   };
 
   const handleFilterChange = (updated: Partial<FilterState>) => {
@@ -161,6 +153,15 @@ export default function CityFeedPage({
     return sorted;
   }, [listings, filters.sortBy]);
 
+  // Shared by IntentNavBar for the Todos/Necesito/Ofrezco tab hrefs.
+  const basePath = isNationalFeed
+    ? '/'
+    : isDepartmentFeed && departmentSlug
+    ? `/departamento/${departmentSlug}/`
+    : citySlug
+    ? `/${citySlug}/`
+    : null;
+
   const placeText = isNationalFeed
     ? 'Colombia'
     : isDepartmentFeed
@@ -197,11 +198,19 @@ export default function CityFeedPage({
           currentDeptSlug={departmentSlug}
           isDepartmentFeed={isDepartmentFeed}
           isNationalFeed={isNationalFeed}
-          onOpenPublish={() => handleOpenPublish(intentTipo || 'ofrezco')}
         />
 
-        {/* Main Hero Section (US-1.1: 2 large buttons <2s load) */}
-        <HeroButtons onSelectTipo={handleSelectHeroTipo} />
+        {/* Intent Nav Bar (US-4.5) — replaces the old full-width hero
+            (components/HeroButtons.tsx, removed): persistent Todos/Necesito/
+            Ofrezco tabs + contextual "+" publish action, first element under
+            the Navbar across all three location levels. */}
+        {basePath && (
+          <IntentNavBar
+            basePath={basePath}
+            intentTipo={intentTipo}
+            onOpenPublish={handleOpenPublish}
+          />
+        )}
 
         {/* Listings Feed Section */}
         <main id="feed" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 scroll-mt-16 sm:scroll-mt-20">
@@ -215,43 +224,6 @@ export default function CityFeedPage({
               </p>
             </div>
           </div>
-
-          {/* Intent Tabs (US-4.5) — dedicated Necesito/Ofrezco journeys at
-              all three location levels (city, department, national), each
-              reusing this same component with a fixed intentTipo. */}
-          {(() => {
-            const basePath = isNationalFeed
-              ? '/'
-              : isDepartmentFeed && departmentSlug
-              ? `/departamento/${departmentSlug}/`
-              : citySlug
-              ? `/${citySlug}/`
-              : null;
-            if (!basePath) return null;
-            return (
-              <div role="tablist" aria-label="Tipo de búsqueda" className="flex gap-2 mb-6 border-b border-slate-800">
-                {[
-                  { href: basePath, label: 'Todos', active: !intentTipo },
-                  { href: `${basePath}necesito/`, label: 'Necesito alojamiento', active: intentTipo === 'necesito' },
-                  { href: `${basePath}ofrezco/`, label: 'Tengo espacio', active: intentTipo === 'ofrezco' },
-                ].map((tab) => (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  role="tab"
-                  aria-selected={tab.active}
-                  className={`touch-target px-3 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors ${
-                    tab.active
-                      ? 'border-emerald-500 text-emerald-300'
-                      : 'border-transparent text-slate-400 hover:text-slate-200'
-                  }`}
-                  >
-                    {tab.label}
-                  </Link>
-                ))}
-              </div>
-            );
-          })()}
 
           {/* Search & Filter Component (US-4.1, US-4.2, US-4.7) */}
           <SearchFilters
@@ -282,14 +254,15 @@ export default function CityFeedPage({
       <TurnstileContainer containerRef={turnstileRef} />
 
       {/* Footer */}
-      <Footer onOpenPrivacy={() => setIsPrivacyOpen(true)} />
+      <Footer />
 
       {/* Publish Modal (<60s Flow - US-2.1 & US-3.1) */}
       <PublishModal
         isOpen={isPublishOpen}
         onClose={() => setIsPublishOpen(false)}
         defaultTipo={publishDefaultTipo}
-        defaultCiudad={cityName || (departmentName ? undefined : 'Pereira')}
+        defaultCiudad={cityName}
+        defaultDepartmentSlug={departmentSlug}
         onSuccessPublished={handleSuccessPublished}
       />
 
@@ -297,12 +270,6 @@ export default function CityFeedPage({
       <ShareModal
         listing={newlyCreatedListing}
         onClose={() => setNewlyCreatedListing(null)}
-      />
-
-      {/* Privacy Policy / Habeas Data Modal (Ley 1581) */}
-      <PrivacyPolicyModal
-        isOpen={isPrivacyOpen}
-        onClose={() => setIsPrivacyOpen(false)}
       />
     </div>
   );

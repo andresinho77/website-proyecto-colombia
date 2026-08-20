@@ -104,7 +104,15 @@ const config: Config = {
         accent: {
           amber: themed('accent-amber'),
           blue: themed('accent-blue'),
-        }
+        },
+        // WhatsApp brand green — a different hue register than `emerald`,
+        // used only for the "Contactar por WhatsApp" action so it isn't
+        // confused with the "Ofrezco" journey's emerald affordance.
+        whatsapp: {
+          500: themed('whatsapp-500'),
+          600: themed('whatsapp-600'),
+          700: themed('whatsapp-700'),
+        },
       },
     },
   },

@@ -63,6 +63,16 @@
   --color-accent-amber: 247 167 33;
   --color-accent-blue: 0 116 228;
 
+  /* WhatsApp brand green (#25D366 family) — deliberately a different hue
+     register than --color-emerald-*, used ONLY for the "Contactar por
+     WhatsApp" action so it doesn't read as the same affordance as the
+     "Ofrezco"/emerald journey color (see ListingCard.tsx). Fixed across
+     light/dark like the other brand accents (rose/emerald/amber) — not
+     re-declared under the dark media query below. */
+  --color-whatsapp-500: 37 211 102;
+  --color-whatsapp-600: 29 168 81;
+  --color-whatsapp-700: 21 140 66;
+
   --glass-card-bg: 255 255 255 / 0.72;
   --glass-nav-bg: 255 255 255 / 0.8;
   --glass-border: 20 20 26 / 0.06;

@@ -1,19 +1,54 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Navbar } from '../../components/Navbar';
 import { Footer } from '../../components/Footer';
-import { DEFAULT_CITY } from '../../lib/cities';
+import { DEFAULT_CITY, PREFERRED_CITY_STORAGE_KEY, getCityBySlug } from '../../lib/cities';
 import { ShieldCheck, ArrowLeft } from 'lucide-react';
 
 export default function TerminosYPrivacidadPage() {
+  const router = useRouter();
+
+  // Bug fix (2026-08-21): this page always sent "Volver al Inicio" (and the
+  // Navbar's city chip) to DEFAULT_CITY, regardless of which city/department
+  // the user was actually browsing before clicking here — e.g. arriving from
+  // Medellín's feed still landed you back on Pereira/whatever DEFAULT_CITY
+  // is. Fall back to the last city remembered by CitySwitcher
+  // (PREFERRED_CITY_STORAGE_KEY) instead of a hardcoded default; read after
+  // mount since localStorage isn't available during SSR.
+  const [homeCitySlug, setHomeCitySlug] = useState(DEFAULT_CITY.slug);
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(PREFERRED_CITY_STORAGE_KEY);
+      if (saved && getCityBySlug(saved)) setHomeCitySlug(saved);
+    } catch {
+      // ignore — keep DEFAULT_CITY fallback
+    }
+  }, []);
+
+  // Prefer real browser back navigation (returns to the exact previous page —
+  // including a department/national feed, which the remembered city slug
+  // can't represent) when this tab actually has history to go back to;
+  // otherwise fall back to the remembered city's feed. The <Link href> below
+  // still points at that same fallback for no-JS/middle-click.
+  const handleBack = (e: React.MouseEvent) => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      e.preventDefault();
+      router.back();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between">
       <div>
-        <Navbar currentCitySlug={DEFAULT_CITY.slug} />
+        <Navbar currentCitySlug={homeCitySlug} />
 
         <main className="max-w-4xl mx-auto px-4 py-12">
           <Link
-            href={`/${DEFAULT_CITY.slug}/`}
+            href={`/${homeCitySlug}/`}
+            onClick={handleBack}
             className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-700 hover:underline mb-6"
           >
             <ArrowLeft className="w-4 h-4" /> Volver al Inicio
@@ -74,6 +109,15 @@ export default function TerminosYPrivacidadPage() {
                     pendiente-definir@alojamientosolidario.co
                   </a>{' '}
                   — canal oficial de solicitudes de datos personales, en proceso de habilitación. Confirmamos la recepción en máximo 24 horas y resolvemos en máximo 5 días hábiles.
+                </p>
+              </section>
+
+              <section className="space-y-2">
+                <h2 className="text-base font-bold text-slate-100">
+                  5. Seguridad y No Comercialización
+                </h2>
+                <p>
+                  Los datos recolectados no serán bajo ninguna circunstancia cedidos, comercializados ni utilizados para fines publicitarios o lucrativos.
                 </p>
               </section>
             </div>

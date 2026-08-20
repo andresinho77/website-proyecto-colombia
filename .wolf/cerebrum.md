@@ -139,6 +139,27 @@
   `CityFeedPage` tab-nav rewired from a fixed `/${citySlug}/` base path to one computed per level.
   Asking this up front (a single AskUserQuestion) would have avoided the rework.
 
+## Do-Not-Repeat — 2026-08-20
+- NEVER run `npm run build` / `npm run validate` while the user's `npm run dev` or `npm run
+  dev:local` server is active — both processes write to `.next/`, and a production build clobbers
+  the dev server's incremental webpack cache mid-flight. Symptom: dev server returns 500 with
+  `Cannot find module './XXX.js'` in `webpack-runtime.js`, browser shows a blank page. Fix is just
+  stopping the dev server, `rm -rf .next`, and restarting it — not an app bug (see bug-015 in
+  `.wolf/buglog.json`). Check `ps aux | grep "next dev"` (or ask the user) before running any
+  `build`/`validate` command; stick to `typecheck`/`lint`/`test` while a dev server might be up.
+
+## User Preferences — persistent nav affordances (2026-08-21)
+- User wants primary CTAs (e.g. "Necesito"/"Ofrezco" publish buttons) to survive scrolling and be
+  reachable from every tab/view, not confined to a one-time hero at the top of the page — led to
+  replacing `HeroButtons.tsx` with a `sticky` `IntentNavBar.tsx` under the Navbar. When proposing
+  UI placement changes, favor options that stay reachable during scroll/navigation over "first
+  element on page load" placements, and pitch >=3 concrete alternatives with tradeoffs (not just
+  one) before building — this user wants to choose, not be handed a single design.
+- When asked to combine navigation (tabs) and an action (open a modal) in one control, the user
+  responded well to being pointed at an established mobile idiom (iOS Reminders/Todoist: one list
+  of tabs + one contextual trailing "+" button) rather than a novel per-item design (a "+" nested
+  inside each tab) — prefer citing a recognizable native-app pattern over inventing a new one.
+
 ## Key Learnings — backend serialization boundary (2026-08-18)
 - The backend has NO serializer layer: controllers return `Listing` rows straight from DynamoDB.
   `src/utils/redact.ts` is the first such boundary — reuse and extend it rather than adding ad-hoc

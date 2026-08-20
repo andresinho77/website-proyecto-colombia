@@ -174,8 +174,21 @@ export const ListingCard: React.FC<ListingCardProps> = ({
                   : 'bg-rose-950 border border-rose-500/40 text-rose-300'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              {isOfrezco ? 'OFREZCO ALOJAMIENTO' : 'NECESITO ALOJAMIENTO'}
+              <Sparkles className="w-3.5 h-3.5 flex-shrink-0" />
+              {/* ListingGrid switches to a 3-column layout at `lg` (1024px),
+                  which briefly shrinks each card enough that the full label
+                  wraps to 2 lines until ~1134px, when columns regain enough
+                  width on their own. Rather than let it wrap (or truncate
+                  permanently), drop to the short label only in that pinch
+                  zone and restore the full one past it — mobile/tablet
+                  (<1024px, single/double column) always gets the full
+                  label. */}
+              <span className="lg:hidden min-[1134px]:inline whitespace-nowrap">
+                {isOfrezco ? 'OFREZCO ALOJAMIENTO' : 'NECESITO ALOJAMIENTO'}
+              </span>
+              <span className="hidden lg:inline min-[1134px]:hidden whitespace-nowrap">
+                {isOfrezco ? 'OFREZCO' : 'NECESITO'}
+              </span>
             </span>
 
             <span className="text-xs font-bold text-slate-300 bg-slate-900/90 border border-slate-700/60 px-2.5 py-1 rounded-lg">
@@ -265,7 +278,7 @@ export const ListingCard: React.FC<ListingCardProps> = ({
         <button
           onClick={handleContactClick}
           disabled={isContacting}
-          className="touch-target w-full py-2.5 rounded-xl bg-solidarity-600 hover:bg-solidarity-500 disabled:opacity-60 text-white font-bold text-sm shadow-md shadow-solidarity-950/50 flex items-center justify-center gap-2 transition-all"
+          className="touch-target w-full py-2.5 rounded-xl bg-whatsapp-600 hover:bg-whatsapp-500 disabled:opacity-60 text-white font-bold text-sm shadow-md shadow-whatsapp-700/40 flex items-center justify-center gap-2 transition-all"
         >
           <MessageSquare className="w-4 h-4" />
           {isContacting ? 'Abriendo WhatsApp…' : 'Contactar por WhatsApp (+57)'}

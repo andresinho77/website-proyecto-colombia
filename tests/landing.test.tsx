@@ -82,7 +82,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
     );
 
     const tabs = screen.getByRole('tablist', { name: /Tipo de búsqueda/i });
-    expect(within(tabs).getByRole('tab', { name: /Necesito alojamiento/i })).toHaveAttribute(
+    expect(within(tabs).getByRole('tab', { name: /^Necesito$/i })).toHaveAttribute(
       'aria-selected',
       'true'
     );

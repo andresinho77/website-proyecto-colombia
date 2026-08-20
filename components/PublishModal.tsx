@@ -8,7 +8,7 @@ import { saveMyListing } from '../lib/localStorage';
 import { ImageUploader } from './ImageUploader';
 import { LocationCombobox } from './LocationCombobox';
 import { getZonesForCityName } from '../lib/zones';
-import { findLocationByLegacyCity, LocationCity } from '../lib/locations';
+import { findLocationByLegacyCity, getCitiesByDepartment, LocationCity } from '../lib/locations';
 
 interface PublishModalProps {
   isOpen: boolean;
@@ -18,7 +18,32 @@ interface PublishModalProps {
    * editable, since a listing's city doesn't have to match the page it was
    * published from. */
   defaultCiudad?: string;
+  /** Department the modal was opened from, e.g. a department-level feed
+   * where there's no single defaultCiudad. Used to pick a city that's
+   * actually IN that department instead of silently falling back to
+   * Pereira/Risaralda regardless of context (bug found 2026-08-21). */
+  defaultDepartmentSlug?: string;
   onSuccessPublished: (listing: Listing) => void;
+}
+
+// Resolves the city to preselect: the explicit defaultCiudad if it maps to a
+// real location, else a city that actually belongs to defaultDepartmentSlug
+// (priority city first), else the Pereira/Risaralda fallback for contexts
+// with no location signal at all (e.g. the national feed).
+function resolveDefaultLocation(
+  defaultCiudad?: string,
+  defaultDepartmentSlug?: string
+): LocationCity | undefined {
+  const byCity = findLocationByLegacyCity(defaultCiudad || '');
+  if (byCity) return byCity;
+
+  if (defaultDepartmentSlug) {
+    const deptCities = getCitiesByDepartment(defaultDepartmentSlug);
+    const priorityCity = deptCities.find((c) => c.isPriority);
+    if (priorityCity || deptCities[0]) return priorityCity || deptCities[0];
+  }
+
+  return findLocationByLegacyCity('pereira');
 }
 
 export const PublishModal: React.FC<PublishModalProps> = ({
@@ -26,9 +51,10 @@ export const PublishModal: React.FC<PublishModalProps> = ({
   onClose,
   defaultTipo = 'ofrezco',
   defaultCiudad,
+  defaultDepartmentSlug,
   onSuccessPublished,
 }) => {
-  const initialLoc = findLocationByLegacyCity(defaultCiudad || 'pereira');
+  const initialLoc = resolveDefaultLocation(defaultCiudad, defaultDepartmentSlug);
   const [tipo, setTipo] = useState<ListingType>(defaultTipo);
   const [ciudad, setCiudad] = useState(initialLoc?.name || 'Pereira');
   const [ciudadSlug, setCiudadSlug] = useState(initialLoc?.slug || 'pereira');
@@ -57,7 +83,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
   // draft must not leak into the next publish flow.
   useEffect(() => {
     if (!isOpen) return;
-    const loc = findLocationByLegacyCity(defaultCiudad || 'pereira');
+    const loc = resolveDefaultLocation(defaultCiudad, defaultDepartmentSlug);
     setTipo(defaultTipo);
     setCiudad(loc?.name || 'Pereira');
     setCiudadSlug(loc?.slug || 'pereira');
@@ -77,7 +103,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     setHabeasData(true);
     setHoneypot('');
     setFormError(null);
-  }, [isOpen, defaultTipo, defaultCiudad]);
+  }, [isOpen, defaultTipo, defaultCiudad, defaultDepartmentSlug]);
 
   // The zone list is per-city (US-4.4) — a zone picked for one city (e.g.
   // "Ladera", Cali-only) isn't valid once the user switches to another, so

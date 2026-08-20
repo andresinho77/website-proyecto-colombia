@@ -160,6 +160,16 @@
   of tabs + one contextual trailing "+" button) rather than a novel per-item design (a "+" nested
   inside each tab) — prefer citing a recognizable native-app pattern over inventing a new one.
 
+## Do-Not-Repeat — 2026-08-21 (list scoping)
+- When the user gives a bulleted list and prefaces it with "make sure to track this... in
+  documentation," treat EVERY bullet as documentation/roadmap work by default — even if one bullet
+  reads like a direct code instruction ("please add an x button and add logic to..."). Started
+  implementing the EmergencyBanner dismiss/reopen feature for real (edited `EmergencyBanner.tsx`,
+  `Navbar.tsx`, `lib/localStorage.ts`) before the user interrupted to clarify the whole list was
+  meant for `ROADMAP.md` only, to build next time it's explicitly asked for. If a list mixes
+  phrasing that could be either doc-only or build-now, confirm scope before writing code rather
+  than assuming per-bullet intent from wording alone.
+
 ## Key Learnings — backend serialization boundary (2026-08-18)
 - The backend has NO serializer layer: controllers return `Listing` rows straight from DynamoDB.
   `src/utils/redact.ts` is the first such boundary — reuse and extend it rather than adding ad-hoc

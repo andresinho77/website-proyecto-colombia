@@ -30,6 +30,19 @@ y Armenia como siguientes.
 - Si existe contradicción entre documentos, **prevalece `ROADMAP.md`** hasta que
   se reconcilie el resto de la documentación.
 
+**Pendiente (pedido 2026-08-21, no ejecutado todavía):** correr una revisión
+de arquitectura con la skill/comando `.claude/commands/architecture-guardian.md`
+("Early-Stage Architecture Guardian" — enfoque *journeys-before-schema*: mapear
+los recorridos de usuario reales, extraer entidades/eventos, y solo entonces
+comparar contra el modelo de datos/API/rutas ya construidos) para encontrar
+brechas y áreas de mejora en el estado actual del repo (frontend + el
+contrato hacia `backend-proyecto-colombia`). El resultado de esa revisión
+debería producir (o alimentar) un `docs/architecture-foundation.md` con
+journeys, entidades/eventos, modelo de datos, contrato de API y mapa de
+rutas — separado de este `ROADMAP.md`, que sigue gobernando estado de
+épicas/dirección de producto, no el detalle de arquitectura. Invocar cuando
+el mantenedor lo pida explícitamente (`/architecture-guardian`).
+
 ---
 
 ## 2. Decisiones de arquitectura
@@ -229,6 +242,63 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     de `rgba()` fijos a las mismas variables. Verificado con capturas
     Playwright en `light`/`dark` `colorScheme` sobre landing, feed y footer;
     `npm run validate` verde.
+- [⬜] **US-1.5**: Como usuario, puedo cerrar el banner de "Líneas de atención
+  nacional de emergencia" con un botón "×", y el sitio recuerda que lo cerré
+  para no volver a mostrármelo en cada visita.
+  - *Origen*: pedido del mantenedor 2026-08-21.
+  - *Criterios*: botón "×" visible en `EmergencyBanner.tsx`; el cierre se
+    persiste (candidato: `lib/localStorage.ts`, mismo patrón que
+    `getMyListings`/`saveMyListing` — sin expiración forzada, ver nota de
+    diseño abajo); tras cerrar, aparece un ícono de teléfono junto al escudo
+    de Habeas Data en el `Navbar` — al hacer clic en ese ícono, el banner de
+    emergencia vuelve a aparecer (no borra el estado "cerrado" permanentemente,
+    solo lo reabre para esa sesión de navegación o hasta que el usuario lo
+    cierre de nuevo). El estado de cierre/reapertura debe compartirse entre
+    `EmergencyBanner` y `Navbar`, que son componentes hermanos bajo
+    `CityFeedPage` — vive mejor como estado levantado a `CityFeedPage` con
+    lectura inicial desde `localStorage` en un `useEffect` (no en el render
+    inicial, para evitar mismatch de hidratación SSR/CSR).
+  - *Nota de diseño*: sin expiración automática del "cerrado" — dado que
+    reabrir es un clic (el ícono de teléfono), no hay urgencia de forzar que
+    reaparezca solo; forzar reaparición periódica sin que el usuario lo pida
+    arriesga entrenar a la gente a ignorarlo aún más rápido.
+- [⬜] **US-1.6**: Como usuario, si visito una URL que no existe (404) o el
+  sitio encuentra un error inesperado (500), veo una página clara en vez de
+  un error crudo de Next.js o una pantalla en blanco.
+  - *Origen*: pedido explícito del mantenedor 2026-08-21 — "missing 404, 500
+    pages in the docs".
+  - *Criterios 404*: `app/not-found.tsx` con copy en español, acorde al tono
+    del resto del sitio (crisis/ayuda humanitaria — no un chiste ni un 404
+    genérico de plantilla), y un CTA claro de vuelta al feed (mismo patrón
+    de "recordar la última ciudad" ya resuelto para "Volver al Inicio" en
+    `app/terminos-y-privacidad/page.tsx`, reutilizable aquí).
+  - *Criterios 500 — REQUISITO DE SEGURIDAD, no negociable*: `app/error.tsx`
+    (Next.js error boundary) debe mostrar detalles técnicos/logs
+    desplazables **únicamente cuando `process.env.NODE_ENV !== 'production'`**
+    (o el flag equivalente que use el build de despliegue) — en producción,
+    el usuario ve solo un mensaje genérico sin stack trace, sin nombres de
+    archivo/función, sin variables de entorno ni ningún detalle interno.
+    Esto es exportación estática (`output: 'export'`, ver sección 2 de este
+    documento) servida desde S3/CloudFront, así que "modo dev" únicamente
+    puede resolverse en build-time (variable inyectada al bundle, igual que
+    `NEXT_PUBLIC_API_URL`), nunca en runtime — verificar explícitamente,
+    antes de cerrar esta historia, que un build de producción
+    (`npm run build` con env de prod) NO incluye el bloque de logs en el
+    bundle servido, no solo que esté oculto por CSS/condicional de UI (un
+    `display: none` no es suficiente; el contenido no debe existir en el
+    HTML/JS entregado al navegador). Candidato de verificación:
+    inspeccionar el `out/` generado y confirmar que ningún stack trace ni
+    ruta de archivo del servidor aparece en el HTML/JS estático.
+- [⬜] **US-1.7**: Como usuario en tema claro, el `Footer` se distingue
+  visualmente del fondo de la página en vez de casi fundirse con él.
+  - *Origen*: pedido explícito del mantenedor 2026-08-21 — "footer
+    background color in light mode needs a slightly different shade to
+    stand out a little bit more".
+  - *Criterios*: ajustar el fondo de `components/Footer.tsx` en modo claro
+    (probablemente un paso de `slate` ligeramente distinto al `bg-slate-950`
+    de la página, ver el sistema de variables CSS de US-1.4) sin romper el
+    contraste ya verificado en modo oscuro; validar con capturas Playwright
+    en ambos `colorScheme` antes de cerrar (mismo método usado en US-1.4).
 
 ### Épica 2 — Publicar oferta ("Tengo")
 - [✅] **US-2.1**: Como usuario con espacio disponible, completo un formulario corto
@@ -406,6 +476,53 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     volumen de publicaciones por ciudad crece.
   - Verificado con `npm run validate` (28/28 tests, incluye un test nuevo
     de reordenamiento por precio) y `npm run build:local`.
+- [⬜] **US-4.8**: Como usuario, el orden de resultados (`sortBy`) es real
+  de punta a punta — el backend ordena y pagina consistentemente, no solo el
+  frontend sobre lo ya cargado.
+  - *Origen*: pedido explícito del mantenedor 2026-08-21 — "missing sort on
+    both BE and FE in the docs". Brecha identificada como parte del cierre
+    de US-4.7 (ver su "Limitación conocida" arriba), ahora promovida a
+    historia propia porque requiere trabajo de backend, no solo frontend.
+  - *Criterios*: `GET /listings` (`backend-proyecto-colombia`) acepta un
+    parámetro `sort` (`recientes | precio_asc | precio_desc | personas_desc`,
+    mismos valores que `SortOption` en `lib/types.ts`) y ordena antes de
+    paginar (coordinarlo con el cursor de paginación de US-4.6, que ya
+    existe — ver `listing.service.ts`); el frontend deja de reordenar
+    client-side (`CityFeedPage`'s `sortedListings`) y en su lugar envía
+    `sortBy` como parte de los filtros en `fetchListings`, confiando en el
+    orden que devuelve la API; "Cargar más" con un orden distinto de
+    "recientes" deja de tener el bug latente de reordenar solo la página ya
+    cargada.
+  - *Fuera de alcance hasta que se confirme*: no implementar todavía — es
+    trabajo de backend primero (repo hermano `backend-proyecto-colombia`),
+    luego frontend consumiéndolo, siguiendo el mismo patrón de coordinación
+    que US-4.4/US-6.5.
+- [⬜] **US-4.9**: Como usuario en mobile, el panel de filtros no debe
+  ocupar tanto espacio vertical que desplace las publicaciones (lo
+  importante) fuera de la vista inicial; y en general, los filtros/facetas
+  deberían acercarse más al patrón de un e-commerce típico (Mercado Libre,
+  Fincaraíz, Amazon) — contador de resultados por filtro antes de
+  aplicarlo, filtros colapsables/en modal en mobile, posible barra de
+  filtros "sticky" compacta en vez del panel completo siempre expandido.
+  - *Origen*: pedido explícito del mantenedor 2026-08-21 — "improvements for
+    filter section (take into account typical e-commerce filters/facets), in
+    mobile it's taking a lot of space from the actual important thing (the
+    posts)". Es la continuación real del rediseño que US-4.7 dejó como "pase
+    intermedio" (ver su nota de alcance) — el panel de `SearchFilters` sigue
+    siendo el mismo grid de selects expandido permanentemente, ahora con
+    chips y orden agregados encima, lo que probablemente empeoró el
+    problema de espacio en mobile en vez de resolverlo.
+  - *Criterios (a definir con el mantenedor antes de construir, candidato a
+    pasar por una skill de diseño dedicada o `/reframe`)*: evaluar un
+    filtro colapsado por defecto en mobile (acordeón o botón "Filtros (N)"
+    que abre un modal/drawer de pantalla completa, patrón común en
+    e-commerce mobile) vs. mantener expandido pero mucho más compacto;
+    contador de resultados en vivo por filtro antes de aplicar (requiere
+    decidir si se calcula client-side sobre lo ya cargado o pidiendo un
+    conteo al backend); mantener el mismo contrato de `FilterState` o
+    extenderlo de forma no disruptiva; no debe romper `IntentNavBar`
+    (sticky bar justo arriba) ni los tests existentes de
+    `SearchFilters`/`CityFeedPage`.
 
 ### Épica 5 — Contacto
 - [✅] **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un

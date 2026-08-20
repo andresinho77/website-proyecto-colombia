@@ -127,6 +127,18 @@
   it. `lambda.tf` did not set `ADMIN_SECRET_KEY` at all — shipping the fail-loud change alone would
   have broken the deploy on the next apply.
 
+## Do-Not-Repeat — 2026-08-19
+- When scoping any "per-location" feature in this frontend, ASK whether it should apply to all 3
+  location levels (city `/[ciudad]/`, department `/departamento/[slug]/`, national `/`) BEFORE
+  limiting the first pass to just one. This project has hierarchical location nav since `3b346e4`
+  (national/department/city), so a feature scoped to "city" alone silently reads as "missing" at
+  the other two levels. Concretely: US-4.5's Necesito/Ofrezco split shipped city-only first; the
+  user immediately noticed it was absent on "Toda Colombia" and confirmed (via a direct question)
+  that all 3 levels should get it, requiring a second round of new route files
+  (`app/necesito|ofrezco/page.tsx`, `app/departamento/[slug]/necesito|ofrezco/page.tsx`) and a
+  `CityFeedPage` tab-nav rewired from a fixed `/${citySlug}/` base path to one computed per level.
+  Asking this up front (a single AskUserQuestion) would have avoided the rework.
+
 ## Key Learnings — backend serialization boundary (2026-08-18)
 - The backend has NO serializer layer: controllers return `Listing` rows straight from DynamoDB.
   `src/utils/redact.ts` is the first such boundary — reuse and extend it rather than adding ad-hoc

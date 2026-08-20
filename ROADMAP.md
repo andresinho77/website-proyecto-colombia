@@ -306,62 +306,71 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     junto a `barrio` (ahora opcional). Ver el mensaje resumen entregado al
     mantenedor en el chat de esta sesión para compartir con el colega tal
     cual.
-- [⬜] **US-4.5**: Como usuario, la búsqueda de "Necesito alojamiento" y de
+- [✅] **US-4.5**: Como usuario, la búsqueda de "Necesito alojamiento" y de
   "Tengo espacio disponible" son experiencias separadas, no un mismo feed
   mezclado con un filtro de tipo.
   - *Origen*: feedback del mantenedor 2026-08-18 — "improve result listing
     journey overall... merits separate listing page for estoy buscando y
-    estoy ofreciendo". Hoy `/[ciudad]/` es un único feed con un filtro
-    "Tipo de Publicación" (todos/ofrezco/necesito) mezclado con zona/barrio/
-    precio; el hero ya empuja al usuario a elegir una intención desde el
-    principio (US-1.1) pero el feed no continúa esa separación.
-  - *Criterios (a definir con el mantenedor antes de construir)*: evaluar
-    rutas separadas (p. ej. `/[ciudad]/necesito/` y `/[ciudad]/ofrezco/`) vs.
-    mantener una sola ruta con la intención como estado prominente en vez de
-    un filtro más; cada camino debe tener su propia copy, orden de
-    filtros/facetas relevante a esa intención (quien necesita probablemente
-    prioriza precio/fecha, quien ofrece quizás prioriza capacidad) y CTA de
-    publicar contextual; no debe duplicar lógica de fetch/filtrado —
-    reutilizar `CityFeedPage`/`fetchListings` con la intención como
-    parámetro fijo en vez de reimplementar el feed dos veces.
-- [⬜] **US-4.6**: Como usuario, el feed pagina o carga progresivamente los
+    estoy ofreciendo".
+  - *Decisión (2026-08-19)*: rutas separadas — `/[ciudad]/necesito/` y
+    `/[ciudad]/ofrezco/` — en vez de mantener la intención como un filtro
+    más. Primera entrega solo a nivel ciudad; el mismo día, tras que el
+    mantenedor notara que el tab-nav no aparecía en "Toda Colombia", se
+    confirmó extenderlo a los 3 niveles de ubicación (ciudad, departamento,
+    nacional) en vez de dejar esos dos con el feed unificado.
+  - *Entregado*: `CityFeedPage` gana `intentTipo?: ListingType` — fija
+    `filters.tipo` (server-side, vía `fetchListings`) sin exponer el select
+    "Tipo de Publicación" (`SearchFilters` gana `hideTipoFilter`); título/
+    subtítulo/CTA de publicar (`publishDefaultTipo`, botón "Publicar" del
+    Navbar) se ajustan a la intención. Nuevas rutas, todas reutilizando
+    `CityFeedPage`/`fetchListings` sin lógica duplicada:
+    `app/[ciudad]/necesito|ofrezco/page.tsx` (ciudad),
+    `app/departamento/[slug]/necesito|ofrezco/page.tsx` (departamento),
+    `app/necesito/page.tsx` y `app/ofrezco/page.tsx` (nacional). El tab-nav
+    (`role="tablist"`, Todos/Necesito/Ofrezco) calcula su `basePath` según
+    el nivel activo (`/`, `/departamento/{slug}/` o `/{citySlug}/`) y
+    enlaza entre las tres rutas de ese mismo nivel.
+  - Verificado con `npm run validate` (28/28 tests) y `npm run build:local`:
+    3417 páginas estáticas, incluye `/necesito`, `/ofrezco`,
+    `/departamento/[slug]/necesito`, `/departamento/[slug]/ofrezco` y
+    `/[ciudad]/necesito`+`/[ciudad]/ofrezco` para las +1100 ciudades.
+- [✅] **US-4.6**: Como usuario, el feed pagina o carga progresivamente los
   resultados en vez de traer todas las publicaciones activas de una ciudad
   de una sola vez.
-  - *Origen*: mismo feedback 2026-08-18 — "pagination". Hoy `fetchListings`
-    trae todo el feed filtrado en una sola respuesta; no es un problema con
-    2-6 publicaciones de demo, pero no escala si una ciudad acumula cientos
-    de publicaciones activas durante una crisis prolongada.
-  - *Criterios*: decidir paginación clásica (numerada) vs. scroll infinito
-    vs. "cargar más" — dado el contexto de conexión limitada/3G mencionado
-    en la sección 9 de este documento, favorecer carga progresiva bajo
-    demanda sobre traer todo de una vez; requiere que el contrato de
-    `GET /listings` soporte `page`/`cursor` + `pageSize` (coordinar con
-    infra, ver patrón de coordinación ya usado en US-4.4/US-6.5); mientras
-    no exista soporte del backend, evaluar un stub frontend-only (paginado
-    client-side sobre el array ya traído) como paso intermedio, igual que
-    `lib/zones.ts` para US-4.4.
-- [⬜] **US-4.7**: Como usuario, filtro y exploro resultados con controles
+  - *Origen*: mismo feedback 2026-08-18 — "pagination".
+  - *Nota (2026-08-19)*: al retomar esta historia se encontró que ya estaba
+    implementada end-to-end en una sesión previa no reflejada en este
+    roadmap — backend (`backend-proyecto-colombia/src/services/listing.service.ts`,
+    cursor en base64 + `limit`/`totalCount`) y frontend (`lib/api.ts`
+    `fetchListings(filters, cursor)`, `CityFeedPage`'s `handleLoadMore`,
+    botón "Cargar más publicaciones" en `ListingGrid`) ya soportan
+    paginación por cursor real, no un stub client-side. Se corrige el
+    estado aquí a ✅ sin cambios de código adicionales.
+- [✅] **US-4.7**: Como usuario, filtro y exploro resultados con controles
   más ricos y accesibles al estilo de un e-commerce (Mercado Libre,
   Fincaraíz), no con la tabla de filtros plana actual.
-  - *Origen*: mismo feedback 2026-08-18 — "the table view is a bit outdated
-    we would go way better with a more e-commerce approach for filters...
-    something aside from list of content with some elegant/accessible/rich-
-    UX controls over the list of results". El `SearchFilters` actual
-    (Tipo/Zona/Barrio/Precio en un grid de `<select>`s planos) funciona pero
-    no comunica cuántos resultados deja cada filtro, no permite quitar un
-    filtro individual de un vistazo, y no ofrece ninguna forma de ordenar
-    los resultados (hoy siempre más reciente primero).
-  - *Criterios (a definir con el mantenedor antes de construir, candidato a
-    pasar por `/reframe` o una skill de diseño dedicada)*: explorar patrones
-    tipo panel de filtros con chips removibles para los filtros activos,
-    contador de resultados por filtro antes de aplicarlo, control de orden
-    (más reciente / precio asc-desc / capacidad), y una alternativa a la
-    grilla de tarjetas actual para cuando hay muchos resultados (lista
-    compacta vs. tarjetas, densidad ajustable); debe seguir siendo
-    accesible por teclado/lector de pantalla y mantener el mismo contrato de
-    `FilterState` (o extenderlo de forma no disruptiva) para no romper
-    US-4.1/US-4.2/US-4.4; validar con `npm run designqc`/capturas en ambos
-    temas (claro/oscuro, ver US-1.4) antes de cerrar.
+  - *Origen*: mismo feedback 2026-08-18 — "the table view is a bit outdated...
+    elegant/accessible/rich-UX controls over the list of results".
+  - *Alcance decidido (2026-08-19)*: pase intermedio, no el rediseño
+    completo — chips removibles para los filtros activos (zona, barrio,
+    precio, tipo cuando aplica, orden) + control de orden (recientes /
+    precio asc / precio desc / más personas), sin tocar la grilla de
+    tarjetas ni introducir densidad ajustable.
+  - *Entregado*: `FilterState` gana `sortBy?: SortOption` (`lib/types.ts`).
+    `SearchFilters` agrega el select "Ordenar por" y una fila de chips
+    removibles (cada uno limpia solo ese filtro) más "Limpiar filtros".
+    `CityFeedPage` aplica el orden client-side sobre `listings` vía
+    `useMemo` antes de pasarlos a `ListingGrid`.
+  - *Limitación conocida, documentada en el propio código*: el orden solo
+    aplica sobre la página ya cargada (`listings`), no sobre el total del
+    backend — al usar "Cargar más" (US-4.6) con un orden distinto de
+    "recientes", los nuevos ítems se agregan y se reordenan junto a los
+    existentes, pero el backend no expone un parámetro de orden todavía.
+    Suficiente para el volumen actual (demo/inicio de crisis); requiere
+    coordinar con infra un parámetro `sort` en `GET /listings` si el
+    volumen de publicaciones por ciudad crece.
+  - Verificado con `npm run validate` (28/28 tests, incluye un test nuevo
+    de reordenamiento por precio) y `npm run build:local`.
 
 ### Épica 5 — Contacto
 - [✅] **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un

@@ -25,6 +25,8 @@ export interface Listing {
   reportes: number;
 }
 
+export type SortOption = 'recientes' | 'precio_asc' | 'precio_desc' | 'personas_desc';
+
 export interface FilterState {
   ciudad: string;
   ciudadSlug?: string;
@@ -34,6 +36,8 @@ export interface FilterState {
   zona: string;
   barrio: string;
   maxPrecio: string;
+  /** US-4.7: sorts the already-loaded page client-side (no backend sort param yet). */
+  sortBy?: SortOption;
   limit?: number;
   cursor?: string;
 }

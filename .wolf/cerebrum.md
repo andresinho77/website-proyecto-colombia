@@ -170,6 +170,22 @@
   phrasing that could be either doc-only or build-now, confirm scope before writing code rather
   than assuming per-bullet intent from wording alone.
 
+## Key Learnings — `next dev` vs. static export 404 behavior (2026-08-21)
+- Requesting an unmatched single-segment path (e.g. `/this-does-not-exist/`) under `next dev`
+  throws Next's internal error `Page "/[ciudad]/page" is missing param ... in
+  generateStaticParams(), which is required with "output: export" config` INSTEAD of rendering
+  `app/not-found.tsx`. **This is not a bug in this repo** — it's inherent to `output: 'export'`
+  (fully static, no server at runtime to resolve a `[ciudad]` value outside
+  `generateStaticParams()`'s list). Verified the real static artifact handles it correctly: `npm
+  run build` produces `out/404.html`, and serving `out/` with a real static file server (`npx
+  serve`) returns `HTTP 404` + the `not-found.tsx` content for the same unmatched path — dev mode's
+  ugly error is a dev-only artifact of Next simulating dynamic SSR matching that doesn't exist in
+  the real deployment. Do NOT try to "fix" this by adding fallback logic, `dynamicParams` config,
+  etc. — there's nothing to fix; test 404 behavior against `out/` + a static server, not `next dev`,
+  for anything touching `[ciudad]`/`[slug]` routes. Production still needs CloudFront's Custom
+  Error Response mapping 403/404 → `/404.html` (see US-1.6 in ROADMAP.md) — S3 alone returns raw
+  XML errors, not our page, until that's configured in `infra-proyecto-colombia`.
+
 ## Key Learnings — backend serialization boundary (2026-08-18)
 - The backend has NO serializer layer: controllers return `Listing` rows straight from DynamoDB.
   `src/utils/redact.ts` is the first such boundary — reuse and extend it rather than adding ad-hoc

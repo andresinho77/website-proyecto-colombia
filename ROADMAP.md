@@ -297,33 +297,69 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     del banner (ambos solo-ícono en `lg:+`) se sentía como un espacio
     accidental una vez que dejaron de convivir con los links "Feed"/
     "Publicar" (ya removidos) — se redujo a `gap-1`.
-- [⬜] **US-1.6**: Como usuario, si visito una URL que no existe (404) o el
+- [✅] **US-1.6**: Como usuario, si visito una URL que no existe (404) o el
   sitio encuentra un error inesperado (500), veo una página clara en vez de
   un error crudo de Next.js o una pantalla en blanco.
   - *Origen*: pedido explícito del mantenedor 2026-08-21 — "missing 404, 500
     pages in the docs".
-  - *Criterios 404*: `app/not-found.tsx` con copy en español, acorde al tono
-    del resto del sitio (crisis/ayuda humanitaria — no un chiste ni un 404
-    genérico de plantilla), y un CTA claro de vuelta al feed (mismo patrón
-    de "recordar la última ciudad" ya resuelto para "Volver al Inicio" en
-    `app/terminos-y-privacidad/page.tsx`, reutilizable aquí).
-  - *Criterios 500 — REQUISITO DE SEGURIDAD, no negociable*: `app/error.tsx`
-    (Next.js error boundary) debe mostrar detalles técnicos/logs
-    desplazables **únicamente cuando `process.env.NODE_ENV !== 'production'`**
-    (o el flag equivalente que use el build de despliegue) — en producción,
-    el usuario ve solo un mensaje genérico sin stack trace, sin nombres de
-    archivo/función, sin variables de entorno ni ningún detalle interno.
-    Esto es exportación estática (`output: 'export'`, ver sección 2 de este
-    documento) servida desde S3/CloudFront, así que "modo dev" únicamente
-    puede resolverse en build-time (variable inyectada al bundle, igual que
-    `NEXT_PUBLIC_API_URL`), nunca en runtime — verificar explícitamente,
-    antes de cerrar esta historia, que un build de producción
-    (`npm run build` con env de prod) NO incluye el bloque de logs en el
-    bundle servido, no solo que esté oculto por CSS/condicional de UI (un
-    `display: none` no es suficiente; el contenido no debe existir en el
-    HTML/JS entregado al navegador). Candidato de verificación:
-    inspeccionar el `out/` generado y confirmar que ningún stack trace ni
-    ruta de archivo del servidor aparece en el HTML/JS estático.
+  - *Entregado*: `app/not-found.tsx` (archivo especial de Next.js, se
+    renderiza para cualquier ruta sin match) — copy en español acorde al
+    tono del sitio, CTA "Volver al feed de alojamientos" hacia la última
+    ciudad recordada. `app/error.tsx` (error boundary de Next.js, Client
+    Component obligatorio) — mensaje genérico + botones "Intentar de nuevo"
+    (`reset()`) y "Volver al feed", más un bloque de detalles técnicos
+    (`error.message`/`error.stack`/`error.digest`, desplazable) que solo
+    existe cuando `process.env.NODE_ENV !== 'production'`.
+  - *Refactor*: la lógica de "recordar la última ciudad" (antes solo en
+    `app/terminos-y-privacidad/page.tsx`, ver su bugfix del mismo día) se
+    extrajo a `lib/useHomeHref.ts`, reutilizado por las 3 páginas
+    (terminos-y-privacidad, not-found, error) en vez de triplicar el mismo
+    `useState`/`useEffect`/lectura de `localStorage`.
+  - *Verificación de seguridad (no negociable, cumplida)*: `npm run build`
+    real con `NODE_ENV=production` + `grep -r "Detalles técnicos" out/
+    .next/` y `grep -r "solo visible en desarrollo" out/ .next/` — **0
+    coincidencias en ambos casos**, confirmando que `process.env.NODE_ENV`
+    se inlinea en build-time (mismo mecanismo que `NEXT_PUBLIC_API_URL`,
+    ver `lib/api.ts`) y el bloque de logs se elimina por completo del
+    bundle de producción vía dead-code elimination del minificador — no es
+    un `display:none` en runtime, el JSX ni siquiera existe en el HTML/JS
+    servido.
+  - Cobertura nueva: `tests/error-pages.test.tsx` (4 casos — copy y enlace
+    del 404; botones de `error.tsx` siempre visibles; el bloque de detalles
+    técnicos NUNCA aparece con `NODE_ENV=production` incluyendo el mensaje
+    y el stack de un error de prueba; SÍ aparece con `NODE_ENV=development`).
+    43/43 tests verdes. `npm run validate` completo (typecheck/lint/test/
+    build) limpio.
+  - *Verificado en el export estático real (2026-08-21)*: `npm run build`
+    genera `out/404.html`; sirviendo `out/` con `npx serve` (que replica el
+    comportamiento estándar de "servidor estático → 404.html en rutas sin
+    match") y pidiendo `/this-does-not-exist/` devuelve `HTTP 404` con el
+    contenido de `not-found.tsx` — confirma que el 404 SÍ funciona en el
+    artefacto que realmente se despliega.
+  - *Nota importante — comportamiento distinto en `next dev` vs. producción
+    real*: pedir una ruta de un solo segmento sin match (p. ej.
+    `/this-does-not-exist/`) en `next dev` lanza el error interno de Next
+    `Page "/[ciudad]/page" is missing param ... in generateStaticParams(),
+    which is required with "output: export" config` en vez de mostrar
+    `not-found.tsx` — **no es un bug de este repo**, es inherente a
+    `output: 'export'` (sección 2 de este documento): con export totalmente
+    estático no existe servidor en runtime que resuelva un valor de `[ciudad]`
+    fuera de la lista de `generateStaticParams()`, así que Next no tiene
+    forma de "caer" a `not-found.tsx` para ese caso en modo dev — solo puede
+    servir los archivos HTML que realmente generó el build. El artefacto
+    real (`out/`) sí resuelve esto correctamente (ver verificación arriba)
+    porque ahí la ruta simplemente no existe como archivo y el 404 lo
+    resuelve el servidor estático / CDN, no Next. **No intentar "arreglar"
+    este mensaje en `next dev`** — no hay nada que arreglar en el código.
+  - *Pendiente de infraestructura (coordinar con `infra-proyecto-colombia`,
+    fuera de alcance de este repo)*: en el despliegue real a S3 +
+    CloudFront, S3 devuelve un 403/404 XML crudo para cualquier ruta sin
+    archivo correspondiente — CloudFront necesita una **Custom Error
+    Response** que mapee esos códigos (403 y 404) a `/404.html` (con
+    `Response Page Path: /404.html`, `HTTP Response Code: 404`) para que los
+    visitantes vean `not-found.tsx` en vez del XML de error de S3. Sin este
+    mapeo, el 404 bonito solo funciona en local (`npx serve`/similares) y
+    nunca en producción real.
 - [⬜] **US-1.7**: Como usuario en tema claro, el `Footer` se distingue
   visualmente del fondo de la página en vez de casi fundirse con él.
   - *Origen*: pedido explícito del mantenedor 2026-08-21 — "footer

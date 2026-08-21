@@ -1,32 +1,22 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Navbar } from '../../components/Navbar';
 import { Footer } from '../../components/Footer';
-import { DEFAULT_CITY, PREFERRED_CITY_STORAGE_KEY, getCityBySlug } from '../../lib/cities';
+import { useHomeHref } from '../../lib/useHomeHref';
 import { ShieldCheck, ArrowLeft } from 'lucide-react';
 
 export default function TerminosYPrivacidadPage() {
   const router = useRouter();
 
-  // Bug fix (2026-08-21): this page always sent "Volver al Inicio" (and the
-  // Navbar's city chip) to DEFAULT_CITY, regardless of which city/department
-  // the user was actually browsing before clicking here — e.g. arriving from
-  // Medellín's feed still landed you back on Pereira/whatever DEFAULT_CITY
-  // is. Fall back to the last city remembered by CitySwitcher
-  // (PREFERRED_CITY_STORAGE_KEY) instead of a hardcoded default; read after
-  // mount since localStorage isn't available during SSR.
-  const [homeCitySlug, setHomeCitySlug] = useState(DEFAULT_CITY.slug);
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(PREFERRED_CITY_STORAGE_KEY);
-      if (saved && getCityBySlug(saved)) setHomeCitySlug(saved);
-    } catch {
-      // ignore — keep DEFAULT_CITY fallback
-    }
-  }, []);
+  // Bug fix (2026-08-21): this page used to always send "Volver al Inicio"
+  // (and the Navbar's city chip) to DEFAULT_CITY, regardless of which city/
+  // department the user was actually browsing before clicking here. Now
+  // shared via lib/useHomeHref.ts (also used by app/not-found.tsx and
+  // app/error.tsx, US-1.6).
+  const { citySlug: homeCitySlug, href: homeHref } = useHomeHref();
 
   // Prefer real browser back navigation (returns to the exact previous page —
   // including a department/national feed, which the remembered city slug
@@ -47,7 +37,7 @@ export default function TerminosYPrivacidadPage() {
 
         <main className="max-w-4xl mx-auto px-4 py-12">
           <Link
-            href={`/${homeCitySlug}/`}
+            href={homeHref}
             onClick={handleBack}
             className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-700 hover:underline mb-6"
           >

@@ -419,7 +419,101 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     del enlace `wa.me` (evitar scraping trivial de teléfonos).
 - [✅] **US-4.2**: Como usuario, puedo filtrar además por barrio (texto libre) y por
   rango de precio (incluyendo "gratis").
-- [⬜] **US-4.3 (fase 2)**: Vista de mapa con pines por barrio.
+- [✅] **US-4.3**: Vista de mapa con pines por zona/barrio.
+  - *Origen*: pedido explícito del mantenedor 2026-08-21. Estaba marcada
+    "fase 2" porque `Listing` no tiene coordenadas reales (solo texto
+    ciudad/zona/barrio) — agregar geocodificación real por publicación es
+    un cambio de esquema de backend fuera de alcance de este pase (ver
+    `docs/architecture-foundation.md`).
+  - *Decisiones (vía preguntas dirigidas antes de construir)*: (a) precisión
+    de pines — centroide aproximado por zona (mismo catálogo curado de
+    `lib/zones.ts`), no coordenadas reales por publicación, sin cambios de
+    backend; (b) proveedor de mapas — Leaflet + OpenStreetMap (sin API key,
+    sin cuenta, sin billing), no Mapbox.
+  - *Entregado*: `lib/zoneCoordinates.ts` (nuevo) — centroide lat/lng por
+    zona para las 7 ciudades prioritarias que ya tienen catálogo curado en
+    `lib/zones.ts` (pereira, cali, quibdo, manizales, armenia, condoto,
+    istmina); zonas con nombre cardinal usan offset real desde el centro de
+    la ciudad, zonas con nombre de comuna sin correspondencia cardinal
+    conocida (Manizales, Armenia) se distribuyen en círculo alrededor del
+    centro — documentado explícitamente como aproximado, no datos GIS
+    reales. Jitter determinista (seedeado por id de la publicación, no
+    aleatorio por render) para que publicaciones en la misma zona no se
+    apilen en un solo píxel.
+  - `components/MapView.tsx` (nuevo, cargado vía `next/dynamic` con
+    `ssr: false` — Leaflet toca `window` al importarse, nunca puede correr
+    en SSR/export estático): pines coloreados por tipo (rose=necesito,
+    emerald=ofrezco, SVG inline en vez de la imagen de marcador por defecto
+    de Leaflet, evitando el problema conocido de rutas de assets con
+    Next.js/webpack) sobre tiles de OpenStreetMap.
+  - `components/MapPopupCard.tsx` (nuevo): resumen compacto en el popup de
+    cada pin (tipo, zona·barrio, descripción, precio, botón "Contactar por
+    WhatsApp"). El botón reutiliza la lógica de revelado de contacto ya
+    probada de `ListingCard.tsx`, extraída a `lib/useContactReveal.ts`
+    (nuevo hook compartido) en vez de reimplementarla — mismo comportamiento
+    a prueba de bloqueo de popups (US-6.5) en ambos lugares.
+  - `components/CityFeedPage.tsx`: toggle "Lista/Mapa" (mismo estilo de
+    segmented pill que `IntentNavBar`), visible solo en feeds de ciudad
+    (no departamento/nacional) para las 7 ciudades con coordenadas curadas
+    (`cityHasMapCoordinates`).
+  - Estilos de Leaflet override en `app/globals.css` (popup oscuro tipo
+    glass-card en vez del blanco por defecto).
+  - Verificado con Playwright contra un build de producción real
+    (`npm run build` + `npx serve out`, no solo `next dev`): el toggle
+    aparece, el mapa carga sin errores de consola/página, 2 marcadores se
+    renderizan para Pereira, el popup muestra el resumen correcto y el
+    botón de WhatsApp llama al mismo flujo ya probado. Bundle compartido de
+    First Load JS prácticamente sin cambio (87.4kB → 87.9kB) — Leaflet
+    queda en un chunk separado, cargado solo cuando se abre el mapa, no en
+    cada página.
+  - Cobertura nueva: `tests/zone-coordinates.test.ts` (5 casos, lógica pura
+    sin DOM) y `tests/map-toggle.test.tsx` (4 casos — el toggle aparece
+    solo para ciudades prioritarias a nivel ciudad, y siempre a nivel
+    departamento/nacional; `MapView` mockeado para no depender de medición
+    real de DOM que Leaflet necesita y jsdom no provee de forma confiable).
+    59/59 tests verdes (antes 51/51), typecheck/lint limpios, `npm run build`
+    completo verificado.
+  - *Extendido a departamento y nacional (2026-08-21, mismo día)*: el
+    mantenedor pidió que el mapa no fuera solo por ciudad. Cada pin ahora se
+    resuelve desde el `ciudadSlug` PROPIO de cada publicación (no un
+    `citySlug` fijo de la página) — así el mismo `MapView` sirve para los 3
+    niveles: en una página de ciudad usa un centro/zoom fijo sobre esa
+    ciudad (como antes); en departamento/nacional, sin un `citySlug` único
+    posible, ajusta el encuadre (`bounds`) a lo que realmente resolvió pines
+    (o cae a una vista de toda Colombia si ninguna publicación actual tiene
+    coordenadas). Mensaje explicativo visible en el mapa cuando cero
+    publicaciones tienen ubicación disponible (`"el mapa cubre Chocó, Valle
+    del Cauca, Risaralda, Caldas y Quindío"`). `lib/zoneCoordinates.ts`
+    normaliza el slug de ciudad con `normalizeSlug` (no solo
+    `.toLowerCase()`) para tolerar tanto slugs reales ("quibdo") como
+    nombres con tilde ("Quibdó") si `ciudadSlug` llegara a faltar.
+    Verificado con Playwright contra el dev server real: departamento
+    (Risaralda) y nacional muestran el toggle y renderizan marcadores sin
+    errores de consola; el encuadre por `bounds` efectivamente enmarca la
+    región real de las publicaciones en vez de mostrar toda Colombia de
+    entrada.
+  - *Departamentos/ciudades prioritarias realineadas al sismo (2026-08-21,
+    mismo día)*: el mantenedor pidió reemplazar los departamentos/ciudades
+    que aparecen por defecto en el selector de ubicación (`CitySwitcher`)
+    por los realmente afectados por el terremoto reciente. Antes eran
+    Antioquia, Atlántico, Caldas, Chocó, Cundinamarca, Quindío, Risaralda y
+    Santander (9, con Medellín/Barranquilla/Bogotá/Bucaramanga como
+    ciudades destacadas); ahora son exactamente los 5 de la sección 1 de
+    este documento — Chocó, Valle del Cauca, Risaralda, Caldas y Quindío —
+    con Manizales, Condoto, Istmina, Quibdó, Armenia, Pereira y Cali como
+    ciudades destacadas (las mismas 7 con coordenadas curadas para el mapa,
+    intencional). `lib/colombia-locations.json`: `isPriority` recalculado
+    para esos 5 departamentos y 7 ciudades, `false` para el resto.
+    `components/CitySwitcher.tsx`: `priorityDepartments.slice(0, 4)` pasó a
+    `slice(0, 5)` (antes recortaba silenciosamente uno de los 5).
+    Consecuencia esperada: `DEFAULT_CITY` (`lib/cities.ts`, primer elemento
+    de `getPriorityLocations()`) pasó de Medellín a Manizales — usado como
+    último fallback en `lib/useHomeHref.ts`/`PublishModal` cuando no hay
+    ninguna otra pista de ubicación. 2 tests ajustados a la nueva
+    prioridad (`tests/publish-modal.test.tsx` usa Valle del Cauca/Cali en
+    vez de Atlántico/Barranquilla como departamento de ejemplo;
+    `tests/locations.test.ts` ya no asume que Medellín aparece en el top-20
+    de una búsqueda por nombre de departamento). 59/59 tests verdes.
 - [🟡] **US-4.4**: Como usuario, filtro por zona/barrio desde una lista
   estructurada por ciudad (no texto libre), al estilo de portales como
   Fincaraíz/Metrocuadrado, para evitar variantes de escritura del mismo
@@ -939,7 +1033,6 @@ de infraestructura.
 ## 10. Fase 2 (no construir aún, solo dejar documentado)
 
 - Bot de WhatsApp para publicar por mensaje (requiere WhatsApp Business API).
-- Vista de mapa.
 - Verificación ligera de número telefónico (OTP), posiblemente vía SNS.
 - Traducción/soporte para comunidades indígenas o afrodescendientes de Chocó
   si el idioma o el acceso a internet son una barrera adicional.

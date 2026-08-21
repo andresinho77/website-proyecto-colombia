@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import { List, Map as MapIcon } from 'lucide-react';
 import { Navbar } from './Navbar';
 import { EmergencyBanner } from './EmergencyBanner';
 import { IntentNavBar } from './IntentNavBar';
@@ -13,6 +15,17 @@ import { useInvisibleTurnstile, TurnstileContainer } from './Turnstile';
 import { Listing, FilterState, ListingType } from '../lib/types';
 import { fetchListings } from '../lib/api';
 import { isEmergencyBannerDismissed, setEmergencyBannerDismissed } from '../lib/localStorage';
+import { cityHasMapCoordinates } from '../lib/zoneCoordinates';
+
+// US-4.3: Leaflet touches `window` at import time, so this can never run
+// during SSR/static export — dynamic + ssr:false loads it client-side only,
+// after the map toggle is actually clicked (or on this page's hydration).
+const MapView = dynamic(() => import('./MapView'), {
+  ssr: false,
+  loading: () => (
+    <div className="rounded-2xl border border-slate-800 bg-slate-900/50 animate-pulse" style={{ height: 520 }} />
+  ),
+});
 
 interface CityFeedPageProps {
   cityName?: string;
@@ -83,6 +96,20 @@ export default function CityFeedPage({
     setIsEmergencyBannerVisible(true);
     setEmergencyBannerDismissed(false);
   };
+
+  // US-4.3: on a city page, only offered when that city is one of the 7
+  // priority cities with a curated zone-coordinate map
+  // (lib/zoneCoordinates.ts) — Listing has no real lat/lng, so a map can't
+  // be positioned for a city outside that list. Department/national feeds
+  // always offer the toggle (2026-08-21) — MapView places each listing by
+  // its OWN city, so a department/national map is meaningful even though
+  // only listings from the 7 priority cities will actually get a pin
+  // (MapView shows an explanatory note when none of the current results do).
+  const showMapToggle = isNationalFeed || isDepartmentFeed || (!!citySlug && cityHasMapCoordinates(citySlug));
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  useEffect(() => {
+    if (!showMapToggle) setViewMode('list');
+  }, [showMapToggle]);
 
   const loadListings = useCallback(async () => {
     setIsLoading(true);
@@ -237,7 +264,13 @@ export default function CityFeedPage({
 
         {/* Listings Feed Section */}
         <main id="feed" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 scroll-mt-16 sm:scroll-mt-20">
-          <div className="mb-6 flex items-center justify-between">
+          {/* items-end (not just sm:items-end): without a cross-axis
+              alignment at the base breakpoint, the row's default
+              align-items:stretch made the Lista/Mapa pill stretch to match
+              the title block's full height whenever the title wrapped to 2
+              lines on narrow screens — a tall blob instead of a compact
+              pill (2026-08-21 mobile feedback). */}
+          <div className="mb-6 flex flex-row items-end justify-between gap-4">
             <div>
               <h2 className="font-display text-2xl sm:text-3xl font-semibold text-slate-100 tracking-tight">
                 {titleText}
@@ -246,6 +279,52 @@ export default function CityFeedPage({
                 {subtitleText}
               </p>
             </div>
+
+            {/* Lista/Mapa toggle (US-4.3) — only where a zone-coordinate map
+                exists for this city (see showMapToggle above). Placed next
+                to the title, above the filters panel, so it's visible
+                without scrolling past anything — a neutral pill tucked
+                below the filters was too easy to miss (2026-08-21
+                feedback: "this should be evident for newcomers"). Brand
+                emerald on the active state (not a neutral gray) for extra
+                visual weight given this is a whole alternate view of the
+                page, not just another filter. */}
+            {showMapToggle && (
+              <div
+                role="tablist"
+                aria-label="Vista de resultados"
+                className="inline-flex items-center gap-1 bg-slate-900 border border-slate-700 shadow-sm rounded-full p-1 flex-shrink-0"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={viewMode === 'list'}
+                  onClick={() => setViewMode('list')}
+                  className={`touch-target inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-emerald-700 text-white shadow-sm'
+                      : 'text-slate-300 hover:text-slate-50 hover:bg-slate-800'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  Lista
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={viewMode === 'map'}
+                  onClick={() => setViewMode('map')}
+                  className={`touch-target inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold transition-colors ${
+                    viewMode === 'map'
+                      ? 'bg-emerald-700 text-white shadow-sm'
+                      : 'text-slate-300 hover:text-slate-50 hover:bg-slate-800'
+                  }`}
+                >
+                  <MapIcon className="w-4 h-4" />
+                  Mapa
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Search & Filter Component (US-4.1, US-4.2, US-4.7) */}
@@ -257,19 +336,27 @@ export default function CityFeedPage({
             hideTipoFilter={!!intentTipo}
           />
 
-          {/* Listing Grid */}
-          <ListingGrid
-            listings={sortedListings}
-            isLoading={isLoading}
-            hasMore={!!nextCursor}
-            isLoadingMore={isLoadingMore}
-            onLoadMore={handleLoadMore}
-            onShareWhatsApp={(item) => setNewlyCreatedListing(item)}
-            onRefresh={loadListings}
-            onOpenPublish={handleOpenPublish}
-            turnstileToken={turnstileToken}
-            onTurnstileConsumed={refreshTurnstile}
-          />
+          {viewMode === 'map' && showMapToggle ? (
+            <MapView
+              listings={sortedListings}
+              citySlug={!isDepartmentFeed && !isNationalFeed ? citySlug : undefined}
+              turnstileToken={turnstileToken}
+              onTurnstileConsumed={refreshTurnstile}
+            />
+          ) : (
+            <ListingGrid
+              listings={sortedListings}
+              isLoading={isLoading}
+              hasMore={!!nextCursor}
+              isLoadingMore={isLoadingMore}
+              onLoadMore={handleLoadMore}
+              onShareWhatsApp={(item) => setNewlyCreatedListing(item)}
+              onRefresh={loadListings}
+              onOpenPublish={handleOpenPublish}
+              turnstileToken={turnstileToken}
+              onTurnstileConsumed={refreshTurnstile}
+            />
+          )}
         </main>
       </div>
 

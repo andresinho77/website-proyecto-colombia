@@ -192,3 +192,23 @@
 html.eb-dismissed [data-emergency-banner] {
   display: none;
 }
+
+/* US-4.3: Leaflet's default popup chrome is a plain white box, jarring
+   against this app's dark glass-card surfaces. Leaflet ships its own CSS
+   (imported in MapView.tsx) that these rules override — kept minimal,
+   only the popup shell + tip, not the whole Leaflet control set. */
+.leaflet-popup-content-wrapper {
+  background: rgb(var(--color-slate-900));
+  color: rgb(var(--color-slate-100));
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.leaflet-popup-tip {
+  background: rgb(var(--color-slate-900));
+}
+.leaflet-popup-close-button {
+  color: rgb(var(--color-slate-400)) !important;
+}
+.leaflet-container {
+  font-family: inherit;
+}

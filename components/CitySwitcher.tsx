@@ -66,7 +66,12 @@ export const CitySwitcher: React.FC<CitySwitcherProps> = ({
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) {
       return {
-        departments: priorityDepartments.slice(0, 4),
+        // slice(0, 5): matches the 5 earthquake-priority departments exactly
+        // (Chocó, Valle del Cauca, Risaralda, Caldas, Quindío — see
+        // lib/colombia-locations.json's isPriority flags). Was slice(0, 4),
+        // which would have silently dropped one of the 5 from this default
+        // view — bump this if the priority set ever grows again.
+        departments: priorityDepartments.slice(0, 5),
         cities: priorityLocations.slice(0, 10),
       };
     }

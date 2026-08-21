@@ -29,7 +29,7 @@
     "id": "01",
     "name": "Antioquia",
     "slug": "antioquia",
-    "isPriority": true,
+    "isPriority": false,
     "cities": [
       {
         "id": "01001",
@@ -668,7 +668,7 @@
         "baseSlug": "medellin",
         "departmentName": "Antioquia",
         "departmentSlug": "antioquia",
-        "isPriority": true
+        "isPriority": false
       },
       {
         "id": "01072",
@@ -1233,7 +1233,7 @@
     "id": "03",
     "name": "Atlántico",
     "slug": "atlantico",
-    "isPriority": true,
+    "isPriority": false,
     "cities": [
       {
         "id": "03001",
@@ -1251,7 +1251,7 @@
         "baseSlug": "barranquilla",
         "departmentName": "Atlántico",
         "departmentSlug": "atlantico",
-        "isPriority": true
+        "isPriority": false
       },
       {
         "id": "03003",
@@ -1441,23 +1441,6 @@
         "departmentName": "Atlántico",
         "departmentSlug": "atlantico",
         "isPriority": false
-      }
-    ]
-  },
-  {
-    "id": "11",
-    "name": "Bogotá D.C.",
-    "slug": "bogota-d-c",
-    "isPriority": true,
-    "cities": [
-      {
-        "id": "11001",
-        "name": "Bogotá",
-        "slug": "bogota",
-        "baseSlug": "bogota",
-        "departmentName": "Bogotá D.C.",
-        "departmentSlug": "bogota-d-c",
-        "isPriority": true
       }
     ]
   },
@@ -4768,7 +4751,7 @@
     "id": "12",
     "name": "Cundinamarca",
     "slug": "cundinamarca",
-    "isPriority": true,
+    "isPriority": false,
     "cities": [
       {
         "id": "12001",
@@ -4843,6 +4826,15 @@
         "isPriority": false
       },
       {
+        "id": "11001",
+        "name": "Bogotá",
+        "slug": "bogota",
+        "baseSlug": "bogota",
+        "departmentName": "Cundinamarca",
+        "departmentSlug": "cundinamarca",
+        "isPriority": false
+      },
+      {
         "id": "12009",
         "name": "Bojacá",
         "slug": "bojaca",
@@ -4888,15 +4880,6 @@
         "isPriority": false
       },
       {
-        "id": "12014",
-        "name": "Cáqueza",
-        "slug": "caqueza",
-        "baseSlug": "caqueza",
-        "departmentName": "Cundinamarca",
-        "departmentSlug": "cundinamarca",
-        "isPriority": false
-      },
-      {
         "id": "12015",
         "name": "Carmen de Carupa",
         "slug": "carmen-de-carupa",
@@ -4910,15 +4893,6 @@
         "name": "Chaguaní",
         "slug": "chaguani",
         "baseSlug": "chaguani",
-        "departmentName": "Cundinamarca",
-        "departmentSlug": "cundinamarca",
-        "isPriority": false
-      },
-      {
-        "id": "12017",
-        "name": "Chía",
-        "slug": "chia",
-        "baseSlug": "chia",
         "departmentName": "Cundinamarca",
         "departmentSlug": "cundinamarca",
         "isPriority": false
@@ -4951,6 +4925,15 @@
         "isPriority": false
       },
       {
+        "id": "12017",
+        "name": "Chía",
+        "slug": "chia",
+        "baseSlug": "chia",
+        "departmentName": "Cundinamarca",
+        "departmentSlug": "cundinamarca",
+        "isPriority": false
+      },
+      {
         "id": "12021",
         "name": "Cogua",
         "slug": "cogua",
@@ -4973,6 +4956,15 @@
         "name": "Cucunubá",
         "slug": "cucunuba",
         "baseSlug": "cucunuba",
+        "departmentName": "Cundinamarca",
+        "departmentSlug": "cundinamarca",
+        "isPriority": false
+      },
+      {
+        "id": "12014",
+        "name": "Cáqueza",
+        "slug": "caqueza",
+        "baseSlug": "caqueza",
         "departmentName": "Cundinamarca",
         "departmentSlug": "cundinamarca",
         "isPriority": false
@@ -5014,15 +5006,6 @@
         "isPriority": false
       },
       {
-        "id": "12028",
-        "name": "Fómeque",
-        "slug": "fomeque",
-        "baseSlug": "fomeque",
-        "departmentName": "Cundinamarca",
-        "departmentSlug": "cundinamarca",
-        "isPriority": false
-      },
-      {
         "id": "12029",
         "name": "Fosca",
         "slug": "fosca",
@@ -5041,19 +5024,28 @@
         "isPriority": false
       },
       {
-        "id": "12031",
-        "name": "Fúquene",
-        "slug": "fuquene",
-        "baseSlug": "fuquene",
+        "id": "12032",
+        "name": "Fusagasugá",
+        "slug": "fusagasuga",
+        "baseSlug": "fusagasuga",
         "departmentName": "Cundinamarca",
         "departmentSlug": "cundinamarca",
         "isPriority": false
       },
       {
-        "id": "12032",
-        "name": "Fusagasugá",
-        "slug": "fusagasuga",
-        "baseSlug": "fusagasuga",
+        "id": "12028",
+        "name": "Fómeque",
+        "slug": "fomeque",
+        "baseSlug": "fomeque",
+        "departmentName": "Cundinamarca",
+        "departmentSlug": "cundinamarca",
+        "isPriority": false
+      },
+      {
+        "id": "12031",
+        "name": "Fúquene",
+        "slug": "fuquene",
+        "baseSlug": "fuquene",
         "departmentName": "Cundinamarca",
         "departmentSlug": "cundinamarca",
         "isPriority": false
@@ -5716,15 +5708,6 @@
         "isPriority": false
       },
       {
-        "id": "12106",
-        "name": "Útica",
-        "slug": "utica",
-        "baseSlug": "utica",
-        "departmentName": "Cundinamarca",
-        "departmentSlug": "cundinamarca",
-        "isPriority": false
-      },
-      {
         "id": "12107",
         "name": "Venecia",
         "slug": "venecia-cundinamarca",
@@ -5810,6 +5793,15 @@
         "name": "Zipaquirá",
         "slug": "zipaquira",
         "baseSlug": "zipaquira",
+        "departmentName": "Cundinamarca",
+        "departmentSlug": "cundinamarca",
+        "isPriority": false
+      },
+      {
+        "id": "12106",
+        "name": "Útica",
+        "slug": "utica",
+        "baseSlug": "utica",
         "departmentName": "Cundinamarca",
         "departmentSlug": "cundinamarca",
         "isPriority": false
@@ -8265,7 +8257,7 @@
     "id": "26",
     "name": "Santander",
     "slug": "santander",
-    "isPriority": true,
+    "isPriority": false,
     "cities": [
       {
         "id": "26001",
@@ -8346,7 +8338,7 @@
         "baseSlug": "bucaramanga",
         "departmentName": "Santander",
         "departmentSlug": "santander",
-        "isPriority": true
+        "isPriority": false
       },
       {
         "id": "26010",

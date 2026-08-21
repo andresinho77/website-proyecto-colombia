@@ -14,10 +14,18 @@ export const Footer: React.FC = () => {
   return (
     <footer className="border-t border-slate-800 bg-footer py-10 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-end justify-between gap-6">
+        {/* Centered as a column on mobile (brand block + privacy link both
+            centered, not left/right-floating) — md:+ reverts to the
+            original left-brand/right-link row, bottom-aligned. */}
+        <div className="flex flex-col items-center text-center md:flex-row md:items-end md:text-left justify-between gap-6">
 
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-900/50 border border-emerald-700/40 flex items-center justify-center text-emerald-700">
+            {/* Hidden on mobile (2026-08-21 feedback) — the Navbar logo
+                right above already establishes the brand, so this second
+                icon just repeated it while eating vertical space that
+                matters more on a phone. md:+ keeps it, matching the
+                original left-aligned row layout there. */}
+            <div className="hidden md:flex w-8 h-8 rounded-lg bg-emerald-900/50 border border-emerald-700/40 items-center justify-center text-emerald-700">
               <HeartHandshake className="w-5 h-5" />
             </div>
             <div>

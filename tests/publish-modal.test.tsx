@@ -4,8 +4,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { PublishModal } from '../components/PublishModal';
 
 // Regression test for a bug found 2026-08-21: publishing from a
-// department-level page (e.g. /departamento/atlantico/necesito/, which has
-// no single defaultCiudad) silently preselected Pereira (Risaralda) —
+// department-level page (e.g. /departamento/valle-del-cauca/necesito/, which
+// has no single defaultCiudad) silently preselected Pereira (Risaralda) —
 // a city that isn't even in the department the user was browsing.
 describe('PublishModal (components/PublishModal.tsx)', () => {
   it('sin defaultCiudad pero con defaultDepartmentSlug, preselecciona una ciudad de ESE departamento', () => {
@@ -13,13 +13,13 @@ describe('PublishModal (components/PublishModal.tsx)', () => {
       <PublishModal
         isOpen={true}
         onClose={vi.fn()}
-        defaultDepartmentSlug="atlantico"
+        defaultDepartmentSlug="valle-del-cauca"
         onSuccessPublished={vi.fn()}
       />
     );
 
     const cityInput = screen.getByPlaceholderText(/Buscar ciudad o departamento/i);
-    expect(cityInput).toHaveValue('Barranquilla (Atlántico)');
+    expect(cityInput).toHaveValue('Cali (Valle del Cauca)');
     expect(cityInput).not.toHaveValue(expect.stringContaining('Pereira'));
   });
 
@@ -29,7 +29,7 @@ describe('PublishModal (components/PublishModal.tsx)', () => {
         isOpen={true}
         onClose={vi.fn()}
         defaultCiudad="Cali"
-        defaultDepartmentSlug="atlantico"
+        defaultDepartmentSlug="caldas"
         onSuccessPublished={vi.fn()}
       />
     );

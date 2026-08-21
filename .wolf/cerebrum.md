@@ -170,6 +170,29 @@
   phrasing that could be either doc-only or build-now, confirm scope before writing code rather
   than assuming per-bullet intent from wording alone.
 
+## Do-Not-Repeat — 2026-08-21 (`lsof`/`pkill` matching client sockets, not just the server)
+- **CRITICAL, bit this session 3 separate times** (twice by Claude directly killing the user's dev
+  server by PID/pattern, once as a real bug in `scripts/stop-local-dev.sh` that was closing the
+  user's browser on every `npm run dev:stopLocal`). Root cause is the same each time: `lsof -ti
+  tcp:$port` (no `-sTCP:LISTEN`) or `pkill -f "next dev"` (no PID scoping) matches ANY process
+  touching that port/command string — not just the one intended. A browser tab holding a WebSocket
+  open to a Next.js dev server's Fast Refresh/HMR endpoint shows up in `lsof -ti tcp:3000` right
+  alongside the actual server process; killing "everything lsof found" kills the browser too.
+  **Rules going forward:**
+  1. Any `lsof -ti tcp:$PORT` used to find a server to kill MUST include `-sTCP:LISTEN` — verified
+     via an isolated test (real server + a simulated client socket) that this exact flag is what
+     separates "the server" from "everyone talking to the server." Fixed in `kill_port()` inside
+     `scripts/stop-local-dev.sh`.
+  2. Never `pkill -f` a generic command substring like `"next dev"` — it matches every dev server
+     for every project the user has running, and every child process spawned under that name.
+     Capture the exact PID from `ps`/`lsof` output and `kill <that PID>` specifically instead.
+  3. Before killing anything believed to be "just mine" (a Claude-started `next dev` instance),
+     verify with `lsof -i :$PORT -sTCP:LISTEN` that the PID is actually what's listening — don't
+     assume the last PID number seen in a `ps aux` grep is safe to kill.
+  4. When in doubt whether a process belongs to the user or to this session, ask before killing —
+     the cost of asking is one message; the cost of guessing wrong is closing the user's browser or
+     dev server mid-work, twice already this session alone.
+
 ## Do-Not-Repeat — 2026-08-21 (literal `text-white`/`hover:text-white` on the `slate` scale)
 - Never pair `hover:bg-slate-800` (or any themed `slate-*` step) with literal `text-white` /
   `hover:text-white`. The `slate` scale inverts per theme (light: 950 near-white/50 near-black;

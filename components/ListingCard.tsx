@@ -16,8 +16,9 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { Listing } from '../lib/types';
-import { reportListing, resolveListing, getContactLink } from '../lib/api';
+import { reportListing, resolveListing } from '../lib/api';
 import { getMyListings } from '../lib/localStorage';
+import { useContactReveal } from '../lib/useContactReveal';
 
 interface ListingCardProps {
   listing: Listing;
@@ -43,8 +44,11 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   const [currentImgIndex, setCurrentImgIndex] = useState(0);
   const [isReporting, setIsReporting] = useState(false);
   const [reportedMsg, setReportedMsg] = useState<string | null>(null);
-  const [isContacting, setIsContacting] = useState(false);
-  const [contactError, setContactError] = useState<string | null>(null);
+  const { isContacting, contactError, handleContactClick } = useContactReveal(
+    listing,
+    turnstileToken,
+    onTurnstileConsumed
+  );
 
   // Author PIN resolution modal state
   const [showResolveModal, setShowResolveModal] = useState(false);
@@ -72,64 +76,6 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   const myListings = getMyListings();
   const myListingLocal = myListings.find((l) => l.id === listing.id);
   const isAuthor = !!myListingLocal;
-
-  // US-5.1 + US-6.5: the number is no longer read directly off `listing` —
-  // it's fetched on demand via getContactLink so a real backend can
-  // rate-limit/Turnstile-gate the reveal per click instead of handing every
-  // number to anyone who scripts a request against the public feed.
-  const buildWhatsAppUrl = (whatsapp: string) => {
-    const cleanPhone = whatsapp.replace(/\D/g, '');
-    const text = encodeURIComponent(
-      `Hola, vi tu publicación en Alojamiento Solidario Colombia (${
-        isOfrezco ? 'Ofrezco' : 'Necesito'
-      } en ${listing.ciudad}, ${location}) [Ref: ${listing.id.substring(
-        0,
-        6
-      )}]. ¿Podemos hablar?`
-    );
-    return `https://wa.me/${cleanPhone}?text=${text}`;
-  };
-
-  const handleContactClick = async () => {
-    setContactError(null);
-    setIsContacting(true);
-
-    // Open the tab synchronously, inside the click handler's own call stack
-    // — once we `await` below we're no longer in the original user gesture,
-    // and Safari (reliably) and Chrome (in some conditions) silently block
-    // a `window.open()` issued after that point, treating it as an
-    // unrequested popup rather than a user-initiated navigation. Opening a
-    // blank tab now and redirecting it once the number resolves keeps this
-    // tied to the gesture either way.
-    //
-    // Deliberately NOT passing 'noopener'/'noreferrer' here: either one
-    // makes the browser return `null` instead of a window reference (spec
-    // behavior — noreferrer implies noopener), which is exactly the
-    // reference this code needs to redirect the tab once the number
-    // resolves. Safe to omit because we set this tab's location ourselves,
-    // right below, to a URL we build (wa.me + our own sanitized text) — the
-    // opened page never runs attacker-controlled content that could abuse
-    // `window.opener`.
-    const pendingTab = window.open('', '_blank');
-
-    const res = await getContactLink(listing.id, turnstileToken);
-    setIsContacting(false);
-    onTurnstileConsumed?.();
-
-    if (!res.success || !res.whatsapp) {
-      pendingTab?.close();
-      setContactError(res.error || 'No se pudo obtener el contacto. Intenta de nuevo.');
-      return;
-    }
-    if (pendingTab) {
-      pendingTab.location.href = buildWhatsAppUrl(res.whatsapp);
-    } else {
-      // Popup was blocked even for the synchronous open (e.g. browser
-      // setting disabling new tabs outright) — fall back to same-tab nav
-      // rather than silently doing nothing.
-      window.location.href = buildWhatsAppUrl(res.whatsapp);
-    }
-  };
 
   // US-6.1: Report listing handler
   const handleReport = async () => {

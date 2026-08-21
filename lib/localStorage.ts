@@ -48,6 +48,7 @@ export const removeMyListing = (id: string) => {
 // staying dismissed indefinitely versus a stale flag silently hiding real
 // emergency numbers from someone who forgot they dismissed it days ago.
 const EMERGENCY_BANNER_DISMISSED_KEY = 'alojamiento_solidario_emergency_banner_dismissed';
+const DATA_POLICY_ACCEPTED_KEY = 'alojamiento_solidario_data_policy_accepted';
 
 export const isEmergencyBannerDismissed = (): boolean => {
   if (typeof window === 'undefined') return false;
@@ -76,4 +77,27 @@ export const setEmergencyBannerDismissed = (dismissed: boolean) => {
   // banner would leave the CSS class stuck from the initial page load,
   // silently keeping it `display:none` even after React re-renders it.
   document.documentElement.classList.toggle('eb-dismissed', dismissed);
+};
+
+export const isDataPolicyAccepted = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return localStorage.getItem(DATA_POLICY_ACCEPTED_KEY) === 'true';
+  } catch (err) {
+    console.error('Error reading localStorage:', err);
+    return false;
+  }
+};
+
+export const setDataPolicyAccepted = (accepted: boolean) => {
+  if (typeof window === 'undefined') return;
+  try {
+    if (accepted) {
+      localStorage.setItem(DATA_POLICY_ACCEPTED_KEY, 'true');
+    } else {
+      localStorage.removeItem(DATA_POLICY_ACCEPTED_KEY);
+    }
+  } catch (err) {
+    console.error('Error saving to localStorage:', err);
+  }
 };

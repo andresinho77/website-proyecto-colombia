@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { List, Map as MapIcon } from 'lucide-react';
 import { Navbar } from './Navbar';
 import { EmergencyBanner } from './EmergencyBanner';
@@ -14,7 +15,12 @@ import { Footer } from './Footer';
 import { useInvisibleTurnstile, TurnstileContainer } from './Turnstile';
 import { Listing, FilterState, ListingType } from '../lib/types';
 import { fetchListings } from '../lib/api';
-import { isEmergencyBannerDismissed, setEmergencyBannerDismissed } from '../lib/localStorage';
+import {
+  isDataPolicyAccepted,
+  isEmergencyBannerDismissed,
+  setDataPolicyAccepted,
+  setEmergencyBannerDismissed,
+} from '../lib/localStorage';
 import { cityHasMapCoordinates } from '../lib/zoneCoordinates';
 
 // US-4.3: Leaflet touches `window` at import time, so this can never run
@@ -85,8 +91,10 @@ export default function CityFeedPage({
   // would otherwise cause a hydration mismatch between server and client
   // render for a returning visitor who previously dismissed it.
   const [isEmergencyBannerVisible, setIsEmergencyBannerVisible] = useState(true);
+  const [isPolicyPopupOpen, setIsPolicyPopupOpen] = useState(false);
   useEffect(() => {
     if (isEmergencyBannerDismissed()) setIsEmergencyBannerVisible(false);
+    if (!isDataPolicyAccepted()) setIsPolicyPopupOpen(true);
   }, []);
   const handleDismissEmergencyBanner = () => {
     setIsEmergencyBannerVisible(false);
@@ -234,6 +242,44 @@ export default function CityFeedPage({
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-solidarity-500 selection:text-white">
+      {isPolicyPopupOpen && (
+        <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm p-4 grid place-items-center">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Aceptación de política de datos"
+            className="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-6 sm:p-7 shadow-2xl"
+          >
+            <h2 className="text-lg sm:text-xl font-semibold text-slate-100">
+              Antes de continuar
+            </h2>
+            <p className="mt-3 text-sm text-slate-300 leading-relaxed">
+              Para usar la plataforma debes confirmar que conoces nuestra Política de Tratamiento de
+              Datos Personales (Ley 1581 de 2012).
+            </p>
+            <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+              Puedes revisarla aquí:{' '}
+              <Link
+                href="/terminos-y-privacidad"
+                className="text-emerald-700 underline underline-offset-2 hover:text-emerald-600"
+              >
+                Política de privacidad y Habeas Data
+              </Link>
+              .
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setDataPolicyAccepted(true);
+                setIsPolicyPopupOpen(false);
+              }}
+              className="mt-6 w-full rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
+            >
+              Acepto y continuar
+            </button>
+          </div>
+        </div>
+      )}
       <div>
         {/* Top Emergency Lines Banner (US-1.5: dismissible, remembered) */}
         {isEmergencyBannerVisible && (

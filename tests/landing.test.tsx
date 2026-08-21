@@ -17,6 +17,7 @@ vi.mock('../lib/api', async (importOriginal) => {
 
 describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   beforeEach(() => {
+    window.localStorage.clear();
     fetchListings.mockResolvedValue({ items: listingsFixture, totalCount: 2 });
   });
 
@@ -64,12 +65,26 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
     expect(screen.getAllByText('0 publicaciones').length).toBeGreaterThan(0);
   });
 
-  it('mantiene los modales cerrados en el render inicial', async () => {
+  it('muestra el popup de política para newcomers y permite continuar al aceptar', async () => {
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
     await waitFor(() => expect(fetchListings).toHaveBeenCalled());
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    expect(screen.queryByText(/Marcar como Resuelta/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('dialog', { name: /Aceptación de política de datos/i })
+    ).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /Acepto y continuar/i }));
+
+    expect(screen.queryByRole('dialog', { name: /Aceptación de política de datos/i })).not.toBeInTheDocument();
+    expect(window.localStorage.getItem('alojamiento_solidario_data_policy_accepted')).toBe('true');
+  });
+
+  it('no vuelve a mostrar el popup cuando la política ya fue aceptada', async () => {
+    window.localStorage.setItem('alojamiento_solidario_data_policy_accepted', 'true');
+    render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
+
+    await waitFor(() => expect(fetchListings).toHaveBeenCalled());
+    expect(screen.queryByRole('dialog', { name: /Aceptación de política de datos/i })).not.toBeInTheDocument();
   });
 
   it('US-4.5: con intentTipo="necesito" fija el filtro de tipo, oculta el select de Tipo y ajusta título/CTA', async () => {

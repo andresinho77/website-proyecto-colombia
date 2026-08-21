@@ -12,6 +12,7 @@ import { Footer } from './Footer';
 import { useInvisibleTurnstile, TurnstileContainer } from './Turnstile';
 import { Listing, FilterState, ListingType } from '../lib/types';
 import { fetchListings } from '../lib/api';
+import { isEmergencyBannerDismissed, setEmergencyBannerDismissed } from '../lib/localStorage';
 
 interface CityFeedPageProps {
   cityName?: string;
@@ -64,6 +65,24 @@ export default function CityFeedPage({
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [publishDefaultTipo, setPublishDefaultTipo] = useState<ListingType>(intentTipo || 'ofrezco');
   const [newlyCreatedListing, setNewlyCreatedListing] = useState<Listing | null>(null);
+
+  // US-1.5: EmergencyBanner dismiss/reopen. Starts visible (default true) —
+  // localStorage isn't available during SSR, so this is corrected right
+  // after mount instead of read directly in useState's initializer, which
+  // would otherwise cause a hydration mismatch between server and client
+  // render for a returning visitor who previously dismissed it.
+  const [isEmergencyBannerVisible, setIsEmergencyBannerVisible] = useState(true);
+  useEffect(() => {
+    if (isEmergencyBannerDismissed()) setIsEmergencyBannerVisible(false);
+  }, []);
+  const handleDismissEmergencyBanner = () => {
+    setIsEmergencyBannerVisible(false);
+    setEmergencyBannerDismissed(true);
+  };
+  const handleReopenEmergencyBanner = () => {
+    setIsEmergencyBannerVisible(true);
+    setEmergencyBannerDismissed(false);
+  };
 
   const loadListings = useCallback(async () => {
     setIsLoading(true);
@@ -189,8 +208,10 @@ export default function CityFeedPage({
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-solidarity-500 selection:text-white">
       <div>
-        {/* Top Emergency Lines Banner */}
-        <EmergencyBanner />
+        {/* Top Emergency Lines Banner (US-1.5: dismissible, remembered) */}
+        {isEmergencyBannerVisible && (
+          <EmergencyBanner onDismiss={handleDismissEmergencyBanner} />
+        )}
 
         {/* Header / Navbar (US-1.2) */}
         <Navbar
@@ -198,6 +219,8 @@ export default function CityFeedPage({
           currentDeptSlug={departmentSlug}
           isDepartmentFeed={isDepartmentFeed}
           isNationalFeed={isNationalFeed}
+          showEmergencyReopen={!isEmergencyBannerVisible}
+          onReopenEmergency={handleReopenEmergencyBanner}
         />
 
         {/* Intent Nav Bar (US-4.5) — replaces the old full-width hero

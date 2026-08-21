@@ -158,3 +158,13 @@
   min-height: 44px;
   min-width: 44px;
 }
+
+/* US-1.5: pre-hydration CLS fix for EmergencyBanner. `.eb-dismissed` is set
+   on <html> by the blocking script in app/layout.tsx BEFORE this element is
+   even parsed, so a returning visitor who dismissed the banner never sees
+   it flash open-then-close — see that script's comment for the full story.
+   Kept in sync with React state afterwards by
+   lib/localStorage.ts's setEmergencyBannerDismissed(). */
+html.eb-dismissed [data-emergency-banner] {
+  display: none;
+}

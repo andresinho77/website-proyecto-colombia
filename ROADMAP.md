@@ -242,26 +242,61 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     de `rgba()` fijos a las mismas variables. Verificado con capturas
     Playwright en `light`/`dark` `colorScheme` sobre landing, feed y footer;
     `npm run validate` verde.
-- [⬜] **US-1.5**: Como usuario, puedo cerrar el banner de "Líneas de atención
+- [✅] **US-1.5**: Como usuario, puedo cerrar el banner de "Líneas de atención
   nacional de emergencia" con un botón "×", y el sitio recuerda que lo cerré
   para no volver a mostrármelo en cada visita.
   - *Origen*: pedido del mantenedor 2026-08-21.
-  - *Criterios*: botón "×" visible en `EmergencyBanner.tsx`; el cierre se
-    persiste (candidato: `lib/localStorage.ts`, mismo patrón que
-    `getMyListings`/`saveMyListing` — sin expiración forzada, ver nota de
-    diseño abajo); tras cerrar, aparece un ícono de teléfono junto al escudo
-    de Habeas Data en el `Navbar` — al hacer clic en ese ícono, el banner de
-    emergencia vuelve a aparecer (no borra el estado "cerrado" permanentemente,
-    solo lo reabre para esa sesión de navegación o hasta que el usuario lo
-    cierre de nuevo). El estado de cierre/reapertura debe compartirse entre
-    `EmergencyBanner` y `Navbar`, que son componentes hermanos bajo
-    `CityFeedPage` — vive mejor como estado levantado a `CityFeedPage` con
-    lectura inicial desde `localStorage` en un `useEffect` (no en el render
-    inicial, para evitar mismatch de hidratación SSR/CSR).
+  - *Entregado*: `lib/localStorage.ts` gana `isEmergencyBannerDismissed()`/
+    `setEmergencyBannerDismissed()` (mismo patrón try/catch que
+    `getMyListings`/`saveMyListing`, sin expiración forzada — ver nota de
+    diseño abajo). `EmergencyBanner.tsx` gana un botón "×" (`onDismiss`
+    prop) junto al resto del banner. El estado `isEmergencyBannerVisible`
+    vive levantado en `CityFeedPage` (empieza `true` y se corrige en un
+    `useEffect` post-mount desde `localStorage`, para no romper la
+    hidratación SSR/CSR de un visitante que ya lo había cerrado antes) y se
+    pasa hacia abajo a `EmergencyBanner` (visibilidad) y a `Navbar`
+    (`showEmergencyReopen`/`onReopenEmergency`) — hermanos bajo
+    `CityFeedPage`. `Navbar.tsx` renderiza un ícono de teléfono junto al
+    escudo de Habeas Data solo cuando el banner está cerrado; al hacer clic
+    reabre el banner y limpia el flag de `localStorage`.
   - *Nota de diseño*: sin expiración automática del "cerrado" — dado que
     reabrir es un clic (el ícono de teléfono), no hay urgencia de forzar que
     reaparezca solo; forzar reaparición periódica sin que el usuario lo pida
     arriesga entrenar a la gente a ignorarlo aún más rápido.
+  - Cobertura nueva: `tests/emergency-banner.test.tsx` (4 casos — visible
+    por defecto, cerrar persiste y muestra el ícono de reapertura, no se
+    muestra en un render nuevo si ya estaba cerrado, reabrir desde el ícono
+    limpia el flag). Verificado con `npm run validate` completo (39/39
+    tests, typecheck/lint/build limpios).
+  - *Fix de CLS (2026-08-21, misma sesión, más tarde)*: el mantenedor
+    detectó un salto de layout — el SSR siempre renderiza el banner abierto
+    (el servidor no puede leer `localStorage`), y la corrección vía
+    `useEffect` solo corre después de hidratar, así que un visitante que ya
+    lo había cerrado lo veía parpadear abierto y luego desaparecer. Fix:
+    script bloqueante e inline en `app/layout.tsx` (`<head>`, antes de
+    hidratar) que lee `localStorage` y agrega la clase `eb-dismissed` a
+    `<html>` — misma técnica que evita el flash de tema equivocado en dark
+    mode, aplicada acá a `localStorage` en vez de una media query. Regla CSS
+    nueva en `app/globals.css`: `html.eb-dismissed [data-emergency-banner] {
+    display: none; }`, con el atributo `data-emergency-banner` agregado al
+    contenedor raíz de `EmergencyBanner.tsx`. `setEmergencyBannerDismissed()`
+    en `lib/localStorage.ts` ahora también sincroniza esa clase en cada
+    cierre/reapertura (`document.documentElement.classList.toggle(...)`),
+    para que nunca quede desalineada con el estado de React tras la carga
+    inicial. Verificado con Playwright: `display: none` ya presente incluso
+    en `domcontentloaded` (antes de que React termine de hidratar), y el
+    ciclo cerrar→reabrir sincroniza la clase y el flag de `localStorage`
+    correctamente en ambas direcciones.
+  - *Ajuste de breakpoints (misma sesión)*: el "dropdown" (acordeón
+    colapsable) se pensó originalmente para `<768px`, pero a 768-1023px el
+    label completo + 3 píldoras + botón "×" ya no entraban en una sola
+    fila — se movió el punto donde el banner se fija abierto de `md:`
+    (768px) a `lg:` (1024px), así que 768-1023px sigue siendo un acordeón,
+    solo que con un label más corto ("Líneas de atención a emergencias").
+  - *Navbar*: el `gap-4` entre el ícono de Habeas Data y el de reapertura
+    del banner (ambos solo-ícono en `lg:+`) se sentía como un espacio
+    accidental una vez que dejaron de convivir con los links "Feed"/
+    "Publicar" (ya removidos) — se redujo a `gap-1`.
 - [⬜] **US-1.6**: Como usuario, si visito una URL que no existe (404) o el
   sitio encuentra un error inesperado (500), veo una página clara en vez de
   un error crudo de Next.js o una pantalla en blanco.

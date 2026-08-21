@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShieldAlert, HeartHandshake } from 'lucide-react';
+import { ShieldAlert, HeartHandshake, PhoneCall } from 'lucide-react';
 import { CitySwitcher } from './CitySwitcher';
 
 interface NavbarProps {
@@ -10,6 +10,10 @@ interface NavbarProps {
   currentDeptSlug?: string;
   isDepartmentFeed?: boolean;
   isNationalFeed?: boolean;
+  /** US-1.5: shows a phone-icon reopen button after the Habeas Data shield
+   * once the EmergencyBanner has been dismissed. */
+  showEmergencyReopen?: boolean;
+  onReopenEmergency?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -17,6 +21,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentDeptSlug,
   isDepartmentFeed = false,
   isNationalFeed = false,
+  showEmergencyReopen = false,
+  onReopenEmergency,
 }) => {
   const homeHref = isNationalFeed
     ? '/'
@@ -72,7 +78,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               redundant with IntentNavBar, which sits right below this bar on
               every page — its tabs already surface the feed and its "+"
               button already covers publish. */}
-          <nav className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">
+          {/* gap-1 (2026-08-21): the old gap-4 was sized for when this row
+              held the "Feed"/"Publicar" links too; now that it's just 2
+              icon buttons at lg:+, that much space read as an accidental
+              gap rather than intentional grouping. */}
+          <nav className="flex items-center gap-1 flex-shrink-0">
             {/* Mobile (below lg): no hover exists, so always show the short
                 "Habeas Data" label next to the icon instead of hiding it
                 behind an interaction nobody on touch can trigger. Desktop
@@ -91,6 +101,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 Política de privacidad / Habeas Data
               </span>
             </Link>
+
+            {/* US-1.5: reappears only after EmergencyBanner is dismissed —
+                without this, dismissing it would be a one-way door. */}
+            {showEmergencyReopen && onReopenEmergency && (
+              <button
+                type="button"
+                onClick={onReopenEmergency}
+                aria-label="Mostrar líneas de atención de emergencia"
+                title="Mostrar líneas de atención de emergencia"
+                className="touch-target w-9 h-9 rounded-full text-slate-400 hover:text-rose-300 hover:bg-slate-800/60 flex items-center justify-center transition-colors"
+              >
+                <PhoneCall className="w-4 h-4" />
+              </button>
+            )}
           </nav>
         </div>
       </div>

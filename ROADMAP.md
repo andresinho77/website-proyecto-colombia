@@ -360,16 +360,37 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     visitantes vean `not-found.tsx` en vez del XML de error de S3. Sin este
     mapeo, el 404 bonito solo funciona en local (`npx serve`/similares) y
     nunca en producción real.
-- [⬜] **US-1.7**: Como usuario en tema claro, el `Footer` se distingue
+- [✅] **US-1.7**: Como usuario en tema claro, el `Footer` se distingue
   visualmente del fondo de la página en vez de casi fundirse con él.
   - *Origen*: pedido explícito del mantenedor 2026-08-21 — "footer
     background color in light mode needs a slightly different shade to
     stand out a little bit more".
-  - *Criterios*: ajustar el fondo de `components/Footer.tsx` en modo claro
-    (probablemente un paso de `slate` ligeramente distinto al `bg-slate-950`
-    de la página, ver el sistema de variables CSS de US-1.4) sin romper el
-    contraste ya verificado en modo oscuro; validar con capturas Playwright
-    en ambos `colorScheme` antes de cerrar (mismo método usado en US-1.4).
+  - *Entregado*: nuevo token `--color-footer-bg` (`app/globals.css`) en vez
+    de reusar `--color-slate-950` — en modo claro ambos redondeaban al mismo
+    casi-blanco (247/247/250), por eso el footer desaparecía visualmente. En
+    `:root` (claro) vale `228 228 232` (mismo tono que `slate-800`, con
+    contraste real contra el `247/247/250` de la página); bajo
+    `@media (prefers-color-scheme: dark)` vale `17 17 23`, idéntico al
+    `slate-950` oscuro — el look en modo oscuro queda sin cambios (ya tenía
+    contraste suficiente vía el divisor `border-t`). Registrado en
+    `tailwind.config.ts` como color `footer` (mismo patrón `themed()` que el
+    resto de la paleta); `components/Footer.tsx` pasa de `bg-slate-950` a
+    `bg-footer`.
+  - Verificado con Playwright en `colorScheme: 'light'`/`'dark'`: claro
+    `rgb(228,228,232)` vs. fondo de página `rgb(247,247,250)` (distinguible);
+    oscuro `rgb(17,17,23)` en ambos (sin cambio). 43/43 tests verdes,
+    typecheck/lint limpios.
+  - *Ajuste adicional (misma sesión)*: el mantenedor pidió quitar los
+    divisores internos del footer (entre la fila de marca, "Canales
+    oficiales de ayuda" y el tagline final) — primero solo en claro, luego
+    "esto debería aplicar a dark mode también". Nuevo token
+    `--color-footer-divider`, igual a `--color-footer-bg` en ambos temas
+    (claro y oscuro) — el borde de 1px sigue ahí (sin salto de layout), solo
+    se vuelve invisible al fundirse con el fondo. `tailwind.config.ts`
+    anida `footer.divider` junto a `footer.DEFAULT`; `Footer.tsx` usa
+    `border-footer-divider` en los 2 divisores internos (el borde superior
+    que separa el footer de la página, `border-slate-800`, no cambió — no
+    es un divisor "de sección" sino el límite del footer mismo).
 
 ### Épica 2 — Publicar oferta ("Tengo")
 - [✅] **US-2.1**: Como usuario con espacio disponible, completo un formulario corto

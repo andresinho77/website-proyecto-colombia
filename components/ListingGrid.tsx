@@ -100,7 +100,7 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
             type="button"
             onClick={onLoadMore}
             disabled={isLoadingMore}
-            className="touch-target px-8 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 text-slate-200 hover:text-white font-semibold text-sm shadow-lg flex items-center gap-2 transition-all disabled:opacity-50"
+            className="touch-target px-8 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 text-slate-200 hover:text-slate-50 font-semibold text-sm shadow-lg flex items-center gap-2 transition-all disabled:opacity-50"
           >
             {isLoadingMore ? (
               <>

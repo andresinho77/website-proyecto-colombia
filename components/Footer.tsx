@@ -12,7 +12,7 @@ const OFFICIAL_CHANNELS = [
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 py-10 text-slate-400 text-xs">
+    <footer className="border-t border-slate-800 bg-footer py-10 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-end justify-between gap-6">
 
@@ -49,7 +49,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-slate-900">
+        <div className="mt-8 pt-6 border-t border-footer-divider">
           <span className="block text-center text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-3">
             Canales oficiales de ayuda
           </span>
@@ -70,7 +70,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-slate-900 text-center text-slate-500 text-[11px] font-light">
+        <div className="mt-6 pt-6 border-t border-footer-divider text-center text-slate-500 text-[11px] font-light">
           Plataforma 100% gratuita y sin ánimo de lucro. El contacto ocurre fuera de la app directamente entre las partes vía WhatsApp.
         </div>
       </div>

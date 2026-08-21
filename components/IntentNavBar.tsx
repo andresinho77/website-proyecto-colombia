@@ -109,7 +109,12 @@ export const IntentNavBar: React.FC<IntentNavBarProps> = ({
               className={`touch-target inline-flex items-center justify-center px-3.5 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap transition-colors ${
                 tab.active
                   ? `${tab.activeBg} shadow-sm`
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  // text-slate-50 (not literal white) — theme-aware: near-
+                  // black in light mode, near-white in dark, so it always
+                  // contrasts against hover:bg-slate-800 in both themes.
+                  // Literal white-on-light-gray was nearly unreadable in
+                  // light mode (2026-08-21).
+                  : 'text-slate-300 hover:text-slate-50 hover:bg-slate-800'
               }`}
             >
               {tab.label}

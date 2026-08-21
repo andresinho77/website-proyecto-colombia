@@ -170,6 +170,19 @@
   phrasing that could be either doc-only or build-now, confirm scope before writing code rather
   than assuming per-bullet intent from wording alone.
 
+## Do-Not-Repeat — 2026-08-21 (literal `text-white`/`hover:text-white` on the `slate` scale)
+- Never pair `hover:bg-slate-800` (or any themed `slate-*` step) with literal `text-white` /
+  `hover:text-white`. The `slate` scale inverts per theme (light: 950 near-white/50 near-black;
+  dark: reversed, see US-1.4) but `white` does NOT — it's always `#fff`. In light mode
+  `bg-slate-800` resolves to a LIGHT gray (`rgb(228,228,232)`), so `hover:text-white` on top of it
+  is nearly invisible (found in `IntentNavBar.tsx`'s inactive tab hover, `ListingGrid.tsx`'s "Cargar
+  más" button, and `LocationCombobox.tsx`'s highlighted/priority-chip states — all fixed
+  2026-08-21). Use `text-slate-50` instead: near-black in light mode, near-white in dark, always
+  contrasts correctly against another `slate-*` step. Only pair literal `white` with a FIXED brand
+  color that stays dark in both themes (rose/emerald/amber-900+ shades, `bg-black/*` overlays) —
+  never with the `slate` scale. When adding a new hover/active state, grep for `hover:text-white`
+  and `text-white` near a `slate-*` background as a quick self-check.
+
 ## Key Learnings — `next dev` vs. static export 404 behavior (2026-08-21)
 - Requesting an unmatched single-segment path (e.g. `/this-does-not-exist/`) under `next dev`
   throws Next's internal error `Page "/[ciudad]/page" is missing param ... in

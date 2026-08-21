@@ -22,6 +22,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   });
 
   it('renderiza la estructura principal: banner, hero, feed y footer', async () => {
+    window.localStorage.setItem('alojamiento_solidario_data_policy_accepted', 'true');
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     expect(
@@ -34,6 +35,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   });
 
   it('pide las publicaciones de la ciudad de la ruta con los filtros por defecto y las pinta en el feed', async () => {
+    window.localStorage.setItem('alojamiento_solidario_data_policy_accepted', 'true');
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     // `exact: false`: la tarjeta envuelve la descripción en comillas tipográficas.
@@ -59,6 +61,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
 
   it('muestra el estado vacío del feed cuando la API no devuelve publicaciones', async () => {
     fetchListings.mockResolvedValue({ items: [], totalCount: 0 });
+    window.localStorage.setItem('alojamiento_solidario_data_policy_accepted', 'true');
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     expect(await screen.findByText('No se encontraron publicaciones')).toBeInTheDocument();
@@ -66,14 +69,25 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   });
 
   it('muestra el popup de política para newcomers y permite continuar al aceptar', async () => {
+    window.localStorage.removeItem('alojamiento_solidario_data_policy_accepted');
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
     await waitFor(() => expect(fetchListings).toHaveBeenCalled());
 
     expect(
       screen.getByRole('dialog', { name: /Aceptación de política de datos/i })
     ).toBeInTheDocument();
+    const policyLink = screen.getByRole('link', { name: /Política de privacidad y Habeas Data/i });
+    expect(policyLink).toHaveAttribute('target', '_blank');
+    expect(policyLink).toHaveAttribute('rel', 'noopener noreferrer');
+    await waitFor(() => expect(policyLink).toHaveFocus());
 
-    await userEvent.click(screen.getByRole('button', { name: /Acepto y continuar/i }));
+    await userEvent.tab();
+    const acceptButton = screen.getByRole('button', { name: /Acepto y continuar/i });
+    expect(acceptButton).toHaveFocus();
+    await userEvent.tab();
+    expect(policyLink).toHaveFocus();
+
+    await userEvent.click(acceptButton);
 
     expect(screen.queryByRole('dialog', { name: /Aceptación de política de datos/i })).not.toBeInTheDocument();
     expect(window.localStorage.getItem('alojamiento_solidario_data_policy_accepted')).toBe('true');
@@ -88,6 +102,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   });
 
   it('US-4.5: con intentTipo="necesito" fija el filtro de tipo, oculta el select de Tipo y ajusta título/CTA', async () => {
+    window.localStorage.setItem('alojamiento_solidario_data_policy_accepted', 'true');
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" intentTipo="necesito" />);
 
     expect(
@@ -107,6 +122,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   });
 
   it('US-4.7: cambiar "Ordenar por" reordena las tarjetas ya cargadas por precio', async () => {
+    window.localStorage.setItem('alojamiento_solidario_data_policy_accepted', 'true');
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
     await screen.findByText(listingOfrezco.descripcion, { exact: false });
 
@@ -123,6 +139,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
   });
 
   it('pide todas las publicaciones a nivel nacional cuando isNationalFeed es true', async () => {
+    window.localStorage.setItem('alojamiento_solidario_data_policy_accepted', 'true');
     render(<CityFeedPage cityName="Colombia" isNationalFeed={true} />);
 
     expect(

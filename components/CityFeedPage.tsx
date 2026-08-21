@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { List, Map as MapIcon } from 'lucide-react';
@@ -92,10 +92,41 @@ export default function CityFeedPage({
   // render for a returning visitor who previously dismissed it.
   const [isEmergencyBannerVisible, setIsEmergencyBannerVisible] = useState(true);
   const [isPolicyPopupOpen, setIsPolicyPopupOpen] = useState(false);
+  const policyDialogRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (isEmergencyBannerDismissed()) setIsEmergencyBannerVisible(false);
     if (!isDataPolicyAccepted()) setIsPolicyPopupOpen(true);
   }, []);
+  useEffect(() => {
+    if (!isPolicyPopupOpen || !policyDialogRef.current) return;
+    const getFocusableElements = () =>
+      policyDialogRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), textarea, input, select, [contenteditable="true"], [tabindex]:not([tabindex="-1"])'
+      ) ?? [];
+
+    const initialFocusableElements = getFocusableElements();
+    if (initialFocusableElements.length === 0) return;
+
+    initialFocusableElements[0].focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Tab') return;
+      const focusableElements = getFocusableElements();
+      if (focusableElements.length === 0) return;
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isPolicyPopupOpen]);
   const handleDismissEmergencyBanner = () => {
     setIsEmergencyBannerVisible(false);
     setEmergencyBannerDismissed(true);
@@ -245,6 +276,7 @@ export default function CityFeedPage({
       {isPolicyPopupOpen && (
         <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm p-4 grid place-items-center">
           <div
+            ref={policyDialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="Aceptación de política de datos"
@@ -261,7 +293,9 @@ export default function CityFeedPage({
               Puedes revisarla aquí:{' '}
               <Link
                 href="/terminos-y-privacidad"
-                className="text-emerald-700 underline underline-offset-2 hover:text-emerald-600"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
               >
                 Política de privacidad y Habeas Data
               </Link>
@@ -280,7 +314,7 @@ export default function CityFeedPage({
           </div>
         </div>
       )}
-      <div>
+      <div aria-hidden={isPolicyPopupOpen ? 'true' : undefined}>
         {/* Top Emergency Lines Banner (US-1.5: dismissible, remembered) */}
         {isEmergencyBannerVisible && (
           <EmergencyBanner onDismiss={handleDismissEmergencyBanner} />

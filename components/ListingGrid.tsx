@@ -31,7 +31,13 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
   turnstileToken,
   onTurnstileConsumed,
 }) => {
-  if (isLoading) {
+  // Full skeleton only on a genuine first load (nothing to show yet).
+  // Bug fix (2026-08-21): this used to fire on `isLoading` alone, so every
+  // filter-triggered refetch — even with results already on screen —
+  // wiped the whole grid to skeletons and back, a jarring blink. A refetch
+  // with existing listings now just dims the current grid (below) instead
+  // of replacing it.
+  if (isLoading && listings.length === 0) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3, 4, 5, 6].map((n) => (
@@ -49,7 +55,7 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
     );
   }
 
-  if (listings.length === 0) {
+  if (!isLoading && listings.length === 0) {
     return (
       <div className="glass-card p-12 rounded-2xl text-center max-w-xl mx-auto my-8">
         <AlertCircle className="w-12 h-12 text-slate-500 mx-auto mb-4" />
@@ -80,7 +86,14 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Dimmed instead of replaced while a filter-triggered refetch is in
+          flight — see the skeleton-condition note above. */}
+      <div
+        aria-busy={isLoading || undefined}
+        className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200 ${
+          isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'
+        }`}
+      >
         {listings.map((listing) => (
           <ListingCard
             key={listing.id}

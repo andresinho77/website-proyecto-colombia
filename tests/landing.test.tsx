@@ -50,7 +50,10 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
         maxPrecio: '',
       })
     );
-    expect(screen.getByText('2 publicaciones')).toBeInTheDocument();
+    // US-4.9: el contador de resultados aparece 2 veces en el DOM a la vez
+    // (barra compacta de mobile + panel de desktop, uno oculto por CSS
+    // según el breakpoint — jsdom no aplica media queries).
+    expect(screen.getAllByText('2 publicaciones').length).toBeGreaterThan(0);
   });
 
   it('muestra el estado vacío del feed cuando la API no devuelve publicaciones', async () => {
@@ -58,7 +61,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     expect(await screen.findByText('No se encontraron publicaciones')).toBeInTheDocument();
-    expect(screen.getByText('0 publicaciones')).toBeInTheDocument();
+    expect(screen.getAllByText('0 publicaciones').length).toBeGreaterThan(0);
   });
 
   it('mantiene los modales cerrados en el render inicial', async () => {

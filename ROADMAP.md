@@ -589,7 +589,7 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     trabajo de backend primero (repo hermano `backend-proyecto-colombia`),
     luego frontend consumiéndolo, siguiendo el mismo patrón de coordinación
     que US-4.4/US-6.5.
-- [⬜] **US-4.9**: Como usuario en mobile, el panel de filtros no debe
+- [✅] **US-4.9**: Como usuario en mobile, el panel de filtros no debe
   ocupar tanto espacio vertical que desplace las publicaciones (lo
   importante) fuera de la vista inicial; y en general, los filtros/facetas
   deberían acercarse más al patrón de un e-commerce típico (Mercado Libre,
@@ -600,21 +600,42 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
     filter section (take into account typical e-commerce filters/facets), in
     mobile it's taking a lot of space from the actual important thing (the
     posts)". Es la continuación real del rediseño que US-4.7 dejó como "pase
-    intermedio" (ver su nota de alcance) — el panel de `SearchFilters` sigue
-    siendo el mismo grid de selects expandido permanentemente, ahora con
-    chips y orden agregados encima, lo que probablemente empeoró el
-    problema de espacio en mobile en vez de resolverlo.
-  - *Criterios (a definir con el mantenedor antes de construir, candidato a
-    pasar por una skill de diseño dedicada o `/reframe`)*: evaluar un
-    filtro colapsado por defecto en mobile (acordeón o botón "Filtros (N)"
-    que abre un modal/drawer de pantalla completa, patrón común en
-    e-commerce mobile) vs. mantener expandido pero mucho más compacto;
-    contador de resultados en vivo por filtro antes de aplicar (requiere
-    decidir si se calcula client-side sobre lo ya cargado o pidiendo un
-    conteo al backend); mantener el mismo contrato de `FilterState` o
-    extenderlo de forma no disruptiva; no debe romper `IntentNavBar`
-    (sticky bar justo arriba) ni los tests existentes de
-    `SearchFilters`/`CityFeedPage`.
+    intermedio" (ver su nota de alcance).
+  - *Decisiones (2026-08-21, vía preguntas dirigidas antes de construir)*:
+    (a) en mobile/tablet (`<lg`, <1024px) el filtro colapsado se resuelve
+    con un modal/bottom-sheet de pantalla completa (no un acordeón inline);
+    (b) sin contador de resultados en vivo por filtro en este pase — queda
+    fuera de alcance explícitamente (requeriría o un endpoint de conteo en
+    el backend, o una estimación client-side inexacta una vez `Cargar más`/
+    paginación entra en juego).
+  - *Entregado*: `components/FilterFields.tsx` (nuevo) extrae los 5 controles
+    (Tipo, Zona, Barrio, Precio, Ordenar) de `SearchFilters.tsx`, reutilizado
+    ahora en dos lugares en vez de duplicar el mismo grid de selects.
+    `components/FilterSheet.tsx` (nuevo) es el modal/bottom-sheet mobile
+    (`items-end` en pantallas angostas, centrado desde `sm:`, mismo patrón
+    de overlay que `PublishModal`/`ShareModal`) — header con
+    "Filtros de búsqueda" + cerrar, `FilterFields` en el cuerpo, footer con
+    "Limpiar" y "Ver N publicaciones" (cierra el sheet).
+    `SearchFilters.tsx` reescrito: por debajo de `lg:` renderiza solo una
+    barra compacta (ícono + "Filtros" + badge con el conteo de filtros
+    activos + resultado + chevron) que abre `FilterSheet`, más los chips
+    activos inline debajo (remover un chip no requiere abrir el sheet); el
+    panel completo siempre-abierto se mantiene sin cambios en `lg:+`
+    (`hidden lg:block`).
+  - Verificado con Playwright en 390×844 (mobile): la primera tarjeta de
+    publicación ya es visible en el viewport inicial, algo que antes exigía
+    scrollear más allá del grid de filtros expandido; el sheet abre con los
+    5 controles + footer; el panel de desktop (1280px) queda
+    pixel-idéntico al anterior.
+  - Cobertura nueva: `tests/search-filters.test.tsx` (5 casos — el trigger
+    abre el sheet con los mismos controles, sin chips no hay badge/botón
+    Limpiar, un chip se puede quitar sin abrir el sheet, "Ver N
+    publicaciones" cierra el sheet, "Limpiar" dentro del sheet llama a
+    `onReset`). Ajustadas 2 aserciones en `tests/landing.test.tsx` a
+    `getAllByText` — el contador de resultados y otros textos ahora existen
+    2 veces en el DOM a la vez (barra mobile + panel desktop, uno oculto
+    solo por CSS; jsdom no aplica media queries). 48/48 tests verdes (antes
+    43/43), typecheck/lint limpios.
 
 ### Épica 5 — Contacto
 - [✅] **US-5.1**: Como usuario, al hacer clic en "Contactar por WhatsApp" se abre un

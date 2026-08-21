@@ -30,18 +30,17 @@ y Armenia como siguientes.
 - Si existe contradicción entre documentos, **prevalece `ROADMAP.md`** hasta que
   se reconcilie el resto de la documentación.
 
-**Pendiente (pedido 2026-08-21, no ejecutado todavía):** correr una revisión
-de arquitectura con la skill/comando `.claude/commands/architecture-guardian.md`
-("Early-Stage Architecture Guardian" — enfoque *journeys-before-schema*: mapear
-los recorridos de usuario reales, extraer entidades/eventos, y solo entonces
-comparar contra el modelo de datos/API/rutas ya construidos) para encontrar
-brechas y áreas de mejora en el estado actual del repo (frontend + el
-contrato hacia `backend-proyecto-colombia`). El resultado de esa revisión
-debería producir (o alimentar) un `docs/architecture-foundation.md` con
-journeys, entidades/eventos, modelo de datos, contrato de API y mapa de
-rutas — separado de este `ROADMAP.md`, que sigue gobernando estado de
-épicas/dirección de producto, no el detalle de arquitectura. Invocar cuando
-el mantenedor lo pida explícitamente (`/architecture-guardian`).
+**Revisión de arquitectura (2026-08-21, completada):** corrida con la skill/
+comando `.claude/commands/architecture-guardian.md` ("Early-Stage
+Architecture Guardian" — enfoque *journeys-before-schema*). Resultado en
+[`docs/architecture-foundation.md`](docs/architecture-foundation.md) —
+journeys por actor, entidades/eventos, modelo de datos, contrato de API y
+mapa de rutas, más 5 preguntas abiertas (la más urgente: US-7.3/purga de
+datos no está implementada pero `docs/DATA_POLICY.md` ya la promete —
+brecha de cumplimiento real, no hipotética). Separado de este `ROADMAP.md`,
+que sigue gobernando estado de épicas/dirección de producto. Re-invocar
+(`/architecture-guardian`) si el código y este documento divergen
+significativamente.
 
 ---
 

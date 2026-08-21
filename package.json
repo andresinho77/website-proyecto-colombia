@@ -9,6 +9,7 @@
     "dev": "next dev",
     "dev:api": "cd ../backend-proyecto-colombia && npm run dev",
     "dev:local": "bash scripts/start-local-dev.sh",
+    "dev:stopLocal": "bash scripts/stop-local-dev.sh",
     "build": "next build",
     "build:local": "NEXT_PUBLIC_API_URL=\"${NEXT_PUBLIC_API_URL:-http://localhost:4000/api/listings}\" next build",
     "start": "next start",
@@ -20,10 +21,12 @@
     "validate:clean": "npm ci && npm run validate"
   },
   "dependencies": {
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.428.0",
     "next": "^14.2.5",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
@@ -31,6 +34,7 @@
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.4",
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^20.14.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",

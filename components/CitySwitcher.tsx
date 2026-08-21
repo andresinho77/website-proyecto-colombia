@@ -52,7 +52,7 @@ export const CitySwitcher: React.FC<CitySwitcherProps> = ({
   }, [currentSlug, isDepartmentMode, isNationalMode]);
 
   const displayName = isNationalMode
-    ? '🇨🇴 Toda Colombia'
+    ? 'Toda Colombia'
     : isDepartmentMode
     ? (currentDept ? `Dpto. ${currentDept.name}` : 'Departamento')
     : (currentCity?.name || 'Pereira');
@@ -66,7 +66,12 @@ export const CitySwitcher: React.FC<CitySwitcherProps> = ({
   const searchResults = useMemo(() => {
     if (!searchQuery.trim()) {
       return {
-        departments: priorityDepartments.slice(0, 4),
+        // slice(0, 5): matches the 5 earthquake-priority departments exactly
+        // (Chocó, Valle del Cauca, Risaralda, Caldas, Quindío — see
+        // lib/colombia-locations.json's isPriority flags). Was slice(0, 4),
+        // which would have silently dropped one of the 5 from this default
+        // view — bump this if the priority set ever grows again.
+        departments: priorityDepartments.slice(0, 5),
         cities: priorityLocations.slice(0, 10),
       };
     }
@@ -132,6 +137,12 @@ export const CitySwitcher: React.FC<CitySwitcherProps> = ({
         aria-expanded={isOpen}
         className={`touch-target flex items-center gap-1.5 ${triggerClasses}`}
       >
+        {/* Flag emoji baked into the displayName string (with a literal
+            space) rendered inconsistently — flag glyphs (regional-indicator
+            pairs) can eat the following space depending on the emoji font,
+            so it's split into its own element with an explicit margin
+            instead of relying on a text-space character. */}
+        {isNationalMode && <span className="mr-1.5" aria-hidden="true">🇨🇴</span>}
         <span>{displayName}</span>
         <ChevronDown
           className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 ${

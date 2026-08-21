@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { PlusCircle, Search, ShieldAlert, HeartHandshake } from 'lucide-react';
+import { ShieldAlert, HeartHandshake, PhoneCall } from 'lucide-react';
 import { CitySwitcher } from './CitySwitcher';
 
 interface NavbarProps {
@@ -10,7 +10,10 @@ interface NavbarProps {
   currentDeptSlug?: string;
   isDepartmentFeed?: boolean;
   isNationalFeed?: boolean;
-  onOpenPublish?: (defaultTipo?: 'ofrezco' | 'necesito') => void;
+  /** US-1.5: shows a phone-icon reopen button after the Habeas Data shield
+   * once the EmergencyBanner has been dismissed. */
+  showEmergencyReopen?: boolean;
+  onReopenEmergency?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -18,7 +21,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentDeptSlug,
   isDepartmentFeed = false,
   isNationalFeed = false,
-  onOpenPublish,
+  showEmergencyReopen = false,
+  onReopenEmergency,
 }) => {
   const homeHref = isNationalFeed
     ? '/'
@@ -69,33 +73,46 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Persistent Header Navigation (US-1.2) */}
-          <nav className="flex items-center gap-1.5 sm:gap-4 flex-shrink-0">
-            <Link
-              href={`${homeHref}#feed`}
-              className="touch-target px-2.5 sm:px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-slate-100 hover:bg-slate-800/60 flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <Search className="w-4 h-4 text-emerald-700" />
-              <span className="md:hidden">Buscar</span>
-              <span className="hidden md:inline">Feed de Alojamientos</span>
-            </Link>
-
+          {/* Persistent Header Navigation (US-1.2). "Feed de Alojamientos"
+              and "Publicar Espacio" were removed (2026-08-21): both are now
+              redundant with IntentNavBar, which sits right below this bar on
+              every page — its tabs already surface the feed and its "+"
+              button already covers publish. */}
+          {/* gap-1 (2026-08-21): the old gap-4 was sized for when this row
+              held the "Feed"/"Publicar" links too; now that it's just 2
+              icon buttons at lg:+, that much space read as an accidental
+              gap rather than intentional grouping. */}
+          <nav className="flex items-center gap-1 flex-shrink-0">
+            {/* Mobile (below lg): no hover exists, so always show the short
+                "Habeas Data" label next to the icon instead of hiding it
+                behind an interaction nobody on touch can trigger. Desktop
+                (lg+): icon-only, hover/focus slides the fuller label in from
+                the right (max-width + translate-x, both animated). */}
             <Link
               href="/terminos-y-privacidad"
-              className="touch-target px-3 py-2 rounded-lg text-xs sm:text-sm font-medium text-slate-400 hover:text-slate-200 hidden lg:flex items-center gap-1 transition-colors"
+              aria-label="Política de privacidad / Habeas Data"
+              className="group touch-target h-9 pl-2.5 pr-3 lg:pr-2.5 lg:hover:pr-3.5 lg:focus-visible:pr-3.5 rounded-full text-slate-400 hover:text-slate-200 focus-visible:text-slate-200 hover:bg-slate-800/60 focus-visible:bg-slate-800/60 flex items-center overflow-hidden transition-[padding,background-color,color] duration-300"
             >
-              <ShieldAlert className="w-4 h-4 text-slate-400" />
-              Habeas Data
+              <ShieldAlert className="w-4 h-4 flex-shrink-0" />
+              <span className="ml-1.5 lg:hidden whitespace-nowrap text-xs font-medium">
+                Habeas Data
+              </span>
+              <span className="hidden lg:inline-block max-w-0 group-hover:max-w-[220px] group-focus-visible:max-w-[220px] opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 -translate-x-2 group-hover:translate-x-0 group-focus-visible:translate-x-0 ml-0 group-hover:ml-2 group-focus-visible:ml-2 whitespace-nowrap overflow-hidden text-xs font-medium transition-all duration-300 ease-out">
+                Política de privacidad / Habeas Data
+              </span>
             </Link>
 
-            {onOpenPublish && (
+            {/* US-1.5: reappears only after EmergencyBanner is dismissed —
+                without this, dismissing it would be a one-way door. */}
+            {showEmergencyReopen && onReopenEmergency && (
               <button
-                onClick={() => onOpenPublish('ofrezco')}
-                className="touch-target px-2.5 sm:px-4 py-2 rounded-xl bg-solidarity-600 hover:bg-solidarity-500 text-white font-semibold text-xs sm:text-sm shadow-md shadow-solidarity-900/40 flex items-center justify-center gap-2 transition-all hover:shadow-solidarity-600/30"
+                type="button"
+                onClick={onReopenEmergency}
+                aria-label="Mostrar líneas de atención de emergencia"
+                title="Mostrar líneas de atención de emergencia"
+                className="touch-target w-9 h-9 rounded-full text-slate-400 hover:text-rose-300 hover:bg-slate-800/60 flex items-center justify-center transition-colors"
               >
-                <PlusCircle className="w-4 h-4" />
-                <span className="md:hidden">Publicar</span>
-                <span className="hidden md:inline">Publicar Espacio</span>
+                <PhoneCall className="w-4 h-4" />
               </button>
             )}
           </nav>

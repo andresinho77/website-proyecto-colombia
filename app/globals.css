@@ -63,6 +63,31 @@
   --color-accent-amber: 247 167 33;
   --color-accent-blue: 0 116 228;
 
+  /* WhatsApp brand green (#25D366 family) — deliberately a different hue
+     register than --color-emerald-*, used ONLY for the "Contactar por
+     WhatsApp" action so it doesn't read as the same affordance as the
+     "Ofrezco"/emerald journey color (see ListingCard.tsx). Fixed across
+     light/dark like the other brand accents (rose/emerald/amber) — not
+     re-declared under the dark media query below. */
+  --color-whatsapp-500: 37 211 102;
+  --color-whatsapp-600: 29 168 81;
+  --color-whatsapp-700: 21 140 66;
+
+  /* US-1.7: Footer used bg-slate-950, identical to the page background
+     (--color-slate-950 above) — in light mode both round to a near-white
+     247/247/250, so the footer visually disappeared into the page instead
+     of standing out as a distinct section. Dedicated token so only the
+     light value changes; the dark value below matches slate-950 exactly,
+     keeping dark mode's look unchanged (it already had enough contrast via
+     the border-t divider). */
+  --color-footer-bg: 228 228 232;
+  /* Internal section dividers (between the brand row, official channels,
+     and tagline) — invisible in both themes by matching --color-footer-bg
+     exactly (zero layout shift, the 1px border is still there, just blends
+     in). Requested for light mode first, then extended to dark the same
+     session. */
+  --color-footer-divider: 228 228 232;
+
   --glass-card-bg: 255 255 255 / 0.72;
   --glass-nav-bg: 255 255 255 / 0.8;
   --glass-border: 20 20 26 / 0.06;
@@ -85,6 +110,15 @@
     --color-slate-800: 42 42 54;
     --color-slate-900: 27 27 36;
     --color-slate-950: 17 17 23;
+
+    /* Unchanged from the page background in dark mode (see US-1.7 note on
+       the light value above) — dark mode's footer already reads distinctly
+       via the border-t divider. */
+    --color-footer-bg: 17 17 23;
+    /* Same treatment as light mode: invisible internal section dividers,
+       matching --color-footer-bg exactly (2026-08-21, extended to dark on
+       request). */
+    --color-footer-divider: 17 17 23;
 
     /* rose/emerald/amber/accent are fixed brand accents (badges, buttons)
        already tuned to sit on any surface — e.g. bg-rose-700 + text-white,
@@ -147,4 +181,34 @@
 .touch-target {
   min-height: 44px;
   min-width: 44px;
+}
+
+/* US-1.5: pre-hydration CLS fix for EmergencyBanner. `.eb-dismissed` is set
+   on <html> by the blocking script in app/layout.tsx BEFORE this element is
+   even parsed, so a returning visitor who dismissed the banner never sees
+   it flash open-then-close — see that script's comment for the full story.
+   Kept in sync with React state afterwards by
+   lib/localStorage.ts's setEmergencyBannerDismissed(). */
+html.eb-dismissed [data-emergency-banner] {
+  display: none;
+}
+
+/* US-4.3: Leaflet's default popup chrome is a plain white box, jarring
+   against this app's dark glass-card surfaces. Leaflet ships its own CSS
+   (imported in MapView.tsx) that these rules override — kept minimal,
+   only the popup shell + tip, not the whole Leaflet control set. */
+.leaflet-popup-content-wrapper {
+  background: rgb(var(--color-slate-900));
+  color: rgb(var(--color-slate-100));
+  border-radius: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+.leaflet-popup-tip {
+  background: rgb(var(--color-slate-900));
+}
+.leaflet-popup-close-button {
+  color: rgb(var(--color-slate-400)) !important;
+}
+.leaflet-container {
+  font-family: inherit;
 }

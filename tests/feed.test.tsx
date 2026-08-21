@@ -52,11 +52,23 @@ describe('ListingGrid (feed)', () => {
     expect(onOpenPublish).toHaveBeenCalledWith('ofrezco');
   });
 
-  it('muestra el skeleton de carga y ninguna tarjeta mientras isLoading es true', () => {
-    const { container } = render(<ListingGrid listings={listingsFixture} isLoading />);
+  it('muestra el skeleton de carga solo quando no hay tarjetas todavía (primera carga)', () => {
+    const { container } = render(<ListingGrid listings={[]} isLoading />);
 
     expect(container.querySelectorAll('.animate-pulse')).toHaveLength(6);
     expect(screen.queryByText(listingOfrezco.descripcion, { exact: false })).not.toBeInTheDocument();
+  });
+
+  it('bug fix (2026-08-21): con tarjetas ya en pantalla, un refetch (isLoading) las atenúa en vez de reemplazarlas por el skeleton', () => {
+    const { container } = render(<ListingGrid listings={listingsFixture} isLoading />);
+
+    // Nada de skeleton — las tarjetas existentes siguen ahí, solo atenuadas.
+    expect(container.querySelectorAll('.animate-pulse')).toHaveLength(0);
+    expect(screen.getByText(listingOfrezco.descripcion, { exact: false })).toBeInTheDocument();
+
+    const grid = container.querySelector('[aria-busy="true"]');
+    expect(grid).not.toBeNull();
+    expect(grid).toHaveClass('opacity-50');
   });
 
   it('muestra el botón "Cargar más publicaciones" cuando hasMore es true y llama onLoadMore al hacer clic', async () => {

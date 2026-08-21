@@ -292,8 +292,15 @@ export const getContactLink = async (
       body: JSON.stringify({ turnstileToken }),
     });
     const data = await res.json();
+    // A 404 here means the id genuinely doesn't exist on a real backend —
+    // don't paper over that with the offline fallback. Any other non-ok
+    // status (backend not deployed yet, 500s, etc.) throws to fall back,
+    // matching fetchListings' pattern elsewhere in this file (bug-014).
+    if (res.status === 404) {
+      return { success: false, error: data.error || 'Publicación no encontrada.' };
+    }
     if (!res.ok || !data.success) {
-      return { success: false, error: data.error || 'No se pudo obtener el contacto.' };
+      throw new Error(data.error || `HTTP ${res.status}`);
     }
     return { success: true, whatsapp: data.whatsapp };
   } catch (err) {

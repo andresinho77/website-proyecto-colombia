@@ -4,24 +4,28 @@ import React from 'react';
 import Link from 'next/link';
 import { HeartHandshake, ShieldCheck, ExternalLink } from 'lucide-react';
 
-interface FooterProps {
-  onOpenPrivacy?: () => void;
-}
-
 const OFFICIAL_CHANNELS = [
   { label: 'Cruz Roja Colombiana', href: 'https://www.cruzrojacolombiana.org/' },
   { label: 'UNGRD', href: 'https://www.gestiondelriesgo.gov.co/' },
   { label: 'Canales oficiales de alcaldías (gov.co)', href: 'https://www.gov.co/' },
 ];
 
-export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
+export const Footer: React.FC = () => {
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 py-10 text-slate-400 text-xs">
+    <footer className="border-t border-slate-800 bg-footer py-10 text-slate-400 text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-end justify-between gap-6">
+        {/* Centered as a column on mobile (brand block + privacy link both
+            centered, not left/right-floating) — md:+ reverts to the
+            original left-brand/right-link row, bottom-aligned. */}
+        <div className="flex flex-col items-center text-center md:flex-row md:items-end md:text-left justify-between gap-6">
 
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-emerald-900/50 border border-emerald-700/40 flex items-center justify-center text-emerald-700">
+            {/* Hidden on mobile (2026-08-21 feedback) — the Navbar logo
+                right above already establishes the brand, so this second
+                icon just repeated it while eating vertical space that
+                matters more on a phone. md:+ keeps it, matching the
+                original left-aligned row layout there. */}
+            <div className="hidden md:flex w-8 h-8 rounded-lg bg-emerald-900/50 border border-emerald-700/40 items-center justify-center text-emerald-700">
               <HeartHandshake className="w-5 h-5" />
             </div>
             <div>
@@ -35,27 +39,25 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 text-slate-300 font-medium">
-            <Link href="/#feed" className="hover:text-emerald-700 transition-colors">
-              Ver Feed Publicaciones
-            </Link>
+            {/* "Ver Feed Publicaciones" removed (2026-08-21): redundant with
+                IntentNavBar, whose tabs already put the feed one click away
+                on every page — same reasoning as dropping it from Navbar. */}
 
+            {/* Single privacy entry point (2026-08-21): this used to sit
+                alongside a "Política de Privacidad" button that opened
+                PrivacyPolicyModal — a near-duplicate of this same page with
+                slightly different wording. The modal is retired; its one
+                unique section (§5, security/no-commercialization) was
+                merged into this page instead of keeping two surfaces to
+                keep aligned. */}
             <Link href="/terminos-y-privacidad" className="hover:text-emerald-700 transition-colors flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-              Ley 1581 Habeas Data
+              Política de Privacidad / Habeas Data
             </Link>
-
-            {onOpenPrivacy && (
-              <button
-                onClick={onOpenPrivacy}
-                className="hover:text-emerald-700 transition-colors underline"
-              >
-                Política de Privacidad
-              </button>
-            )}
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-slate-900">
+        <div className="mt-8 pt-6 border-t border-footer-divider">
           <span className="block text-center text-slate-500 text-[11px] font-semibold uppercase tracking-wider mb-3">
             Canales oficiales de ayuda
           </span>
@@ -76,7 +78,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-slate-900 text-center text-slate-500 text-[11px] font-light">
+        <div className="mt-6 pt-6 border-t border-footer-divider text-center text-slate-500 text-[11px] font-light">
           Plataforma 100% gratuita y sin ánimo de lucro. El contacto ocurre fuera de la app directamente entre las partes vía WhatsApp.
         </div>
       </div>

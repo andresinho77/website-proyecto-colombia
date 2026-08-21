@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import CityFeedPage from '../components/CityFeedPage';
 import { listingsFixture, listingOfrezco } from './fixtures/listings';
@@ -49,7 +50,10 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
         maxPrecio: '',
       })
     );
-    expect(screen.getByText('2 publicaciones')).toBeInTheDocument();
+    // US-4.9: el contador de resultados aparece 2 veces en el DOM a la vez
+    // (barra compacta de mobile + panel de desktop, uno oculto por CSS
+    // según el breakpoint — jsdom no aplica media queries).
+    expect(screen.getAllByText('2 publicaciones').length).toBeGreaterThan(0);
   });
 
   it('muestra el estado vacío del feed cuando la API no devuelve publicaciones', async () => {
@@ -57,7 +61,7 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     expect(await screen.findByText('No se encontraron publicaciones')).toBeInTheDocument();
-    expect(screen.getByText('0 publicaciones')).toBeInTheDocument();
+    expect(screen.getAllByText('0 publicaciones').length).toBeGreaterThan(0);
   });
 
   it('mantiene los modales cerrados en el render inicial', async () => {
@@ -66,6 +70,41 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.queryByText(/Marcar como Resuelta/i)).not.toBeInTheDocument();
+  });
+
+  it('US-4.5: con intentTipo="necesito" fija el filtro de tipo, oculta el select de Tipo y ajusta título/CTA', async () => {
+    render(<CityFeedPage cityName="Pereira" citySlug="pereira" intentTipo="necesito" />);
+
+    expect(
+      await screen.findByRole('heading', { name: /Alojamiento buscado en Pereira/i })
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Tipo de Publicación')).not.toBeInTheDocument();
+
+    expect(fetchListings).toHaveBeenCalledWith(
+      expect.objectContaining({ tipo: 'necesito' })
+    );
+
+    const tabs = screen.getByRole('tablist', { name: /Tipo de búsqueda/i });
+    expect(within(tabs).getByRole('tab', { name: /^Necesito$/i })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+  });
+
+  it('US-4.7: cambiar "Ordenar por" reordena las tarjetas ya cargadas por precio', async () => {
+    render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
+    await screen.findByText(listingOfrezco.descripcion, { exact: false });
+
+    const cardOrder = () =>
+      screen.getAllByText(/^(OFREZCO|NECESITO) ALOJAMIENTO$/).map((el) => el.textContent);
+
+    // listingOfrezco (precio 0) llega primero por ser más reciente (creadoEn mayor en el fixture... )
+    expect(cardOrder()).toEqual(['OFREZCO ALOJAMIENTO', 'NECESITO ALOJAMIENTO']);
+
+    await userEvent.selectOptions(screen.getByLabelText(/Ordenar por/i), 'precio_desc');
+
+    // listingNecesito tiene precio 200000 > 0, debe pasar a estar primero.
+    expect(cardOrder()).toEqual(['NECESITO ALOJAMIENTO', 'OFREZCO ALOJAMIENTO']);
   });
 
   it('pide todas las publicaciones a nivel nacional cuando isNationalFeed es true', async () => {

@@ -76,3 +76,163 @@
 - [2026-08-14] GitHub Pages approach removed entirely (workflow `deploy-pages` job + Pages artifact, ROADMAP references). Supersedes the 2026-08-13 dual-path decision. Entrega única: este repo hace build/type-check y expone el artefacto estático `out/`; el despliegue productivo (S3/CloudFront) lo hace `infra-proyecto-colombia`. `output: 'export'` en `next.config.mjs` se mantiene porque produce ese artefacto.
 - [2026-08-13] ~~Delivery split: this repo publishes a permanent public mock on GitHub Pages~~ — superseded 2026-08-14 (GitHub Pages removed). Production deployment path (S3/CloudFront and infra automation) is owned by `infra-proyecto-colombia`.
 - [2026-08-13] Documentation governance formalized: when docs disagree, `ROADMAP.md` prevails until reconciliation.
+
+## Do-Not-Repeat — 2026-08-18
+- `terraform init -backend=false` does NOT switch a project to local state. It only skips backend
+  initialization for that run; a backend already cached in `.terraform/terraform.tfstate` stays
+  active, and `-state=<file>` is then silently ignored. To genuinely force local state, write a
+  `*_override.tf` file with a `terraform { backend "local" { path = ... } }` block and pair it with
+  a separate `TF_DATA_DIR` so the real backend cache is not clobbered.
+- Never swallow `terraform init` output with `>/dev/null 2>&1 || true` in dev scripts — it hid the
+  backend misconfiguration until apply failed at lock acquisition.
+
+## Key Learnings — infra-proyecto-colombia
+- `provider.tf` hardcodes a prod S3 backend (`proyecto-colombia-prod-tfstate`, lock table
+  `proyecto-colombia-prod-tfstate-locks`); backend blocks cannot take variables, so any local
+  workflow must override it explicitly.
+- `start-local-dev.sh` exports `AWS_ENDPOINT_URL=http://localhost:4566` globally, which the S3
+  backend's AWS SDK honors too — so a remote backend will be redirected into LocalStack, not AWS.
+  This is a safety net (dummy `test` creds never reach prod) but produces confusing errors.
+- Terraform aborts an `apply` at state-lock acquisition, before reading state, refreshing, or
+  planning — a lock failure therefore cannot have mutated remote state or real resources.
+
+## Key Learnings — npm / CI (2026-08-18)
+- `npm ci` "Missing: X from lock file" is usually a hoisted **peer dependency** that npm auto-installs
+  but that was never materialized at the lockfile root. Nested copies of the same package under another
+  dependency do NOT satisfy it. Repair with `npm install --package-lock-only` and check the diff is
+  additive only.
+- Before blaming an npm/Node version mismatch for a CI-only failure, reproduce locally with the CI's
+  npm (`npx npm@<major> ci --dry-run`). Here both npm 10 and 11 failed identically — the lockfile was
+  simply stale, and the version theory would have been wrong.
+- `npm ci --dry-run` validates lockfile sync without touching node_modules — the safe way to test a
+  lockfile fix.
+
+## Pending — repo hygiene
+- `.nvmrc` pins Node 24 (used by frontend-ci.yml and deploy.yml via `node-version-file`), but local
+  Node is v22.22.3. Not the cause of bug-002, but a real local/CI parity gap worth closing.
+
+## Decision Log — 2026-08-18 (Security Finding 1)
+- Secrets get NO default anywhere in the deployed path. `admin_secret_key` is declared in Terraform
+  without a default so a missing value fails `plan`, and the backend throws at cold start rather than
+  degrading to a known key. Chosen over a "safe default" because the review proved prod had been
+  running on the published fallback for real.
+- A single local-only constant (`LOCAL_DEV_ADMIN_KEY`) is kept for dev ergonomics, but the backend
+  explicitly REJECTS it when `isLocal === false`, so it can never become a production credential.
+- Secrets reach prod via `TF_VAR_admin_secret_key` from GitHub Secrets, never via committed
+  `*.tfvars`. `environments/prod.tfvars` must stay free of secret values; local/dev tfvars are
+  LocalStack-only (`use_localstack = true`) so their values are not credentials.
+
+## Do-Not-Repeat — 2026-08-18 (cont.)
+- Before making an env var required/fail-loud in the backend, CHECK that the infra actually supplies
+  it. `lambda.tf` did not set `ADMIN_SECRET_KEY` at all — shipping the fail-loud change alone would
+  have broken the deploy on the next apply.
+
+## Do-Not-Repeat — 2026-08-19
+- When scoping any "per-location" feature in this frontend, ASK whether it should apply to all 3
+  location levels (city `/[ciudad]/`, department `/departamento/[slug]/`, national `/`) BEFORE
+  limiting the first pass to just one. This project has hierarchical location nav since `3b346e4`
+  (national/department/city), so a feature scoped to "city" alone silently reads as "missing" at
+  the other two levels. Concretely: US-4.5's Necesito/Ofrezco split shipped city-only first; the
+  user immediately noticed it was absent on "Toda Colombia" and confirmed (via a direct question)
+  that all 3 levels should get it, requiring a second round of new route files
+  (`app/necesito|ofrezco/page.tsx`, `app/departamento/[slug]/necesito|ofrezco/page.tsx`) and a
+  `CityFeedPage` tab-nav rewired from a fixed `/${citySlug}/` base path to one computed per level.
+  Asking this up front (a single AskUserQuestion) would have avoided the rework.
+
+## Do-Not-Repeat — 2026-08-20
+- NEVER run `npm run build` / `npm run validate` while the user's `npm run dev` or `npm run
+  dev:local` server is active — both processes write to `.next/`, and a production build clobbers
+  the dev server's incremental webpack cache mid-flight. Symptom: dev server returns 500 with
+  `Cannot find module './XXX.js'` in `webpack-runtime.js`, browser shows a blank page. Fix is just
+  stopping the dev server, `rm -rf .next`, and restarting it — not an app bug (see bug-015 in
+  `.wolf/buglog.json`). Check `ps aux | grep "next dev"` (or ask the user) before running any
+  `build`/`validate` command; stick to `typecheck`/`lint`/`test` while a dev server might be up.
+
+## User Preferences — persistent nav affordances (2026-08-21)
+- User wants primary CTAs (e.g. "Necesito"/"Ofrezco" publish buttons) to survive scrolling and be
+  reachable from every tab/view, not confined to a one-time hero at the top of the page — led to
+  replacing `HeroButtons.tsx` with a `sticky` `IntentNavBar.tsx` under the Navbar. When proposing
+  UI placement changes, favor options that stay reachable during scroll/navigation over "first
+  element on page load" placements, and pitch >=3 concrete alternatives with tradeoffs (not just
+  one) before building — this user wants to choose, not be handed a single design.
+- When asked to combine navigation (tabs) and an action (open a modal) in one control, the user
+  responded well to being pointed at an established mobile idiom (iOS Reminders/Todoist: one list
+  of tabs + one contextual trailing "+" button) rather than a novel per-item design (a "+" nested
+  inside each tab) — prefer citing a recognizable native-app pattern over inventing a new one.
+
+## Do-Not-Repeat — 2026-08-21 (list scoping)
+- When the user gives a bulleted list and prefaces it with "make sure to track this... in
+  documentation," treat EVERY bullet as documentation/roadmap work by default — even if one bullet
+  reads like a direct code instruction ("please add an x button and add logic to..."). Started
+  implementing the EmergencyBanner dismiss/reopen feature for real (edited `EmergencyBanner.tsx`,
+  `Navbar.tsx`, `lib/localStorage.ts`) before the user interrupted to clarify the whole list was
+  meant for `ROADMAP.md` only, to build next time it's explicitly asked for. If a list mixes
+  phrasing that could be either doc-only or build-now, confirm scope before writing code rather
+  than assuming per-bullet intent from wording alone.
+
+## Do-Not-Repeat — 2026-08-21 (`lsof`/`pkill` matching client sockets, not just the server)
+- **CRITICAL, bit this session 3 separate times** (twice by Claude directly killing the user's dev
+  server by PID/pattern, once as a real bug in `scripts/stop-local-dev.sh` that was closing the
+  user's browser on every `npm run dev:stopLocal`). Root cause is the same each time: `lsof -ti
+  tcp:$port` (no `-sTCP:LISTEN`) or `pkill -f "next dev"` (no PID scoping) matches ANY process
+  touching that port/command string — not just the one intended. A browser tab holding a WebSocket
+  open to a Next.js dev server's Fast Refresh/HMR endpoint shows up in `lsof -ti tcp:3000` right
+  alongside the actual server process; killing "everything lsof found" kills the browser too.
+  **Rules going forward:**
+  1. Any `lsof -ti tcp:$PORT` used to find a server to kill MUST include `-sTCP:LISTEN` — verified
+     via an isolated test (real server + a simulated client socket) that this exact flag is what
+     separates "the server" from "everyone talking to the server." Fixed in `kill_port()` inside
+     `scripts/stop-local-dev.sh`.
+  2. Never `pkill -f` a generic command substring like `"next dev"` — it matches every dev server
+     for every project the user has running, and every child process spawned under that name.
+     Capture the exact PID from `ps`/`lsof` output and `kill <that PID>` specifically instead.
+  3. Before killing anything believed to be "just mine" (a Claude-started `next dev` instance),
+     verify with `lsof -i :$PORT -sTCP:LISTEN` that the PID is actually what's listening — don't
+     assume the last PID number seen in a `ps aux` grep is safe to kill.
+  4. When in doubt whether a process belongs to the user or to this session, ask before killing —
+     the cost of asking is one message; the cost of guessing wrong is closing the user's browser or
+     dev server mid-work, twice already this session alone.
+
+## Do-Not-Repeat — 2026-08-21 (literal `text-white`/`hover:text-white` on the `slate` scale)
+- Never pair `hover:bg-slate-800` (or any themed `slate-*` step) with literal `text-white` /
+  `hover:text-white`. The `slate` scale inverts per theme (light: 950 near-white/50 near-black;
+  dark: reversed, see US-1.4) but `white` does NOT — it's always `#fff`. In light mode
+  `bg-slate-800` resolves to a LIGHT gray (`rgb(228,228,232)`), so `hover:text-white` on top of it
+  is nearly invisible (found in `IntentNavBar.tsx`'s inactive tab hover, `ListingGrid.tsx`'s "Cargar
+  más" button, and `LocationCombobox.tsx`'s highlighted/priority-chip states — all fixed
+  2026-08-21). Use `text-slate-50` instead: near-black in light mode, near-white in dark, always
+  contrasts correctly against another `slate-*` step. Only pair literal `white` with a FIXED brand
+  color that stays dark in both themes (rose/emerald/amber-900+ shades, `bg-black/*` overlays) —
+  never with the `slate` scale. When adding a new hover/active state, grep for `hover:text-white`
+  and `text-white` near a `slate-*` background as a quick self-check.
+
+## Key Learnings — `next dev` vs. static export 404 behavior (2026-08-21)
+- Requesting an unmatched single-segment path (e.g. `/this-does-not-exist/`) under `next dev`
+  throws Next's internal error `Page "/[ciudad]/page" is missing param ... in
+  generateStaticParams(), which is required with "output: export" config` INSTEAD of rendering
+  `app/not-found.tsx`. **This is not a bug in this repo** — it's inherent to `output: 'export'`
+  (fully static, no server at runtime to resolve a `[ciudad]` value outside
+  `generateStaticParams()`'s list). Verified the real static artifact handles it correctly: `npm
+  run build` produces `out/404.html`, and serving `out/` with a real static file server (`npx
+  serve`) returns `HTTP 404` + the `not-found.tsx` content for the same unmatched path — dev mode's
+  ugly error is a dev-only artifact of Next simulating dynamic SSR matching that doesn't exist in
+  the real deployment. Do NOT try to "fix" this by adding fallback logic, `dynamicParams` config,
+  etc. — there's nothing to fix; test 404 behavior against `out/` + a static server, not `next dev`,
+  for anything touching `[ciudad]`/`[slug]` routes. Production still needs CloudFront's Custom
+  Error Response mapping 403/404 → `/404.html` (see US-1.6 in ROADMAP.md) — S3 alone returns raw
+  XML errors, not our page, until that's configured in `infra-proyecto-colombia`.
+
+## Key Learnings — backend serialization boundary (2026-08-18)
+- The backend has NO serializer layer: controllers return `Listing` rows straight from DynamoDB.
+  `src/utils/redact.ts` is the first such boundary — reuse and extend it rather than adding ad-hoc
+  field deletions at call sites.
+- The author `pin` is generated server-side at creation and returned in the CREATE response only
+  (`PublishModal.tsx` persists it to localStorage). `ListingCard` reads it back from localStorage,
+  never from the feed — so the feed does not need `pin`.
+- Admin frontend (`website .../app/admin/page.tsx`) renders `item.whatsapp` from `list_all`; the
+  redacted item deliberately keeps the SAME key holding a masked value so the page keeps working.
+
+## User Preferences
+- Fix exactly the finding that was asked for, one at a time. When adjacent issues surface, report them
+  with evidence and let the user schedule them — do not fold them into the current change.
+- Do not commit unless explicitly asked.

@@ -14,15 +14,26 @@ import {
 } from '../lib/locations';
 
 describe('Locations Catalog & Utilities (lib/locations.ts)', () => {
-  it('loads all 33 Colombian departments and over 1,100 municipalities with 100% unique slugs', () => {
+  it('loads 32 Colombian departments and over 1,100 municipalities with 100% unique slugs', () => {
+    // 32, not the official DIVIPOLA 33 — Bogotá D.C. was merged into
+    // Cundinamarca's city list (2026-08-21, explicit maintainer decision):
+    // DANE/DIVIPOLA treats Bogotá D.C. as its own department-equivalent
+    // (code 11, separate from Cundinamarca/25), but this app deliberately
+    // uses the simpler "Bogotá is a city in Cundinamarca" mental model
+    // instead. See lib/colombia-locations.json — no /departamento/bogota-d-c/
+    // route anymore, Bogotá lives under /departamento/cundinamarca/.
     const depts = getDepartments();
-    expect(depts.length).toBe(33);
+    expect(depts.length).toBe(32);
 
     const allCities = getAllCities();
     expect(allCities.length).toBeGreaterThan(1100);
 
     const slugs = new Set(allCities.map((c) => c.slug));
     expect(slugs.size).toBe(allCities.length);
+
+    const bogota = getCityBySlug('bogota');
+    expect(bogota?.departmentSlug).toBe('cundinamarca');
+    expect(getDepartmentBySlug('bogota-d-c')).toBeUndefined();
   });
 
   it('normalizes slugs removing accents and special characters', () => {
@@ -96,7 +107,12 @@ describe('Locations Catalog & Utilities (lib/locations.ts)', () => {
     expect(departments.length).toBeGreaterThan(0);
     expect(departments[0]?.slug).toBe('antioquia');
     expect(cities.length).toBeGreaterThan(0);
-    expect(cities.some((c) => c.slug === 'medellin')).toBe(true);
+    // Antioquia no longer has a priority city (isPriority moved to the 5
+    // earthquake-affected departments, 2026-08-21), so its capital no
+    // longer gets boosted to the front of a plain department-name search
+    // among 100+ municipalities — assert the match is IN Antioquia rather
+    // than hardcoding which specific city surfaces in the default limit.
+    expect(cities.every((c) => c.departmentSlug === 'antioquia')).toBe(true);
 
     const { departments: chocoDepts, cities: chocoCities } = searchLocationsAndDepartments('choco');
     expect(chocoDepts.length).toBeGreaterThan(0);

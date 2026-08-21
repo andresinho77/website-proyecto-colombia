@@ -32,6 +32,25 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`scroll-smooth ${jakarta.variable}`}>
+      <head>
+        {/* Blocking, pre-hydration script — avoids a layout shift for a
+            returning visitor who already dismissed EmergencyBanner (US-1.5).
+            SSR always renders the banner open (the server can't read
+            localStorage), and React's useEffect correction only runs after
+            hydration — by then the banner would already have painted once
+            and then disappeared, a visible CLS. This runs synchronously in
+            <head>, before the banner's markup is even parsed, and adds a
+            class to <html> that a CSS rule (app/globals.css) uses to hide
+            it from the very first paint — the same "flash of wrong state"
+            fix used for dark mode, applied to localStorage instead of a
+            media query. Kept in sync afterwards by
+            lib/localStorage.ts's setEmergencyBannerDismissed(). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(localStorage.getItem('alojamiento_solidario_emergency_banner_dismissed')==='true'){document.documentElement.classList.add('eb-dismissed');}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

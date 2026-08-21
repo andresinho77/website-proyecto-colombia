@@ -67,4 +67,23 @@ describe('getContactLink (lib/api.ts)', () => {
     expect(res.success).toBe(false);
     expect(res.error).toMatch(/no encontrada/i);
   });
+
+  it('cae al fallback offline si el 404 viene del framework y no de la API (bug-015)', async () => {
+    // Fastify (dev server) y API Gateway responden así cuando la ruta
+    // /contact no está montada. No significa que la publicación no exista,
+    // y mostrarlo tal cual dejaba un "Not Found" en inglés bajo el botón.
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: async () => ({
+        message: 'Route POST:/api/listings/mock-1/contact not found',
+        error: 'Not Found',
+        statusCode: 404,
+      }),
+    }) as unknown as typeof fetch;
+
+    const res = await getContactLink('mock-1');
+    expect(res.success).toBe(true);
+    expect(res.whatsapp).toBe('+573105550123');
+  });
 });

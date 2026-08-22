@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { List, Map as MapIcon } from 'lucide-react';
 import { Navbar } from './Navbar';
 import { EmergencyBanner } from './EmergencyBanner';
@@ -14,7 +15,12 @@ import { Footer } from './Footer';
 import { useInvisibleTurnstile, TurnstileContainer } from './Turnstile';
 import { Listing, FilterState, ListingType } from '../lib/types';
 import { fetchListings } from '../lib/api';
-import { isEmergencyBannerDismissed, setEmergencyBannerDismissed } from '../lib/localStorage';
+import {
+  isDataPolicyAccepted,
+  isEmergencyBannerDismissed,
+  setDataPolicyAccepted,
+  setEmergencyBannerDismissed,
+} from '../lib/localStorage';
 import { cityHasMapCoordinates } from '../lib/zoneCoordinates';
 
 // US-4.3: Leaflet touches `window` at import time, so this can never run
@@ -85,8 +91,15 @@ export default function CityFeedPage({
   // would otherwise cause a hydration mismatch between server and client
   // render for a returning visitor who previously dismissed it.
   const [isEmergencyBannerVisible, setIsEmergencyBannerVisible] = useState(true);
+  // US-7.x: non-blocking cookie-consent-style banner (2026-08-22) — was a
+  // full-screen blocking dialog with a focus trap; downgraded to a dismissible
+  // bottom banner so first-time visitors aren't gated out of the page while
+  // they decide. No focus trap needed since the rest of the page stays
+  // interactive underneath it.
+  const [isPolicyBannerOpen, setIsPolicyBannerOpen] = useState(false);
   useEffect(() => {
     if (isEmergencyBannerDismissed()) setIsEmergencyBannerVisible(false);
+    if (!isDataPolicyAccepted()) setIsPolicyBannerOpen(true);
   }, []);
   const handleDismissEmergencyBanner = () => {
     setIsEmergencyBannerVisible(false);
@@ -381,6 +394,60 @@ export default function CityFeedPage({
         listing={newlyCreatedListing}
         onClose={() => setNewlyCreatedListing(null)}
       />
+
+      {/* Data policy banner (2026-08-22): cookie-consent style — informational,
+          non-blocking, dismissible. Replaced a full-screen modal that gated
+          first-time visitors out of the page until they clicked accept. */}
+      {isPolicyBannerOpen && (
+        <div
+          role="region"
+          aria-label="Aviso de política de datos"
+          className="fixed inset-x-0 bottom-0 z-[90] border-t border-slate-700 bg-slate-900/95 backdrop-blur-sm px-4 py-4 sm:px-6"
+        >
+          <div className="mx-auto max-w-5xl relative">
+            <button
+              type="button"
+              aria-label="Cerrar aviso"
+              onClick={() => {
+                setDataPolicyAccepted(true);
+                setIsPolicyBannerOpen(false);
+              }}
+              className="absolute -top-1 right-0 rounded-lg p-1 text-slate-400 transition-colors hover:text-slate-200"
+            >
+              ×
+            </button>
+            <p className="pr-8 text-xs sm:text-sm text-slate-300 leading-relaxed">
+              En Alojamiento Solidario Colombia usamos el almacenamiento local de tu navegador
+              únicamente para recordar preferencias como el idioma de visualización, la ciudad que estás
+              consultando y si ya viste este aviso, con el fin de mejorar tu experiencia y evitar
+              mostrarte de nuevo esta misma información en cada visita. No usamos cookies de rastreo ni
+              compartimos estos datos con terceros ni con fines comerciales o publicitarios. Al continuar
+              navegando en la plataforma confirmas que conoces el tratamiento que damos a los datos que
+              nos compartes al publicar o contactar por WhatsApp, de acuerdo con la Ley 1581 de 2012.
+            </p>
+            <div className="mt-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Link
+                href="/terminos-y-privacidad"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs sm:text-sm text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
+              >
+                Política de privacidad y Habeas Data
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setDataPolicyAccepted(true);
+                  setIsPolicyBannerOpen(false);
+                }}
+                className="w-full sm:w-auto shrink-0 rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

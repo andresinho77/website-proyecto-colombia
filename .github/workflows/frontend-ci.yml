@@ -1,10 +1,12 @@
 name: "Frontend Next.js CI/CD Pipeline"
 
+# `staging` es una rama desplegable: sus PR deben pasar la misma puerta de
+# calidad que los de main, porque al fusionarse disparan un despliegue a AWS.
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "staging", "dev" ]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "staging", "dev" ]
 
 permissions:
   contents: read
@@ -15,7 +17,8 @@ concurrency:
 
 env:
   # Endpoint usado cuando la repository variable aun no esta configurada.
-  # No hay ambiente de preview/staging: el artefacto siempre apunta a produccion.
+  # Este job solo valida y sube un artefacto; quien publica en AWS es deploy.yml,
+  # que resuelve el endpoint real del entorno (staging o prod) por su cuenta.
   FALLBACK_API_URL: "https://api.alojamientosolidario.co/api/listings"
 
 jobs:

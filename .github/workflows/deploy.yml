@@ -1,9 +1,22 @@
 name: "Frontend Deploy to AWS"
 
+# Promocion de entornos: dev -> staging -> main
+#   * PR contra `staging` -> solo CI (frontend-ci.yml). No se toca AWS.
+#   * merge en `staging`  -> publica en proyecto-colombia-staging-web-hosting
+#   * merge en `main`     -> publica en proyecto-colombia-prod-web-hosting
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "staging" ]
   workflow_dispatch:
+    inputs:
+      environment:
+        description: "Entorno objetivo del despliegue manual"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - prod
 
 # id-token es obligatorio para pedir el token OIDC de GitHub que AWS canjea
 # por credenciales temporales. No hay claves estaticas en este repo.
@@ -11,21 +24,52 @@ permissions:
   id-token: write
   contents: read
 
-# Un solo deploy a la vez; no cancelamos el que ya esta corriendo para no
-# dejar el bucket a medias entre el sync y la invalidacion.
-concurrency:
-  group: "deploy-prod"
-  cancel-in-progress: false
-
 env:
   AWS_REGION: "us-east-1"
-  S3_BUCKET: "proyecto-colombia-prod-web-hosting"
-  CLOUDFRONT_DISTRIBUTION_ID: "E3LIQPKLMQ5LGY"
 
 jobs:
+  # ----------------------------------------------------------------------------
+  # Traduce la rama (o el input manual) al entorno y a sus recursos AWS.
+  # El bucket se deriva del prefijo; la distribucion de CloudFront de staging se
+  # descubre por tag, porque su ID no se conoce hasta que Terraform la crea.
+  # ----------------------------------------------------------------------------
+  resolve-environment:
+    name: "Resolve Target Environment"
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.resolve.outputs.environment }}
+      bucket: ${{ steps.resolve.outputs.bucket }}
+
+    steps:
+      - name: Resolve
+        id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ENVIRONMENT="${{ inputs.environment }}"
+          elif [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            ENVIRONMENT="prod"
+          else
+            ENVIRONMENT="staging"
+          fi
+
+          echo "environment=$ENVIRONMENT" >> "$GITHUB_OUTPUT"
+          echo "bucket=proyecto-colombia-$ENVIRONMENT-web-hosting" >> "$GITHUB_OUTPUT"
+          echo "Entorno objetivo: $ENVIRONMENT"
+
   deploy:
     name: "Build Static Export & Publish to S3 + CloudFront"
+    needs: resolve-environment
     runs-on: ubuntu-latest
+
+    # Un solo deploy por entorno a la vez; no cancelamos el que ya esta corriendo
+    # para no dejar el bucket a medias entre el sync y la invalidacion.
+    concurrency:
+      group: "deploy-${{ needs.resolve-environment.outputs.environment }}"
+      cancel-in-progress: false
+
+    env:
+      TARGET_ENV: ${{ needs.resolve-environment.outputs.environment }}
+      S3_BUCKET: ${{ needs.resolve-environment.outputs.bucket }}
 
     steps:
       - name: Checkout Code
@@ -40,19 +84,33 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      # Cada entorno apunta a su propio API Gateway. Mezclarlos publicaria un
+      # frontend de staging leyendo y escribiendo en la base de datos de prod.
       - name: Resolve API base URL
         id: api
         env:
-          REPO_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          PROD_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          STAGING_API_URL: ${{ vars.NEXT_PUBLIC_API_URL_STAGING }}
         run: |
-          # Si la repository variable no esta configurada no inyectamos nada:
-          # Next.js toma entonces el valor de .env.production, que ya apunta al
-          # API Gateway de produccion.
-          if [ -n "$REPO_API_URL" ]; then
-            echo "url=$REPO_API_URL" >> "$GITHUB_OUTPUT"
+          if [ "$TARGET_ENV" = "prod" ]; then
+            # Si la repository variable no esta configurada no inyectamos nada:
+            # Next.js toma entonces el valor de .env.production, que ya apunta al
+            # API Gateway de produccion.
+            if [ -n "$PROD_API_URL" ]; then
+              echo "url=$PROD_API_URL" >> "$GITHUB_OUTPUT"
+            else
+              echo "::warning title=NEXT_PUBLIC_API_URL::Repository variable not set; falling back to .env.production."
+              echo "url=" >> "$GITHUB_OUTPUT"
+            fi
           else
-            echo "::warning title=NEXT_PUBLIC_API_URL::Repository variable not set; falling back to .env.production."
-            echo "url=" >> "$GITHUB_OUTPUT"
+            # En staging NO hay fallback: .env.production apunta a prod, asi que
+            # construir sin esta variable publicaria un frontend de staging
+            # hablando con la API de produccion.
+            if [ -z "$STAGING_API_URL" ]; then
+              echo "::error title=NEXT_PUBLIC_API_URL_STAGING::Falta la repository variable NEXT_PUBLIC_API_URL_STAGING. Tomar el valor de 'terraform output api_gateway_endpoint' en el entorno staging y configurarla en Settings -> Secrets and variables -> Actions -> Variables."
+              exit 1
+            fi
+            echo "url=$STAGING_API_URL" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build Next.js Static Export
@@ -60,12 +118,69 @@ jobs:
           NEXT_PUBLIC_API_URL: ${{ steps.api.outputs.url }}
         run: npm run build
 
+      # Cada entorno tiene su propio rol OIDC: el de staging solo confia en la
+      # rama `staging`, por lo que un push a staging no puede obtener
+      # credenciales capaces de escribir en el bucket de produccion.
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN_PROD }}
+          role-to-assume: ${{ needs.resolve-environment.outputs.environment == 'prod' && secrets.AWS_ROLE_ARN_PROD || secrets.AWS_ROLE_ARN_STAGING }}
           aws-region: ${{ env.AWS_REGION }}
           audience: sts.amazonaws.com
+
+      # ------------------------------------------------------------------------
+      # Guarda por tags. Terraform etiqueta cada recurso con Environment=<entorno>.
+      # Comprobamos el tag del bucket destino antes del primer `s3 sync --delete`,
+      # que es una operacion destructiva e irreversible sobre el contenido.
+      # ------------------------------------------------------------------------
+      - name: Verify Target Bucket Environment Tag
+        run: |
+          TAG_ENV="$(aws s3api get-bucket-tagging \
+            --bucket "$S3_BUCKET" \
+            --query 'TagSet[?Key==`Environment`].Value | [0]' --output text)"
+
+          echo "Bucket: $S3_BUCKET"
+          echo "Tag Environment: $TAG_ENV (esperado: $TARGET_ENV)"
+
+          if [ "$TAG_ENV" != "$TARGET_ENV" ]; then
+            echo "::error title=Guarda de entorno::El bucket '$S3_BUCKET' tiene Environment='$TAG_ENV' y se esperaba '$TARGET_ENV'. Abortado antes del sync. Si el tag falta, aplicar la infraestructura desde infra-proyecto-colombia."
+            exit 1
+          fi
+
+      # La distribucion de prod tiene ID conocido y fijo. La de staging la crea
+      # Terraform, asi que se localiza por su tag Environment en vez de fijar un
+      # ID que cambiaria en cada recreacion del entorno.
+      - name: Resolve CloudFront Distribution
+        id: cdn
+        env:
+          PROD_DISTRIBUTION_ID: "E3LIQPKLMQ5LGY"
+          STAGING_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID_STAGING }}
+        run: |
+          if [ "$TARGET_ENV" = "prod" ]; then
+            DIST_ID="$PROD_DISTRIBUTION_ID"
+          elif [ -n "$STAGING_DISTRIBUTION_ID" ]; then
+            DIST_ID="$STAGING_DISTRIBUTION_ID"
+          else
+            DIST_ID=""
+            for ARN in $(aws cloudfront list-distributions \
+              --query 'DistributionList.Items[].ARN' --output text); do
+              ENV_TAG="$(aws cloudfront list-tags-for-resource \
+                --resource "$ARN" \
+                --query 'Tags.Items[?Key==`Environment`].Value | [0]' --output text)"
+              if [ "$ENV_TAG" = "staging" ]; then
+                DIST_ID="${ARN##*/}"
+                break
+              fi
+            done
+          fi
+
+          if [ -z "$DIST_ID" ] || [ "$DIST_ID" = "None" ]; then
+            echo "::error title=CloudFront::No se encontro ninguna distribucion con Environment=staging. Desplegar primero infra-proyecto-colombia en staging, o fijar la repository variable CLOUDFRONT_DISTRIBUTION_ID_STAGING."
+            exit 1
+          fi
+
+          echo "distribution_id=$DIST_ID" >> "$GITHUB_OUTPUT"
+          echo "Distribucion objetivo: $DIST_ID"
 
       # Dos pasadas de sync para separar politicas de cache. Los assets de
       # _next/static llevan hash en el nombre, asi que son inmutables; el HTML
@@ -88,6 +203,8 @@ jobs:
             --no-progress
 
       - name: Invalidate CloudFront Cache
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ steps.cdn.outputs.distribution_id }}
         run: |
           INVALIDATION_ID="$(aws cloudfront create-invalidation \
             --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
@@ -99,11 +216,15 @@ jobs:
             --id "$INVALIDATION_ID"
 
       - name: Deployment Summary
+        if: always()
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ steps.cdn.outputs.distribution_id }}
         run: |
           {
-            echo "### Frontend desplegado"
+            echo "### Frontend desplegado — \`${TARGET_ENV}\`"
             echo ""
             echo "- Bucket: \`${S3_BUCKET}\`"
             echo "- Distribution: \`${CLOUDFRONT_DISTRIBUTION_ID}\`"
-            echo "- URL: https://dfngszk43c2ig.cloudfront.net/"
+            echo "- Verificado por tag: \`Environment=${TARGET_ENV}\`"
+            echo "- Commit: \`${GITHUB_SHA}\`"
           } >> "$GITHUB_STEP_SUMMARY"

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { List, Map as MapIcon } from 'lucide-react';
@@ -91,42 +91,16 @@ export default function CityFeedPage({
   // would otherwise cause a hydration mismatch between server and client
   // render for a returning visitor who previously dismissed it.
   const [isEmergencyBannerVisible, setIsEmergencyBannerVisible] = useState(true);
-  const [isPolicyPopupOpen, setIsPolicyPopupOpen] = useState(false);
-  const policyDialogRef = useRef<HTMLDivElement | null>(null);
+  // US-7.x: non-blocking cookie-consent-style banner (2026-08-22) — was a
+  // full-screen blocking dialog with a focus trap; downgraded to a dismissible
+  // bottom banner so first-time visitors aren't gated out of the page while
+  // they decide. No focus trap needed since the rest of the page stays
+  // interactive underneath it.
+  const [isPolicyBannerOpen, setIsPolicyBannerOpen] = useState(false);
   useEffect(() => {
     if (isEmergencyBannerDismissed()) setIsEmergencyBannerVisible(false);
-    if (!isDataPolicyAccepted()) setIsPolicyPopupOpen(true);
+    if (!isDataPolicyAccepted()) setIsPolicyBannerOpen(true);
   }, []);
-  useEffect(() => {
-    if (!isPolicyPopupOpen || !policyDialogRef.current) return;
-    const getFocusableElements = () =>
-      policyDialogRef.current?.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), textarea, input, select, [contenteditable="true"], [tabindex]:not([tabindex="-1"])'
-      ) ?? [];
-
-    const initialFocusableElements = getFocusableElements();
-    if (initialFocusableElements.length === 0) return;
-
-    initialFocusableElements[0].focus();
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== 'Tab') return;
-      const focusableElements = getFocusableElements();
-      if (focusableElements.length === 0) return;
-      const first = focusableElements[0];
-      const last = focusableElements[focusableElements.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isPolicyPopupOpen]);
   const handleDismissEmergencyBanner = () => {
     setIsEmergencyBannerVisible(false);
     setEmergencyBannerDismissed(true);
@@ -273,48 +247,7 @@ export default function CityFeedPage({
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-solidarity-500 selection:text-white">
-      {isPolicyPopupOpen && (
-        <div className="fixed inset-0 z-[90] bg-black/70 backdrop-blur-sm p-4 grid place-items-center">
-          <div
-            ref={policyDialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label="Aceptación de política de datos"
-            className="w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 p-6 sm:p-7 shadow-2xl"
-          >
-            <h2 className="text-lg sm:text-xl font-semibold text-slate-100">
-              Antes de continuar
-            </h2>
-            <p className="mt-3 text-sm text-slate-300 leading-relaxed">
-              Para usar la plataforma debes confirmar que conoces nuestra Política de Tratamiento de
-              Datos Personales (Ley 1581 de 2012).
-            </p>
-            <p className="mt-2 text-sm text-slate-300 leading-relaxed">
-              Puedes revisarla aquí:{' '}
-              <Link
-                href="/terminos-y-privacidad"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
-              >
-                Política de privacidad y Habeas Data
-              </Link>
-              .
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setDataPolicyAccepted(true);
-                setIsPolicyPopupOpen(false);
-              }}
-              className="mt-6 w-full rounded-xl bg-emerald-700 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
-            >
-              Acepto y continuar
-            </button>
-          </div>
-        </div>
-      )}
-      <div aria-hidden={isPolicyPopupOpen ? 'true' : undefined}>
+      <div>
         {/* Top Emergency Lines Banner (US-1.5: dismissible, remembered) */}
         {isEmergencyBannerVisible && (
           <EmergencyBanner onDismiss={handleDismissEmergencyBanner} />
@@ -461,6 +394,60 @@ export default function CityFeedPage({
         listing={newlyCreatedListing}
         onClose={() => setNewlyCreatedListing(null)}
       />
+
+      {/* Data policy banner (2026-08-22): cookie-consent style — informational,
+          non-blocking, dismissible. Replaced a full-screen modal that gated
+          first-time visitors out of the page until they clicked accept. */}
+      {isPolicyBannerOpen && (
+        <div
+          role="region"
+          aria-label="Aviso de política de datos"
+          className="fixed inset-x-0 bottom-0 z-[90] border-t border-slate-700 bg-slate-900/95 backdrop-blur-sm px-4 py-4 sm:px-6"
+        >
+          <div className="mx-auto max-w-5xl relative">
+            <button
+              type="button"
+              aria-label="Cerrar aviso"
+              onClick={() => {
+                setDataPolicyAccepted(true);
+                setIsPolicyBannerOpen(false);
+              }}
+              className="absolute -top-1 right-0 rounded-lg p-1 text-slate-400 transition-colors hover:text-slate-200"
+            >
+              ×
+            </button>
+            <p className="pr-8 text-xs sm:text-sm text-slate-300 leading-relaxed">
+              En Alojamiento Solidario Colombia usamos el almacenamiento local de tu navegador
+              únicamente para recordar preferencias como el idioma de visualización, la ciudad que estás
+              consultando y si ya viste este aviso, con el fin de mejorar tu experiencia y evitar
+              mostrarte de nuevo esta misma información en cada visita. No usamos cookies de rastreo ni
+              compartimos estos datos con terceros ni con fines comerciales o publicitarios. Al continuar
+              navegando en la plataforma confirmas que conoces el tratamiento que damos a los datos que
+              nos compartes al publicar o contactar por WhatsApp, de acuerdo con la Ley 1581 de 2012.
+            </p>
+            <div className="mt-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <Link
+                href="/terminos-y-privacidad"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs sm:text-sm text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
+              >
+                Política de privacidad y Habeas Data
+              </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setDataPolicyAccepted(true);
+                  setIsPolicyBannerOpen(false);
+                }}
+                className="w-full sm:w-auto shrink-0 rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-600"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

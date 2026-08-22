@@ -68,37 +68,37 @@ describe('CityFeedPage (components/CityFeedPage.tsx)', () => {
     expect(screen.getAllByText('0 publicaciones').length).toBeGreaterThan(0);
   });
 
-  it('muestra el popup de política para newcomers y permite continuar al aceptar', async () => {
+  it('muestra el aviso de política para newcomers, sin bloquear el resto de la página, y permite aceptar', async () => {
     window.localStorage.removeItem('alojamiento_solidario_data_policy_accepted');
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
     await waitFor(() => expect(fetchListings).toHaveBeenCalled());
 
     expect(
-      screen.getByRole('dialog', { name: /Aceptación de política de datos/i })
+      screen.getByRole('region', { name: /Aviso de política de datos/i })
     ).toBeInTheDocument();
+    // No bloqueante: el resto de la página sigue siendo interactuable con el
+    // aviso abierto (a diferencia del modal previo con overlay + focus trap).
+    expect(
+      screen.getByRole('heading', { name: /Alojamientos solidarios en Pereira/i })
+    ).toBeInTheDocument();
+
     const policyLink = screen.getByRole('link', { name: /Política de privacidad y Habeas Data/i });
     expect(policyLink).toHaveAttribute('target', '_blank');
     expect(policyLink).toHaveAttribute('rel', 'noopener noreferrer');
-    await waitFor(() => expect(policyLink).toHaveFocus());
 
-    await userEvent.tab();
-    const acceptButton = screen.getByRole('button', { name: /Acepto y continuar/i });
-    expect(acceptButton).toHaveFocus();
-    await userEvent.tab();
-    expect(policyLink).toHaveFocus();
-
+    const acceptButton = screen.getByRole('button', { name: /^Entendido$/i });
     await userEvent.click(acceptButton);
 
-    expect(screen.queryByRole('dialog', { name: /Aceptación de política de datos/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: /Aviso de política de datos/i })).not.toBeInTheDocument();
     expect(window.localStorage.getItem('alojamiento_solidario_data_policy_accepted')).toBe('true');
   });
 
-  it('no vuelve a mostrar el popup cuando la política ya fue aceptada', async () => {
+  it('no vuelve a mostrar el aviso cuando la política ya fue aceptada', async () => {
     window.localStorage.setItem('alojamiento_solidario_data_policy_accepted', 'true');
     render(<CityFeedPage cityName="Pereira" citySlug="pereira" />);
 
     await waitFor(() => expect(fetchListings).toHaveBeenCalled());
-    expect(screen.queryByRole('dialog', { name: /Aceptación de política de datos/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: /Aviso de política de datos/i })).not.toBeInTheDocument();
   });
 
   it('US-4.5: con intentTipo="necesito" fija el filtro de tipo, oculta el select de Tipo y ajusta título/CTA', async () => {

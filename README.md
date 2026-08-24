@@ -66,6 +66,8 @@ The frontend talks to the backend **only** through this variable (resolved once 
 | `npm run build` without it | **Build fails** with explicit instructions. The value is inlined into the static bundle, so a deployable artifact must never point at a guessed endpoint. |
 | `npm run validate` / `build:local` | Injects the local endpoint unless a value is already exported in the shell. |
 | CI | Uses the `NEXT_PUBLIC_API_URL` repository variable. If it is unset, CI logs a warning and falls back to the production endpoint so the artifact stays deployable. |
+| Deploy to **prod** | Uses `NEXT_PUBLIC_API_URL`; if unset, falls back to `.env.production`, which already points at the production API Gateway. |
+| Deploy to **staging** | Uses `NEXT_PUBLIC_API_URL_STAGING`. **There is no fallback** — the deploy fails if it is unset, because `.env.production` points at prod and a silent fallback would publish a staging frontend that reads and writes the production database. |
 
 ---
 
@@ -138,14 +140,94 @@ NEXT_PUBLIC_API_URL="https://dev-api.alojamientosolidario.co/api/listings" npm r
 
 ---
 
-### 3. PROD Environment (AWS Production)
+### 3. STAGING Environment (AWS Pre-Production)
+
+Staging is a full replica of production in the same AWS account, provisioned by `infra-proyecto-colombia` and separated by resource prefix and tags.
+
+To compile a static bundle targeting **STAGING**:
+
+```bash
+# Endpoint comes from the staging Terraform state, not from prod's
+cd ../infra-proyecto-colombia
+terraform init -reconfigure -backend-config=backend/staging.hcl
+terraform output api_gateway_endpoint
+
+cd ../website-proyecto-colombia
+NEXT_PUBLIC_API_URL="<the endpoint printed above>" npm run build
+```
+
+The bundle is written to `out/`, ready to sync to `proyecto-colombia-staging-web-hosting`.
+
+---
+
+### 4. PROD Environment (AWS Production)
 
 To compile the production static bundle targeting **PROD** (`alojamientosolidario.co`):
 
 ```bash
 NEXT_PUBLIC_API_URL="https://api.alojamientosolidario.co/api/listings" npm run build
 ```
-The bundle is written to `out/`, ready to sync to the S3 web bucket `proyecto-colombia-prod-web-hosting`. The production deploy itself is owned by `infra-proyecto-colombia` — this repo only produces and validates the artifact.
+The bundle is written to `out/`, ready to sync to the S3 web bucket `proyecto-colombia-prod-web-hosting`.
+
+---
+
+## 🚀 Deployment (`.github/workflows/deploy.yml`)
+
+### Branch promotion flow
+
+```
+feature/* ──PR──▶ dev ──PR──▶ staging ──PR──▶ main
+                               │               │
+                               ▼               ▼
+              proyecto-colombia-staging-    proyecto-colombia-prod-
+                    web-hosting                 web-hosting
+              (Environment=staging)         (Environment=prod)
+```
+
+| Event | What runs | Touches AWS? |
+|---|---|---|
+| PR opened/updated against `staging` | `frontend-ci.yml` — typecheck, lint, tests, build | No |
+| PR **merged** into `staging` (push) | `deploy.yml` → staging bucket + staging CloudFront | ✅ Writes |
+| PR **merged** into `main` (push) | `deploy.yml` → prod bucket + prod CloudFront | ✅ Writes |
+
+An open PR never deploys. The deploy happens on the push produced by merging it.
+
+### How the target environment is resolved
+
+The workflow derives everything from the branch (or from the `environment` input on a manual run):
+
+| | STAGING | PROD |
+|---|---|---|
+| S3 bucket | `proyecto-colombia-staging-web-hosting` | `proyecto-colombia-prod-web-hosting` |
+| CloudFront | discovered by its `Environment=staging` tag, or `CLOUDFRONT_DISTRIBUTION_ID_STAGING` | `E3LIQPKLMQ5LGY` |
+| API URL | `NEXT_PUBLIC_API_URL_STAGING` (required) | `NEXT_PUBLIC_API_URL` (falls back to `.env.production`) |
+| OIDC role | `AWS_ROLE_ARN_STAGING` | `AWS_ROLE_ARN_PROD` |
+
+The staging distribution is looked up by tag rather than hardcoded, because its ID is not known until Terraform creates it and would change if the environment were ever rebuilt.
+
+### The tag guard
+
+`s3 sync --delete` is destructive and irreversible. Before the first sync, the workflow reads the target bucket's tags and aborts on mismatch:
+
+```bash
+aws s3api get-bucket-tagging --bucket <bucket> \
+  --query 'TagSet[?Key==`Environment`].Value | [0]'
+# must equal "staging" when deploying staging, "prod" when deploying prod
+```
+
+Terraform sets that tag on every resource. A missing tag means the environment has not been provisioned — apply `infra-proyecto-colombia` for that environment first.
+
+### Required repository settings
+
+Configure in **Settings &rarr; Secrets and variables &rarr; Actions**:
+
+| Name | Kind | Purpose |
+|---|---|---|
+| `AWS_ROLE_ARN_PROD` | Secret | OIDC role for production deploys |
+| `AWS_ROLE_ARN_STAGING` | Secret | OIDC role for staging deploys |
+| `NEXT_PUBLIC_API_URL` | Variable | Production API endpoint (optional; `.env.production` is the fallback) |
+| `NEXT_PUBLIC_API_URL_STAGING` | Variable | Staging API endpoint — **required**, from `terraform output api_gateway_endpoint` on the staging state |
+| `CLOUDFRONT_DISTRIBUTION_ID_STAGING` | Variable | Optional. Skips the tag lookup for the staging distribution |
 
 ---
 
@@ -154,6 +236,7 @@ The bundle is written to `out/`, ready to sync to the S3 web bucket `proyecto-co
 | Variable Name | Description | Example (Local) | Example (Production) |
 |---|---|---|---|
 | `NEXT_PUBLIC_API_URL` | Base HTTP endpoint for listings API | `http://localhost:4000/api/listings` | `https://s1kxeu5lol.execute-api.us-east-1.amazonaws.com/api/listings` |
+| `NEXT_PUBLIC_API_URL_STAGING` | Staging listings API endpoint. CI/CD only — read as a repository variable by `deploy.yml`, never at build time locally | — | `https://<staging-api-id>.execute-api.us-east-1.amazonaws.com/api/listings` |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile CAPTCHA public site key | `1x00000000000000000000AA` *(Always passes)* | `0x4AAAAAA...` *(Live key)* |
 
 ---

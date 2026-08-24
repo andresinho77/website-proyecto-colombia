@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Listing } from './types';
 import { getContactLink } from './api';
+import { getListingUrl } from './listingUrl';
 
 /**
  * US-5.1 + US-6.5's "reveal WhatsApp on click" flow, extracted out of
@@ -25,13 +26,15 @@ export function useContactReveal(
 
   const buildWhatsAppUrl = (whatsapp: string) => {
     const cleanPhone = whatsapp.replace(/\D/g, '');
+    const postUrl = getListingUrl(listing);
+
     const text = encodeURIComponent(
       `Hola, vi tu publicación en Alojamiento Solidario Colombia (${
         isOfrezco ? 'Ofrezco' : 'Necesito'
       } en ${listing.ciudad}, ${location}) [Ref: ${listing.id.substring(
         0,
         6
-      )}]. ¿Podemos hablar?`
+      )}]. ¿Podemos hablar? Ver publicación: ${postUrl}`
     );
     return `https://wa.me/${cleanPhone}?text=${text}`;
   };

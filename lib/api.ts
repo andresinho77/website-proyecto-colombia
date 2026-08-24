@@ -296,7 +296,18 @@ export const getContactLink = async (
     // don't paper over that with the offline fallback. Any other non-ok
     // status (backend not deployed yet, 500s, etc.) throws to fall back,
     // matching fetchListings' pattern elsewhere in this file (bug-014).
-    if (res.status === 404) {
+    //
+    // But only OUR api's 404 is authoritative. When the /contact route
+    // itself isn't wired (Fastify dev server, or an API Gateway missing the
+    // route), the framework answers with its own
+    // `{ message, error: "Not Found", statusCode: 404 }` envelope — ours is
+    // just `{ error: "Publicación no encontrada." }`. Treating the former as
+    // a real miss is what surfaced a raw English "Not Found" under the
+    // contact button; a route-level 404 falls through to the offline
+    // fallback like any other unusable response (bug-015).
+    const isFrameworkNotFound =
+      data?.statusCode !== undefined || data?.error === 'Not Found';
+    if (res.status === 404 && !isFrameworkNotFound) {
       return { success: false, error: data.error || 'Publicación no encontrada.' };
     }
     if (!res.ok || !data.success) {

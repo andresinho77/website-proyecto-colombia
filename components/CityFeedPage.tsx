@@ -84,6 +84,10 @@ export default function CityFeedPage({
   const [isPublishOpen, setIsPublishOpen] = useState(false);
   const [publishDefaultTipo, setPublishDefaultTipo] = useState<ListingType>(intentTipo || 'ofrezco');
   const [newlyCreatedListing, setNewlyCreatedListing] = useState<Listing | null>(null);
+  // Separado de `newlyCreatedListing` a propósito: compartir una tarjeta del
+  // feed no es haber publicado nada, y la ShareModal usa esa distinción para
+  // no mostrar el PIN de autor ni la copia de "publicación exitosa".
+  const [sharingListing, setSharingListing] = useState<Listing | null>(null);
 
   // US-1.5: EmergencyBanner dismiss/reopen. Starts visible (default true) —
   // localStorage isn't available during SSR, so this is corrected right
@@ -363,7 +367,7 @@ export default function CityFeedPage({
               hasMore={!!nextCursor}
               isLoadingMore={isLoadingMore}
               onLoadMore={handleLoadMore}
-              onShareWhatsApp={(item) => setNewlyCreatedListing(item)}
+              onShareWhatsApp={(item) => setSharingListing(item)}
               onRefresh={loadListings}
               onOpenPublish={handleOpenPublish}
               turnstileToken={turnstileToken}
@@ -392,7 +396,15 @@ export default function CityFeedPage({
       {/* WhatsApp Share & PIN Confirmation Modal (US-2.2) */}
       <ShareModal
         listing={newlyCreatedListing}
+        variant="published"
         onClose={() => setNewlyCreatedListing(null)}
+      />
+
+      {/* US-2.2: compartir una publicación existente desde el feed */}
+      <ShareModal
+        listing={sharingListing}
+        variant="share"
+        onClose={() => setSharingListing(null)}
       />
 
       {/* Data policy banner (2026-08-22): cookie-consent style — informational,

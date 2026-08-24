@@ -97,9 +97,12 @@ describe('ListingCard contact reveal (US-6.5)', () => {
     openSpy = vi.spyOn(window, 'open').mockReturnValue(fakeTab as unknown as Window);
   });
 
-  it('abre una pestaña en blanco de inmediato y la redirige a wa.me al resolver el número', async () => {
+  it('abre una pestaña en blanco de inmediato y la redirige a wa.me al resolver el número incluyendo el enlace directo al anuncio', async () => {
     getContactLink.mockResolvedValue({ success: true, whatsapp: listingOfrezco.whatsapp });
-    render(<ListingGrid listings={[listingOfrezco]} />);
+    const { container } = render(<ListingGrid listings={[listingOfrezco]} />);
+
+    // El elemento de la tarjeta contiene el id para anclaje directo
+    expect(container.querySelector(`#listing-${listingOfrezco.id}`)).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: /Contactar por WhatsApp/i }));
 
@@ -111,6 +114,11 @@ describe('ListingCard contact reveal (US-6.5)', () => {
     await waitFor(() => expect(getContactLink).toHaveBeenCalledWith(listingOfrezco.id, undefined));
     await waitFor(() => expect(fakeTab.location.href).toContain('wa.me'));
     expect(fakeTab.location.href).toContain(listingOfrezco.whatsapp.replace(/\D/g, ''));
+    // La barra final importa: sin ella la ruta exportada no resuelve (bug-015).
+    expect(decodeURIComponent(fakeTab.location.href)).toContain(
+      `/pereira/#listing-${listingOfrezco.id}`
+    );
+    expect(decodeURIComponent(fakeTab.location.href)).toContain('Ver publicación:');
   });
 
   it('muestra el error y cierra la pestaña pendiente si getContactLink falla', async () => {

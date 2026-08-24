@@ -108,7 +108,10 @@ export const ListingCard: React.FC<ListingCardProps> = ({
   };
 
   return (
-    <div className="glass-card glass-card-hover rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between">
+    <div
+      id={`listing-${listing.id}`}
+      className="glass-card glass-card-hover rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between scroll-mt-24"
+    >
       <div>
         {/* Header & Badges */}
         <div className="p-5 pb-3">

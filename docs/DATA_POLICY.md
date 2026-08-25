@@ -2,7 +2,7 @@
 
 ## Objetivo
 Este documento define el proceso operativo del frontend para atender solicitudes de
-eliminacion o anonimización de datos personales en Alojamiento Solidario Colombia,
+eliminacion o anonimización de datos personales en Vecinos Héroes,
 en cumplimiento de Ley 1581 de 2012 y Decreto 1377 de 2013.
 
 ## Alcance
@@ -12,7 +12,10 @@ en cumplimiento de Ley 1581 de 2012 y Decreto 1377 de 2013.
   `infra-proyecto-colombia`.
 
 ## Canal de solicitud
-- Correo operativo: `pendiente-definir@alojamientosolidario.co`.
+- Correo operativo: `pendiente-definir@vecinosheroes.com` — **sigue siendo un
+  placeholder, en proceso de habilitación**. No existe buzon en el dominio todavia:
+  ver la seccion de correo en
+  `infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md`.
 - Hasta definir correo final, registrar solicitudes en issue privado con etiqueta
   `data-request` y fecha de recepcion.
 

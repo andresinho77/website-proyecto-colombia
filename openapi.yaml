@@ -11,8 +11,8 @@ servers:
   - url: https://api.vecinosheroes.com/api
     description: >-
       Production custom domain — PLANNED, does not resolve yet. Requires an
-      aws_apigatewayv2_domain_name in infra-proyecto-colombia plus the GoDaddy
-      CNAME; see infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md.
+      aws_apigatewayv2_domain_name in infra-proyecto-colombia plus the Porkbun
+      CNAME; see infra-proyecto-colombia/docs/DNS_PORKBUN_RUNBOOK.md.
   - url: http://localhost:4000/api
     description: LocalStack / Local Development Server
 paths:

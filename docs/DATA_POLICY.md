@@ -15,7 +15,7 @@ en cumplimiento de Ley 1581 de 2012 y Decreto 1377 de 2013.
 - Correo operativo: `pendiente-definir@vecinosheroes.com` — **sigue siendo un
   placeholder, en proceso de habilitación**. No existe buzon en el dominio todavia:
   ver la seccion de correo en
-  `infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md`.
+  `infra-proyecto-colombia/docs/DNS_PORKBUN_RUNBOOK.md`.
 - Hasta definir correo final, registrar solicitudes en issue privado con etiqueta
   `data-request` y fecha de recepcion.
 

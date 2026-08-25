@@ -142,7 +142,7 @@ NEXT_PUBLIC_API_URL="<the dev API Gateway endpoint>/api/listings" npm run build
 > Use the raw `*.execute-api.us-east-1.amazonaws.com` endpoint from
 > `terraform output api_gateway_endpoint`. The custom domain `dev-api.vecinosheroes.com`
 > is **planned and does not resolve** — see
-> `infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md`.
+> `infra-proyecto-colombia/docs/DNS_PORKBUN_RUNBOOK.md`.
 
 ---
 
@@ -178,8 +178,8 @@ NEXT_PUBLIC_API_URL="https://s1kxeu5lol.execute-api.us-east-1.amazonaws.com/api/
 > This is the **real** prod endpoint, and it is what `.env.production` already uses. The
 > custom domain `api.vecinosheroes.com` does not exist: `apigateway.tf` declares no
 > `aws_apigatewayv2_domain_name`. Do not substitute it here until that resource is
-> applied and its GoDaddy CNAME is published — see
-> `infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md`.
+> applied and its Porkbun CNAME is published — see
+> `infra-proyecto-colombia/docs/DNS_PORKBUN_RUNBOOK.md`.
 The bundle is written to `out/`, ready to sync to the S3 web bucket `proyecto-colombia-prod-web-hosting`.
 
 ---

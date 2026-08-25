@@ -1,4 +1,4 @@
-# Architecture Foundation — Alojamiento Solidario Colombia
+# Architecture Foundation — Vecinos Héroes
 
 > Living document produced by an Early-Stage Architecture Guardian pass
 > (`.claude/commands/architecture-guardian.md`), applied **retroactively**

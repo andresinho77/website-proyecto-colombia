@@ -8,7 +8,7 @@ import { normalizeSlug } from './locations';
  * prerender pass. In the browser we always prefer window.location.origin so
  * a link shared from a preview/local build points back at that same host.
  */
-const SITE_ORIGIN = 'https://alojamientosolidario.co';
+const SITE_ORIGIN = 'https://www.vecinosheroes.com';
 
 /**
  * Absolute, shareable deep link to a single listing: the city feed plus the

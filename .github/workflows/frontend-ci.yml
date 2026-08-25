@@ -19,7 +19,7 @@ env:
   # Endpoint usado cuando la repository variable aun no esta configurada.
   # Este job solo valida y sube un artefacto; quien publica en AWS es deploy.yml,
   # que resuelve el endpoint real del entorno (staging o prod) por su cuenta.
-  FALLBACK_API_URL: "https://api.alojamientosolidario.co/api/listings"
+  FALLBACK_API_URL: "https://api.vecinosheroes.com/api/listings"
 
 jobs:
   frontend-ci:

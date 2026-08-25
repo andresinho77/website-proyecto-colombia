@@ -236,3 +236,40 @@
 - Fix exactly the finding that was asked for, one at a time. When adjacent issues surface, report them
   with evidence and let the user schedule them — do not fold them into the current change.
 - Do not commit unless explicitly asked.
+
+## Decision Log — 2026-08-25 (domain rebrand to Vecinos Héroes)
+
+- The project is rebranding from `alojamientosolidario.co` to **`vecinosheroes.com`**.
+  `www.vecinosheroes.com` is the **single canonical hostname**. `vecinosheroes.com`,
+  `vecinosheroes.org` and `www.vecinosheroes.org` are all `301` redirects to it,
+  implemented as GoDaddy Forwarding rules.
+- **`.org` has zero AWS footprint** — no DNS records, no ACM certificate, no CloudFront
+  alias. If you ever find yourself adding an ACM validation record to the `.org` zone,
+  the design has been misread.
+- Chose single-canonical over two-domains-serving because it avoids splitting SEO across
+  identical content, and because it means `acm.tf` needs **no code change**: its existing
+  `domain_name` + `*.${domain_name}` is exactly the right certificate for one registrable
+  domain.
+- Brand prose in docs became "Vecinos Héroes". **UI strings and SEO metadata were
+  deliberately NOT changed** — `Navbar.tsx`, `Footer.tsx`, `layout.tsx`, `app/page.tsx`,
+  `app/[ciudad]/page.tsx`, `ShareModal.tsx`, `useContactReveal.ts`, `CityFeedPage.tsx`,
+  `terminos-y-privacidad/page.tsx` still say "Alojamiento Solidario Colombia". That is a
+  known follow-up, not an oversight.
+- Full DNS runbook lives at `infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md`.
+
+## Key Learnings — custom domains were never wired (2026-08-25)
+
+- `var.domain_name` in `infra-proyecto-colombia` feeds **exactly one** resource: the cert
+  request in `acm.tf`. CloudFront runs on `cloudfront_default_certificate` with no
+  `aliases`, so prod has always served from `dfngszk43c2ig.cloudfront.net`.
+- `api.alojamientosolidario.co` / `dev-api.*` in `openapi.yaml`, this README and
+  `frontend-ci.yml` were **dead references** — `apigateway.tf` declares no
+  `aws_apigatewayv2_domain_name`. The specs now point at the real
+  `s1kxeu5lol.execute-api.us-east-1.amazonaws.com` endpoint, with the custom domain
+  marked PLANNED. Do not "restore" the custom-domain URLs until that resource exists.
+- `fileUrl` in the API spec is built from `CDN_DOMAIN`, which `lambda.tf` sets from the
+  distribution's own `*.cloudfront.net` attribute — it does **not** follow a CloudFront
+  alias. Media URLs stay unbranded until `lambda.tf` passes the alias explicitly.
+- There is **no dev CloudFront distribution**: `dev.tfvars` sets `use_localstack = true`,
+  which zeroes out `count` on CloudFront, API Gateway and S3. A `dev.*` DNS record would
+  point at nothing.

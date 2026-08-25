@@ -1,15 +1,18 @@
 openapi: 3.0.3
 info:
-  title: Alojamiento Solidario Colombia — API Specification
+  title: Vecinos Héroes — API Specification
   version: 1.0.0
   description: >-
-    OpenAPI Specification (OAS 3.0.3) for Alojamiento Solidario Colombia serverless APIs,
+    OpenAPI Specification (OAS 3.0.3) for Vecinos Héroes serverless APIs,
     serviced via AWS HTTP API Gateway v2, AWS Lambda, DynamoDB, and Amazon S3.
 servers:
-  - url: https://api.alojamientosolidario.co/api
-    description: Production Environment (AWS CloudFront CDN + API Gateway)
-  - url: https://dev-api.alojamientosolidario.co/api
-    description: Development Sandbox Environment
+  - url: https://s1kxeu5lol.execute-api.us-east-1.amazonaws.com/api
+    description: Production Environment (AWS HTTP API Gateway v2)
+  - url: https://api.vecinosheroes.com/api
+    description: >-
+      Production custom domain — PLANNED, does not resolve yet. Requires an
+      aws_apigatewayv2_domain_name in infra-proyecto-colombia plus the GoDaddy
+      CNAME; see infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md.
   - url: http://localhost:4000/api
     description: LocalStack / Local Development Server
 paths:
@@ -660,8 +663,13 @@ components:
         fileUrl:
           type: string
           format: uri
-          description: Public CDN URL through which the uploaded image will be delivered
-          example: "https://api.alojamientosolidario.co/listings/7e96c311_1786905783255.jpg"
+          description: >-
+            Public CDN URL through which the uploaded image will be delivered.
+            Built as `https://${CDN_DOMAIN}/${fileKey}`, where CDN_DOMAIN is the
+            CloudFront distribution's own domain name (see lambda.tf). It becomes
+            `www.vecinosheroes.com` only once CloudFront carries the alias AND
+            lambda.tf is changed to pass the alias instead of the distribution name.
+          example: "https://dfngszk43c2ig.cloudfront.net/listings/7e96c311_1786905783255.jpg"
 
     ContactListingRequest:
       type: object

@@ -1,6 +1,6 @@
-# Alojamiento Solidario Colombia — Website Repository 🇨🇴⚡
+# Vecinos Héroes — Website Repository 🇨🇴⚡
 
-React / Next.js 14 Web Application for **Alojamiento Solidario Colombia** (`website-proyecto-colombia`). Designed for survivors, volunteers, and citizens following the August 10, 2026 earthquake in Colombia (affecting Chocó, Pereira, Cali, Quibdó, Manizales, and Armenia).
+React / Next.js 14 Web Application for **Vecinos Héroes** (`website-proyecto-colombia`). Designed for survivors, volunteers, and citizens following the August 10, 2026 earthquake in Colombia (affecting Chocó, Pereira, Cali, Quibdó, Manizales, and Armenia).
 
 For product direction, architecture, and epic progress check the [ROADMAP](/ROADMAP.md).
 
@@ -135,8 +135,14 @@ Open **`http://localhost:3000`** (or `http://localhost:3001`).
 
 #### Step 3: Build a Static Bundle Against It
 ```bash
-NEXT_PUBLIC_API_URL="https://dev-api.alojamientosolidario.co/api/listings" npm run build
+NEXT_PUBLIC_API_URL="<the dev API Gateway endpoint>/api/listings" npm run build
 ```
+
+> [!NOTE]
+> Use the raw `*.execute-api.us-east-1.amazonaws.com` endpoint from
+> `terraform output api_gateway_endpoint`. The custom domain `dev-api.vecinosheroes.com`
+> is **planned and does not resolve** — see
+> `infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md`.
 
 ---
 
@@ -162,11 +168,18 @@ The bundle is written to `out/`, ready to sync to `proyecto-colombia-staging-web
 
 ### 4. PROD Environment (AWS Production)
 
-To compile the production static bundle targeting **PROD** (`alojamientosolidario.co`):
+To compile the production static bundle targeting **PROD** (`www.vecinosheroes.com`):
 
 ```bash
-NEXT_PUBLIC_API_URL="https://api.alojamientosolidario.co/api/listings" npm run build
+NEXT_PUBLIC_API_URL="https://s1kxeu5lol.execute-api.us-east-1.amazonaws.com/api/listings" npm run build
 ```
+
+> [!IMPORTANT]
+> This is the **real** prod endpoint, and it is what `.env.production` already uses. The
+> custom domain `api.vecinosheroes.com` does not exist: `apigateway.tf` declares no
+> `aws_apigatewayv2_domain_name`. Do not substitute it here until that resource is
+> applied and its GoDaddy CNAME is published — see
+> `infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md`.
 The bundle is written to `out/`, ready to sync to the S3 web bucket `proyecto-colombia-prod-web-hosting`.
 
 ---

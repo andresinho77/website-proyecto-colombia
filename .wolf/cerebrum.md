@@ -242,7 +242,7 @@
 - The project is rebranding from `alojamientosolidario.co` to **`vecinosheroes.com`**.
   `www.vecinosheroes.com` is the **single canonical hostname**. `vecinosheroes.com`,
   `vecinosheroes.org` and `www.vecinosheroes.org` are all `301` redirects to it,
-  implemented as GoDaddy Forwarding rules.
+  implemented as Porkbun Forwarding rules.
 - **`.org` has zero AWS footprint** — no DNS records, no ACM certificate, no CloudFront
   alias. If you ever find yourself adding an ACM validation record to the `.org` zone,
   the design has been misread.
@@ -255,7 +255,7 @@
   `app/[ciudad]/page.tsx`, `ShareModal.tsx`, `useContactReveal.ts`, `CityFeedPage.tsx`,
   `terminos-y-privacidad/page.tsx` still say "Alojamiento Solidario Colombia". That is a
   known follow-up, not an oversight.
-- Full DNS runbook lives at `infra-proyecto-colombia/docs/DNS_GODADDY_RUNBOOK.md`.
+- Full DNS runbook lives at `infra-proyecto-colombia/docs/DNS_PORKBUN_RUNBOOK.md`.
 
 ## Key Learnings — custom domains were never wired (2026-08-25)
 

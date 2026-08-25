@@ -76,7 +76,7 @@ export default function TerminosYPrivacidadPage() {
                   2. Qué Datos Recolectamos y Para Qué
                 </h2>
                 <p>
-                  Al publicar, recolectamos únicamente: número de <strong>Celular/WhatsApp</strong>, <strong>Ciudad</strong>, <strong>Barrio/Sector</strong>, cantidad de personas, fechas de disponibilidad, precio (si aplica), la descripción que escribas y, si decides adjuntarlas, fotos del espacio. No solicitamos ni almacenamos tu nombre, documento de identidad ni dirección exacta. Estos datos se tratan con la <strong>única y exclusiva finalidad</strong> de facilitar la comunicación directa, voluntaria y sin intermediarios entre ciudadanos que ofrecen espacio disponible y personas afectadas por el desastre natural del 10 de agosto de 2026, a través de un enlace directo a WhatsApp (`wa.me`).
+                  Al publicar, recolectamos únicamente: número de <strong>Celular/WhatsApp</strong>, <strong>Correo electrónico</strong>, <strong>Ciudad</strong>, <strong>Barrio/Sector</strong>, cantidad de personas, fechas de disponibilidad, precio (si aplica), la descripción que escribas y, si decides adjuntarlas, fotos del espacio. No solicitamos ni almacenamos tu nombre, documento de identidad ni dirección exacta. El correo electrónico se usa <strong>únicamente</strong> para avisarte, a los 30 días de inactividad, que confirmes si tu publicación sigue vigente (ver sección 3) — nunca se muestra en el feed público ni se comparte con nadie. Estos datos se tratan con la <strong>única y exclusiva finalidad</strong> de facilitar la comunicación directa, voluntaria y sin intermediarios entre ciudadanos que ofrecen espacio disponible y personas afectadas por el desastre natural del 10 de agosto de 2026, a través de un enlace directo a WhatsApp (`wa.me`).
                 </p>
               </section>
 
@@ -85,7 +85,10 @@ export default function TerminosYPrivacidadPage() {
                   3. Tiempo de Conservación (Retención)
                 </h2>
                 <p>
-                  Vencimiento funcional a los <strong>15 días</strong> de inactividad; los datos de contacto y la descripción se <strong>anonimizan a los 30 días</strong> de que la publicación quede resuelta o vencida; y se <strong>eliminan por completo a los 90 días</strong>, salvo obligación legal de conservarlos.
+                  Si marcas tu publicación como <strong>&ldquo;Resuelta&rdquo;</strong> o la elimina un moderador, tus datos de contacto (celular, correo, descripción) se <strong>anonimizan de inmediato</strong>, en el mismo momento del cambio — no esperamos ningún plazo adicional. El registro se elimina por completo <strong>90 días</strong> después, como ventana de auditoría.
+                </p>
+                <p>
+                  Si tu publicación sigue <strong>activa</strong> sin que nadie la marque como resuelta, a los <strong>30 días</strong> sin confirmación te enviamos un correo pidiéndote confirmar si aún la necesitas o la tienes disponible, con un enlace de un clic. Si no respondes, a los <strong>60 días</strong> la publicación y tus datos se <strong>eliminan por completo</strong> — sin un anonimizado intermedio, ya que a esa altura ya intentamos contactarte y no obtuvimos respuesta.
                 </p>
               </section>
 
@@ -95,8 +98,8 @@ export default function TerminosYPrivacidadPage() {
                 </h2>
                 <p>
                   Todo titular de los datos tiene derecho a conocer, actualizar, rectificar y solicitar la supresión de su información. La vía inmediata es marcar la publicación como &ldquo;Resuelta&rdquo; con el PIN de 4 dígitos generado al publicar, lo que la retira del feed público al instante. Para solicitudes formales (por ejemplo, si perdiste el PIN), escribe a{' '}
-                  <a href="mailto:pendiente-definir@alojamientosolidario.co" className="text-emerald-700 underline">
-                    pendiente-definir@alojamientosolidario.co
+                  <a href="mailto:pendiente-definir@vecinosheroes.com" className="text-emerald-700 underline">
+                    pendiente-definir@vecinosheroes.com
                   </a>{' '}
                   — canal oficial de solicitudes de datos personales, en proceso de habilitación. Confirmamos la recepción en máximo 24 horas y resolvemos en máximo 5 días hábiles.
                 </p>

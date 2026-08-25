@@ -18,6 +18,8 @@ export interface Listing {
   precio: number;
   descripcion: string;
   whatsapp: string;
+  /** US-7.3: solo usado para el aviso de renovacion a los 30 dias de inactividad — nunca se expone en el feed publico. */
+  email: string;
   imagenes?: string[];
   pin?: string;
   creadoEn: number;
@@ -62,6 +64,8 @@ export interface CreateListingInput {
   precio: number;
   descripcion: string;
   whatsapp: string;
+  /** US-7.3: requerido — el backend lo necesita para el aviso de renovacion. */
+  email: string;
   imagenes: string[];
   habeasData: boolean;
   b_hp_fax?: string; // Honeypot field

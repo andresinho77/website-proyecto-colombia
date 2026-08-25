@@ -50,6 +50,7 @@ const MOCK_LISTINGS: Listing[] = [
     precio: 0,
     descripcion: 'Habitación amplia amoblada disponible con 2 camas dobles. Agua potable, luz y baño privado. Aceptamos familias con niños y mascotas.',
     whatsapp: '+573105550123',
+    email: "autor@example.com",
     imagenes: [
       'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80'
     ],
@@ -73,6 +74,7 @@ const MOCK_LISTINGS: Listing[] = [
     precio: 0,
     descripcion: 'Familia damnificada por la emergencia (2 adultos y 1 bebé de 8 meses). Requerimos espacio temporal seguro en Pereira o barrios cercanos.',
     whatsapp: '+573205559876',
+    email: "autor@example.com",
     imagenes: [],
     pin: '5678',
     creadoEn: Date.now() - 3600000 * 5,
@@ -94,6 +96,7 @@ const MOCK_LISTINGS: Listing[] = [
     precio: 0,
     descripcion: 'Ofrezco apartamento independiente para 2 personas. WiFi, cocina con estufa a gas y reserva de agua. Contacto rápido por WhatsApp.',
     whatsapp: '+573155554321',
+    email: "autor@example.com",
     imagenes: [
       'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80'
     ],
@@ -117,6 +120,7 @@ const MOCK_LISTINGS: Listing[] = [
     precio: 0,
     descripcion: 'Bodega cubierta apta como albergue temporal para familias o acopio de donaciones. Baño comunitario y energía eléctrica activa.',
     whatsapp: '+573185557788',
+    email: "autor@example.com",
     imagenes: [],
     pin: '7777',
     creadoEn: Date.now() - 3600000 * 18,
@@ -233,6 +237,7 @@ export const createListing = async (input: CreateListingInput): Promise<{ succes
       precio: Number(input.precio) || 0,
       descripcion: input.descripcion,
       whatsapp: input.whatsapp,
+      email: input.email,
       imagenes: input.imagenes || [],
       pin: String(Math.floor(1000 + Math.random() * 9000)),
       creadoEn: Date.now(),
@@ -422,6 +427,29 @@ export const resolveListing = async (id: string, pin: string): Promise<{ success
       return { success: false, error: 'PIN incorrecto.' };
     }
     item.estado = 'resuelto';
+    return { success: true };
+  }
+};
+
+// US-7.3: confirms a still-`activo` listing is still real, resetting the
+// 30-day-nudge/60-day-delete retention clock. Same no-login trust model as
+// `resolveListing` (PIN check), called from app/renovar/[id]/page.tsx.
+export const renewListing = async (id: string, pin: string): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/${id}/renew`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pin }),
+    });
+    const data = await res.json();
+    if (!res.ok) return { success: false, error: data.error };
+    return { success: true };
+  } catch (err) {
+    const item = MOCK_LISTINGS.find((i) => i.id === id);
+    if (!item) return { success: false, error: 'Publicación no encontrada.' };
+    if (!item.pin || item.pin !== pin) {
+      return { success: false, error: 'PIN incorrecto.' };
+    }
     return { success: true };
   }
 };

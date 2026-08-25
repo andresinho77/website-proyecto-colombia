@@ -875,22 +875,34 @@ Estado de cobertura actual: [✅] totalmente cubierto, [🟡] parcialmente cubie
 - [✅] **US-7.2**: Como administrador, tengo un proceso documentado (`docs/DATA_POLICY.md`)
   para atender solicitudes de eliminación de datos personales, incluyendo un
   canal de contacto (correo o formulario) y un tiempo de respuesta comprometido.
-- [⬜] **US-7.3**: Como sistema, las publicaciones con `estado = eliminado` o
-  vencidas (ver retención abajo) deben purgarse o anonimizarse de forma
-  efectiva en la base de datos, no solo ocultarse del feed — esto debe
-  coordinarse con el repo de infraestructura como un job programado (p. ej.
-  Lambda con EventBridge) o un proceso documentado que el arquitecto ejecute.
+- [✅] **US-7.3**: Como sistema, las publicaciones resueltas/eliminadas o
+  vencidas se purgan/anonimizan de forma efectiva en la base de datos, no
+  solo se ocultan del feed. Implementado como barrido diario (Lambda +
+  EventBridge Scheduler, `infra-proyecto-colombia/retention.tf`) sobre la
+  logica en `backend-proyecto-colombia/src/services/retention.service.ts`.
+  El modelo final se revisó y difiere del propuesto originalmente abajo
+  (ver "Política de retención" actualizada) — la versión anterior (15 días
+  de vencimiento duro) se consideró demasiado estricta para alguien
+  buscando alojamiento activamente.
 - [✅] **US-7.4**: Como usuario, debo marcar explícitamente una casilla de
   aceptación de la política de datos antes de poder enviar cualquier
   formulario ("Tengo" o "Necesito").
 
-**Política de retención propuesta (a validar con el arquitecto):**
-- Publicaciones activas: se auto-marcan como vencidas a los 15 días de
-  inactividad.
-- Datos de publicaciones vencidas/resueltas: anonimizar (remover WhatsApp y
-  descripción) a los 30 días; eliminar el registro completo a los 90 días,
-  salvo que exista una obligación legal de conservarlo por más tiempo.
-- Solicitudes de eliminación manual: procesar en un máximo de 5 días hábiles.
+**Política de retención (US-7.3, implementada — ver `docs/DATA_POLICY.md` para el detalle operativo):**
+- Resuelta o eliminada (autor vía PIN, o moderador): datos personales
+  (WhatsApp, descripción, correo) se anonimizan **de inmediato**, en el
+  momento del cambio de estado. El registro se elimina 90 días después,
+  como ventana de auditoría.
+- Activa sin confirmar: a los 30 días se envía un correo de aviso con
+  enlace de renovación de un clic (`POST /listings/{id}/renew`, PIN); sin
+  respuesta, a los 60 días se elimina de inmediato (sin anonimizado
+  intermedio).
+- Reportada queda fuera del ciclo — solo entra si se resuelve a
+  resuelto/eliminado.
+- Esto requirió agregar `email` como campo **requerido** al publicar — una
+  excepción deliberada y acotada al principio de "publicar sin fricción,
+  sin login" (ver US-6.5 abajo), necesaria para que el aviso de renovación
+  tenga a dónde llegar.
 
 ### Épica 8 — Despliegue y CI/CD (frontend)
 - [✅] **US-8.1**: Como mantenedor, cada push y PR a `main`/`dev` ejecuta en GitHub

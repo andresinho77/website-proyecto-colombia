@@ -70,6 +70,10 @@ export const PublishModal: React.FC<PublishModalProps> = ({
   const [precio, setPrecio] = useState(0);
   const [descripcion, setDescripcion] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
+  // US-7.3: requerido — el backend lo usa para el aviso de renovacion a los
+  // 30 dias de inactividad (excepcion deliberada y acotada al principio de
+  // "publicar sin friccion", ver docs/DATA_POLICY.md).
+  const [email, setEmail] = useState('');
   const [imagenes, setImagenes] = useState<string[]>([]);
   const [habeasData, setHabeasData] = useState(true);
   const [honeypot, setHoneypot] = useState(''); // Anti-bot trap
@@ -99,6 +103,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
     setPrecio(0);
     setDescripcion('');
     setWhatsapp('');
+    setEmail('');
     setImagenes([]);
     setHabeasData(true);
     setHoneypot('');
@@ -156,6 +161,10 @@ export const PublishModal: React.FC<PublishModalProps> = ({
       setFormError('Ingrese un celular colombiano válido de 10 dígitos (Ej: +573105550123).');
       return;
     }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setFormError('Ingrese un correo electrónico válido.');
+      return;
+    }
     if (!habeasData) {
       setFormError('Debe aceptar el Tratamiento de Datos Personales (Ley 1581 de 2012).');
       return;
@@ -177,6 +186,7 @@ export const PublishModal: React.FC<PublishModalProps> = ({
       precio: isGratis ? 0 : Number(precio) || 0,
       descripcion: descripcion.trim(),
       whatsapp,
+      email: email.trim(),
       imagenes,
       habeasData,
       b_hp_fax: honeypot, // Honeypot field
@@ -428,6 +438,28 @@ export const PublishModal: React.FC<PublishModalProps> = ({
             </div>
             <p className="text-[11px] text-slate-400 mt-1">
               Formato celular colombiano (10 dígitos). El contacto ocurrirá directo por WhatsApp.
+            </p>
+          </div>
+
+          {/* US-7.3: correo requerido para el aviso de renovacion */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">
+              Correo electrónico *
+            </label>
+            <input
+              // Sin `type="email"`: dejaria que la validacion nativa del
+              // navegador bloquee el submit antes de que corra la propia
+              // (mismo patron que el campo de WhatsApp, `type="tel"`, cuyo
+              // formato tambien se valida solo en JS mas abajo).
+              type="text"
+              required
+              placeholder="tucorreo@ejemplo.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 text-slate-100 rounded-xl px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none placeholder-slate-500"
+            />
+            <p className="text-[11px] text-slate-400 mt-1">
+              Solo lo usamos para avisarte, a los 30 días, que confirmes si tu publicación sigue vigente.
             </p>
           </div>
 
